@@ -1,0 +1,29 @@
+# Conda env for `reproduce.sh` / Binder / Docker. Channels: conda-forge for breadth of packages.
+name: DCEGM_Search_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9.0
+  - econ-ark==0.13.0
+  - numpy==1.23
+  - matplotlib==3.6
+  - seaborn==0.12
+  - pandas==1.5
+  - requests
+  - numba
+  - scipy
+  - statsmodels==0.14.3
+  - scikit-learn
+  - pandas-datareader
+  - openpyxl
+  - dill
+  - jupyter
+  - nbconvert
+  - ipykernel
+  - pip
+  - pip:
+      - sequence-jacobian
+      - pyscbwrapper
+      - pyjstat
+      - yellowbrick==1.5

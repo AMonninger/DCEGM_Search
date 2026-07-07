@@ -1,0 +1,15 @@
+##############################################################################
+### Protocol for project DCEGM_Search
+##############################################################################
+
+Day 7/7/2026:
+- Created environment.yml
+- Updated code to econ-ark version 0.13.0
+- Created Figures.ipynb
+
+To do:
+- Understand code from Sujaat
+- Version with large number of shock grid points
+- Version with Transitionmatrix income shocks
+- play around with jax and autodiff
+- Example 2: durable vs non-durable
