@@ -7,9 +7,14 @@ Day 7/7/2026:
 - Updated code to econ-ark version 0.13.0
 - Created Figures.ipynb
 
-To do:
-- Understand code from Sujaat
-- Version with large number of shock grid points
+Day 7/9/2026
 - Version with Transitionmatrix income shocks
+- Created Figures_IncomeDiscMethod.ipynb to compare shock points and Transitionmethod as smoothness
+
+
+To do:
+- Understand code from Sujaat and argument of figures and paper
+- Combine Transitionmatrix and Search
+- Add Transitionmatrix version which includes TasteShock (instead of discretizing tasteshock with many points)
 - play around with jax and autodiff
 - Example 2: durable vs non-durable

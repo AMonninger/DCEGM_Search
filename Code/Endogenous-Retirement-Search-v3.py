@@ -43,9 +43,10 @@ from HARK.ConsumptionSaving.ConsIndShockModel import ConsumerSolution
 from HARK.interpolation import LinearInterp
 from  HARK.rewards import CRRAutility, CRRAutility_inv, CRRAutilityP, CRRAutilityP_inv
 from HARK.distribution import MeanOneLogNormal
-from HARK.utilities import construct_assets_grid
+from HARK.utilities import construct_assets_grid, make_grid_exp_mult
 # from HARK.simulation import drawMeanOneLognormal
 from math import sqrt
+import scipy.stats as sp_stats
 
 
 # might as well alias them utility, as we need CRRA
@@ -442,12 +443,45 @@ class ChoiceSpecificSolution(Solution):
         self.V_TFunc = V_TFunc
 
 class RetiringDeaton(IndShockConsumerType):
+    # Income integration method: "Discretize" (default) or "TransitionMethod"
+    IncomeDiscMethod = "Discretize"
+    bGridMin = 0.0
+    bGridMax = 48.0
+    bGridCount = 300
+    mGridMin = 1e-4
+    mGridMax = 52.0
+    mGridCount = 310
+    IncUnemp_Std = 0.1
+
     def __init__(self, **kwds):
 
         IndShockConsumerType.__init__(self, **kwds)
 
+        # Ensure income-integration attributes exist on the instance for HARK's solver
+        for attr, default in (
+            ('IncomeDiscMethod', RetiringDeaton.IncomeDiscMethod),
+            ('bGridMin', RetiringDeaton.bGridMin),
+            ('bGridMax', RetiringDeaton.bGridMax),
+            ('bGridCount', RetiringDeaton.bGridCount),
+            ('mGridMin', RetiringDeaton.mGridMin),
+            ('mGridMax', RetiringDeaton.mGridMax),
+            ('mGridCount', RetiringDeaton.mGridCount),
+            ('IncUnemp_Std', RetiringDeaton.IncUnemp_Std),
+        ):
+            if attr not in self.__dict__:
+                setattr(self, attr, default)
+        if 'income_bGrid' not in self.__dict__:
+            self.income_bGrid = None
+        if 'income_mGrid' not in self.__dict__:
+            self.income_mGrid = None
+        if 'incomeTranMatrix' not in self.__dict__:
+            self.incomeTranMatrix = [None] * self.T_cycle
+
         self.time_inv = ['aXtraGrid', 'mGrid', 'EGMVector', 'par', 'Util', 'UtilP',
-                         'UtilP_inv', 'saveCommon']
+                         'UtilP_inv', 'saveCommon', 'IncomeDiscMethod', 'income_bGrid',
+                         'income_mGrid']
+
+        self.time_vary = self.time_vary + ['incomeTranMatrix']
 
         self.par = RetiringDeatonParameters(self.DiscFac, self.CRRA, self.DisUtil, self.Rfree, self.YRet, self.YWork, self.sigma_s, self.sigma_t, self.sigma_xi, self.prob_opt, self.TasteShkCount, self.smoothtype)
         # d == 2 is working
@@ -460,7 +494,39 @@ class RetiringDeaton(IndShockConsumerType):
 
     def pre_solve(self):
         super().pre_solve()
+        self._setup_income_integration()
         self.updateLast()
+
+    def _setup_income_integration(self):
+        """Build dense b/m grids and transition matrices when using TransitionMethod."""
+        if self.IncomeDiscMethod != "TransitionMethod":
+            self.income_bGrid = None
+            self.income_mGrid = None
+            self.incomeTranMatrix = [None] * self.T_cycle
+            return
+
+        bGrid = make_grid_exp_mult(self.bGridMin, self.bGridMax, self.bGridCount, timestonest=1)
+        mGrid = make_grid_exp_mult(self.mGridMin, self.mGridMax, self.mGridCount, timestonest=1)
+        b_offset = self.Rfree * self.aXtraGrid[0]
+        m_offset = self.YWork + b_offset
+        self.income_bGrid = bGrid + b_offset
+        self.income_mGrid = mGrid + m_offset
+
+        self.incomeTranMatrix = []
+        for t in range(self.T_cycle):
+            tran_std = self.TranShkStd[t]
+            unemp_prb = self.UnempPrb[t] if hasattr(self.UnempPrb, '__getitem__') else self.UnempPrb
+            inc_unemp = self.IncUnemp[t] if hasattr(self.IncUnemp, '__getitem__') else self.IncUnemp
+            if unemp_prb > 0.0:
+                probGrid = updateBM_TranMatrix_withUnemp(
+                    tran_std, unemp_prb, inc_unemp, self.IncUnemp_Std,
+                    self.income_bGrid, self.income_mGrid, YWork=self.YWork,
+                )
+            else:
+                probGrid = updateBM_TranMatrix(
+                    tran_std, self.income_bGrid, self.income_mGrid, YWork=self.YWork,
+                )
+            self.incomeTranMatrix.append(probGrid)
 
     def updateLast(self):
         """
@@ -511,7 +577,7 @@ class RetiringDeaton(IndShockConsumerType):
 
 # +
 # Functions used to solve each period
-def solveRetiringDeaton(solution_next, LivPrb, PermGroFac, IncShkDstn, PermShkDstn, TranShkDstn, aXtraGrid, mGrid, EGMVector, par, Util, UtilP, UtilP_inv, saveCommon):
+def solveRetiringDeaton(solution_next, LivPrb, PermGroFac, IncShkDstn, PermShkDstn, TranShkDstn, aXtraGrid, mGrid, EGMVector, par, Util, UtilP, UtilP_inv, saveCommon, IncomeDiscMethod, income_bGrid, income_mGrid, incomeTranMatrix):
     """
     Solves a period of problem defined by the RetiringDeaton AgentType. It uses
     DCEGM to solve the mixed choice problem.
@@ -525,7 +591,12 @@ def solveRetiringDeaton(solution_next, LivPrb, PermGroFac, IncShkDstn, PermShkDs
     """
     TasteShkDstn = MeanOneLogNormal(sigma=par.sigma_xi).discretize(par.TasteShkCount)
     rs = solveRetiredDeaton(solution_next, aXtraGrid, EGMVector, par, Util, UtilP, UtilP_inv)
-    ws = solveWorkingDeaton(solution_next, aXtraGrid, mGrid, EGMVector, par, Util, UtilP, UtilP_inv, TranShkDstn.atoms[0], TranShkDstn.pmv, TasteShkDstn.atoms[0], TasteShkDstn.pmv)
+    ws = solveWorkingDeaton(
+        solution_next, aXtraGrid, mGrid, EGMVector, par, Util, UtilP, UtilP_inv,
+        TranShkDstn.atoms[0], TranShkDstn.pmv, TasteShkDstn.atoms[0], TasteShkDstn.pmv,
+        IncomeDiscMethod=IncomeDiscMethod, income_bGrid=income_bGrid, income_mGrid=income_mGrid,
+        incomeTranMatrix=incomeTranMatrix,
+    )
 
     C, V_T, P = calcExtraSaves(saveCommon, rs, ws, par, mGrid, TasteShkDstn.atoms[0], TasteShkDstn.pmv)
 
@@ -594,7 +665,80 @@ def solveRetiredDeaton(solution_next, aXtraGrid, EGMVector, par, Util, UtilP, Ut
 
 
 
-def solveWorkingDeaton(solution_next, aXtraGrid, mGrid, EGMVector, par, Util, UtilP, UtilP_inv, TranInc, TranIncWeights, TasteShk, TasteShkWeights):
+def updateBM_TranMatrix(TranShkStd, bGrid, mGrid, YWork=1.0):
+    """
+    Transition matrix from b-grid to m-grid for mean-one lognormal transitory shocks.
+    Rows index b, columns index m; each row sums to one.
+    """
+    s = TranShkStd
+    mu = -0.5 * s**2
+    lognorm_dist = sp_stats.lognorm(s, scale=numpy.exp(mu))
+    b, m = numpy.meshgrid(bGrid, mGrid, indexing='ij')
+    tran_shock = (m - b) / YWork
+    probGrid = lognorm_dist.pdf(tran_shock) / YWork
+    for i_b in range(len(bGrid)):
+        row_sum = numpy.sum(probGrid[i_b])
+        probGrid[i_b] = probGrid[i_b] / numpy.max([row_sum, 1e-6])
+    return probGrid
+
+
+def updateBM_TranMatrix_withUnemp(TranShkStd, UnempPrb, IncUnemp, IncUnemp_Std, bGrid, mGrid, YWork=1.0):
+    """
+    Transition matrix allowing unemployment via a continuous mixture PDF (no point mass).
+    """
+    mu_transformed = (1.0 - UnempPrb * IncUnemp) / (1.0 - UnempPrb)
+    s_emp = TranShkStd
+    mu_emp = numpy.log(mu_transformed) - 0.5 * s_emp**2
+    s_unemp = IncUnemp_Std
+    mu_unemp = numpy.log(IncUnemp) - 0.5 * s_unemp**2
+    lognorm_dist_emp = sp_stats.lognorm(s=s_emp, scale=numpy.exp(mu_emp))
+    lognorm_dist_unemp = sp_stats.lognorm(s=s_unemp, scale=numpy.exp(mu_unemp))
+
+    def mixture_pdf(tran_shock):
+        return ((1.0 - UnempPrb) * lognorm_dist_emp.pdf(tran_shock)
+                + UnempPrb * lognorm_dist_unemp.pdf(tran_shock))
+
+    b, m = numpy.meshgrid(bGrid, mGrid, indexing='ij')
+    tran_shock = (m - b) / YWork
+    probGrid = mixture_pdf(tran_shock) / YWork
+    for i_b in range(len(bGrid)):
+        row_sum = numpy.sum(probGrid[i_b])
+        probGrid[i_b] = probGrid[i_b] / numpy.max([row_sum, 1e-6])
+    return probGrid
+
+
+def _integrate_via_transition(values_on_m, probGrid, income_bGrid, aXtraGrid, Rfree):
+    """Apply b->m transition matrix, then interpolate onto b=Rfree*a."""
+    values_on_b = probGrid @ values_on_m.reshape(-1, 1)
+    values_on_b = values_on_b.flatten()
+    b_at_a = Rfree * aXtraGrid
+    return numpy.interp(b_at_a, income_bGrid, values_on_b)
+
+
+def _finish_solveWorkingDeaton(EGMVector, aXtraGrid, mGrid, par, Util, UtilP, UtilP_inv,
+                               EV_tp1, cost_t, EUtilP_tp1):
+    """Common EGM and envelope step for solveWorkingDeaton."""
+    choice = 2
+    m_t, C_t, Ev, cost_t_cons = calcEGMStep(
+        EGMVector, aXtraGrid, EV_tp1, cost_t, EUtilP_tp1, par, Util, UtilP, UtilP_inv, choice,
+    )
+    V_T = numpy.divide(-1.0, Util(C_t, choice) - cost_t_cons + par.DiscFac * Ev)
+    m_t, C_t, V_T = calcMultilineEnvelope(m_t, C_t, V_T, mGrid)
+    CFunc = LinearInterp(m_t, C_t, lower_extrap=True)
+    V_TFunc = LinearInterp(m_t, V_T, lower_extrap=True)
+    return ChoiceSpecificSolution(m_t, C_t, CFunc, V_T, V_TFunc)
+
+
+def solveWorkingDeaton(solution_next, aXtraGrid, mGrid, EGMVector, par, Util, UtilP, UtilP_inv,
+                       TranInc, TranIncWeights, TasteShk, TasteShkWeights,
+                       IncomeDiscMethod="Discretize", income_bGrid=None, income_mGrid=None,
+                       incomeTranMatrix=None):
+    if IncomeDiscMethod == "TransitionMethod":
+        return _solveWorkingDeaton_transition(
+            solution_next, aXtraGrid, mGrid, EGMVector, par, Util, UtilP, UtilP_inv,
+            TasteShk, TasteShkWeights, income_bGrid, income_mGrid, incomeTranMatrix,
+        )
+
     choice = 2
 
     choiceCount = len(solution_next.ChoiceSols)
@@ -686,23 +830,82 @@ def solveWorkingDeaton(solution_next, aXtraGrid, mGrid, EGMVector, par, Util, Ut
                 
     EUtilP_tp1 = RHS
     EV_tp1 = P1*gothV1 + P2*gothV2
-        
-    # EGM step
-    m_t, C_t, Ev, cost_t_cons = calcEGMStep(EGMVector, aXtraGrid, EV_tp1, cost_t, EUtilP_tp1, par, Util, UtilP, UtilP_inv, choice)
 
-    V_T = numpy.divide(-1.0, Util(C_t, choice) - cost_t_cons + par.DiscFac*Ev)
-    
-    # We do the envelope step in transformed value space for accuracy. The values
-    # keep their monotonicity under our transformation.
-    m_t, C_t, V_T = calcMultilineEnvelope(m_t, C_t, V_T, mGrid)
-    
-    # The solution is the working specific consumption function and value function
-    # specifying lower_extrap=True for C is easier than explicitly adding a 0,
-    # as it'll be linear in the constrained interval anyway.
-    CFunc = LinearInterp(m_t, C_t, lower_extrap=True)
-    V_TFunc = LinearInterp(m_t, V_T, lower_extrap=True)
+    return _finish_solveWorkingDeaton(
+        EGMVector, aXtraGrid, mGrid, par, Util, UtilP, UtilP_inv, EV_tp1, cost_t, EUtilP_tp1,
+    )
 
-    return ChoiceSpecificSolution(m_t, C_t, CFunc, V_T, V_TFunc)
+
+def _solveWorkingDeaton_transition(solution_next, aXtraGrid, mGrid, EGMVector, par, Util, UtilP,
+                                   UtilP_inv, TasteShk, TasteShkWeights, income_bGrid,
+                                   income_mGrid, probGrid):
+    """Working-period solver using Matt White's transition-matrix integration."""
+    choiceCount = len(solution_next.ChoiceSols)
+    income_mGrid = numpy.asarray(income_mGrid)
+    income_bGrid = numpy.asarray(income_bGrid)
+
+    CFunc_R = solution_next.ChoiceSols[0].CFunc
+    CFunc_W = solution_next.ChoiceSols[1].CFunc
+    V_TFunc_R = solution_next.ChoiceSols[0].V_TFunc
+    V_TFunc_W = solution_next.ChoiceSols[1].V_TFunc
+
+    if par.TasteShkCount == 1:
+        C_R_m = CFunc_R(income_mGrid)
+        C_W_m = CFunc_W(income_mGrid)
+        V_R_m = numpy.divide(-1.0, V_TFunc_R(income_mGrid))
+        V_W_m = numpy.divide(-1.0, V_TFunc_W(income_mGrid))
+        V_RW_m, inds_m = calcLogSumChoiceProbs(
+            numpy.stack((V_R_m, V_W_m)), 0.0, smoothtype='type1',
+        )
+        ind0_m = inds_m[0]
+        ind1_m = inds_m[1]
+        UtilP_mixed_m = ind0_m * UtilP(C_R_m, 1) + ind1_m * UtilP(C_W_m, 2)
+
+        gothV1 = _integrate_via_transition(V_RW_m, probGrid, income_bGrid, aXtraGrid, par.Rfree)
+        gothV2 = _integrate_via_transition(V_W_m, probGrid, income_bGrid, aXtraGrid, par.Rfree)
+        RHS1 = _integrate_via_transition(UtilP_mixed_m, probGrid, income_bGrid, aXtraGrid, par.Rfree)
+        RHS2 = _integrate_via_transition(UtilP(C_W_m, 2), probGrid, income_bGrid, aXtraGrid, par.Rfree)
+    else:
+        TasteShk = numpy.asarray(TasteShk)
+        TasteShkWeights = numpy.asarray(TasteShkWeights)
+        C_R_m = CFunc_R(income_mGrid)
+        C_W_m = CFunc_W(income_mGrid)
+        V_R_m = numpy.divide(-1.0, V_TFunc_R(income_mGrid))
+        V_T_W_m = V_TFunc_W(income_mGrid)
+        V_W_mt = numpy.divide(-1.0, TasteShk[numpy.newaxis, :] * V_T_W_m[:, numpy.newaxis])
+        V_R_mt = numpy.broadcast_to(V_R_m[:, numpy.newaxis], V_W_mt.shape)
+        V_RW_mt, inds_mt = calcLogSumChoiceProbs(
+            numpy.stack((V_R_mt, V_W_mt)), 0.0, smoothtype='type1',
+        )
+        ind0_mt = inds_mt[0]
+        ind1_mt = inds_mt[1]
+        UtilP_mixed_mt = (
+            ind0_mt * UtilP(C_R_m[:, numpy.newaxis], 1)
+            + ind1_mt * TasteShk[numpy.newaxis, :] * UtilP(C_W_m[:, numpy.newaxis], 2)
+        )
+        UtilP_mixed_m = numpy.dot(UtilP_mixed_mt, TasteShkWeights)
+        V_RW_m = numpy.dot(V_RW_mt, TasteShkWeights)
+        V_W_m = numpy.dot(V_W_mt, TasteShkWeights)
+        RHS2_m = TasteShk[numpy.newaxis, :] * UtilP(C_W_m[:, numpy.newaxis], 2)
+        RHS2_m = numpy.dot(RHS2_m, TasteShkWeights)
+
+        gothV1 = _integrate_via_transition(V_RW_m, probGrid, income_bGrid, aXtraGrid, par.Rfree)
+        gothV2 = _integrate_via_transition(V_W_m, probGrid, income_bGrid, aXtraGrid, par.Rfree)
+        RHS1 = _integrate_via_transition(UtilP_mixed_m, probGrid, income_bGrid, aXtraGrid, par.Rfree)
+        RHS2 = _integrate_via_transition(RHS2_m, probGrid, income_bGrid, aXtraGrid, par.Rfree)
+
+    effort_all, cost_t = OutcomeProbsCost_Search(
+        numpy.stack((gothV1, gothV2)), par.sigma_s, par.DiscFac, par.prob_opt,
+    )
+    effort_t = effort_all[0, :]
+    P1 = (1.0 - effort_t) * par.prob_opt + effort_t
+    P2 = (1.0 - effort_t) * (1.0 - par.prob_opt)
+    EUtilP_tp1 = par.Rfree * (P1 * RHS1 + P2 * RHS2)
+    EV_tp1 = P1 * gothV1 + P2 * gothV2
+
+    return _finish_solveWorkingDeaton(
+        EGMVector, aXtraGrid, mGrid, par, Util, UtilP, UtilP_inv, EV_tp1, cost_t, EUtilP_tp1,
+    )
 
 
 # -
