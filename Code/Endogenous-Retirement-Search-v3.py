@@ -452,6 +452,22 @@ class RetiringDeaton(IndShockConsumerType):
     mGridMax = 52.0
     mGridCount = 310
     IncUnemp_Std = 0.1
+    # Optional lower-support truncation of the continuous transition density
+    # (and, when method is "truncation", matching clip of the Discretize atoms).
+    # Off by default. When active for TransitionMethod, pdf((m-b)/YWork) is
+    # zeroed for shocks below the floor, then each row is renormalized.
+    #
+    # How to turn it on (pick one):
+    #   TranShk_min = 0.67                 # explicit floor (highest priority)
+    #   TranShkMinMethod = "truncation"    # floor = max(1 - TranShkTruncation*sigma, 0)
+    #                                      # also clips Discretize atoms to
+    #                                      # [1 - k*sigma, 1 + k*sigma] (same support)
+    #   TranShkMinMethod = "disc_min"      # floor = min atom of equiprobable N-node disc.
+    #   TranShkMinMethod = "none"/None     # no truncation (default)
+    TranShk_min = None
+    TranShkMinMethod = None
+    TranShkTruncation = 2.0
+    TranShkMinDiscCount = 151
 
     def __init__(self, **kwds):
 
@@ -467,6 +483,10 @@ class RetiringDeaton(IndShockConsumerType):
             ('mGridMax', RetiringDeaton.mGridMax),
             ('mGridCount', RetiringDeaton.mGridCount),
             ('IncUnemp_Std', RetiringDeaton.IncUnemp_Std),
+            ('TranShk_min', RetiringDeaton.TranShk_min),
+            ('TranShkMinMethod', RetiringDeaton.TranShkMinMethod),
+            ('TranShkTruncation', RetiringDeaton.TranShkTruncation),
+            ('TranShkMinDiscCount', RetiringDeaton.TranShkMinDiscCount),
         ):
             if attr not in self.__dict__:
                 setattr(self, attr, default)
@@ -476,6 +496,8 @@ class RetiringDeaton(IndShockConsumerType):
             self.income_mGrid = None
         if 'incomeTranMatrix' not in self.__dict__:
             self.incomeTranMatrix = [None] * self.T_cycle
+        if 'TranShk_min_resolved' not in self.__dict__:
+            self.TranShk_min_resolved = [None] * self.T_cycle
 
         self.time_inv = ['aXtraGrid', 'mGrid', 'EGMVector', 'par', 'Util', 'UtilP',
                          'UtilP_inv', 'saveCommon', 'IncomeDiscMethod', 'income_bGrid',
@@ -494,8 +516,83 @@ class RetiringDeaton(IndShockConsumerType):
 
     def pre_solve(self):
         super().pre_solve()
+        self._apply_TranShk_support_clip()
         self._setup_income_integration()
         self.updateLast()
+
+    def _tran_shk_clip_bounds(self, tran_std):
+        """Return (lo, hi) clip bounds when TranShkMinMethod == 'truncation'."""
+        k = self.TranShkTruncation
+        lo = float(numpy.max([1.0 - k * tran_std, 0.0]))
+        hi = float(1.0 + k * tran_std)
+        return lo, hi
+
+    def _apply_TranShk_support_clip(self):
+        """
+        When TranShkMinMethod == 'truncation', clip discrete shock atoms to
+        [1 - k*sigma, 1 + k*sigma] so Discretize and TransitionMethod share the
+        same truncated support (DurableModel convention).
+        """
+        if self.TranShkMinMethod != "truncation":
+            return
+
+        def _clip_dstn_list(dstn_list, which="tran"):
+            if dstn_list is None:
+                return
+            for t, dstn in enumerate(dstn_list):
+                tran_std = self.TranShkStd[t] if hasattr(self.TranShkStd, "__getitem__") else self.TranShkStd
+                lo, hi = self._tran_shk_clip_bounds(tran_std)
+                atoms = numpy.asarray(dstn.atoms)
+                if which == "tran":
+                    # TranShkDstn: atoms shape (1, N) or (N,)
+                    if atoms.ndim == 2:
+                        atoms[0, :] = numpy.clip(atoms[0, :], lo, hi)
+                    else:
+                        atoms = numpy.clip(atoms, lo, hi)
+                elif which == "inc":
+                    # IncShkDstn: atoms[0]=perm, atoms[1]=tran
+                    if atoms.ndim == 2 and atoms.shape[0] >= 2:
+                        atoms[1, :] = numpy.clip(atoms[1, :], lo, hi)
+                dstn.atoms = atoms
+
+        if hasattr(self, "TranShkDstn"):
+            _clip_dstn_list(self.TranShkDstn, which="tran")
+        if hasattr(self, "IncShkDstn"):
+            _clip_dstn_list(self.IncShkDstn, which="inc")
+
+    def _resolve_TranShk_min(self, tran_std):
+        """
+        Resolve the optional lower support floor for the continuous transition density.
+
+        Priority:
+          1. Explicit numeric self.TranShk_min (if not None)
+          2. self.TranShkMinMethod in {"truncation", "disc_min"}
+          3. None → no truncation
+        """
+        # Explicit override always wins
+        if self.TranShk_min is not None:
+            return float(self.TranShk_min)
+
+        method = self.TranShkMinMethod
+        if method is None or method == "none":
+            return None
+        if method == "truncation":
+            # Same rule as MixtureTranIncShk_HANK_Truncated in utilities_Durable.py
+            # with default truncation=2: TranShk_min = max(1 - truncation*sigma, 0).
+            lo, _hi = self._tran_shk_clip_bounds(tran_std)
+            return lo
+        if method == "disc_min":
+            # Min atom of the equiprobable N-node discretization used as the
+            # Discretize reference (default N=151).
+            dstn = MeanOneLogNormal(sigma=tran_std).discretize(
+                self.TranShkMinDiscCount if tran_std > 0.0 else 1,
+                method="equiprobable",
+                tail_N=0,
+            )
+            return float(numpy.min(numpy.asarray(dstn.atoms).ravel()))
+        raise ValueError(
+            "TranShkMinMethod must be None/'none', 'truncation', or 'disc_min'; got %r" % (method,)
+        )
 
     def _setup_income_integration(self):
         """Build dense b/m grids and transition matrices when using TransitionMethod."""
@@ -503,28 +600,40 @@ class RetiringDeaton(IndShockConsumerType):
             self.income_bGrid = None
             self.income_mGrid = None
             self.incomeTranMatrix = [None] * self.T_cycle
+            self.TranShk_min_resolved = [None] * self.T_cycle
             return
 
         bGrid = make_grid_exp_mult(self.bGridMin, self.bGridMax, self.bGridCount, timestonest=1)
         mGrid = make_grid_exp_mult(self.mGridMin, self.mGridMax, self.mGridCount, timestonest=1)
         b_offset = self.Rfree * self.aXtraGrid[0]
-        m_offset = self.YWork + b_offset
+        # Next-period resources are m = b + YWork*theta with theta ~ lognormal on (0, inf),
+        # so the smallest attainable m (as theta -> 0) is b, whose minimum is b_offset. The
+        # m-grid must therefore start near b_offset, NOT at YWork + b_offset: shifting it up
+        # by YWork truncates all downward-shock mass mapping to m < YWork and biases the
+        # interim value near the lower boundary. Keep the mean shock (theta = 1, m = b + YWork)
+        # well inside the grid via the exponentially spaced upper range.
+        m_offset = b_offset
         self.income_bGrid = bGrid + b_offset
         self.income_mGrid = mGrid + m_offset
 
         self.incomeTranMatrix = []
+        self.TranShk_min_resolved = []
         for t in range(self.T_cycle):
             tran_std = self.TranShkStd[t]
             unemp_prb = self.UnempPrb[t] if hasattr(self.UnempPrb, '__getitem__') else self.UnempPrb
             inc_unemp = self.IncUnemp[t] if hasattr(self.IncUnemp, '__getitem__') else self.IncUnemp
+            tran_shk_min = self._resolve_TranShk_min(tran_std)
+            self.TranShk_min_resolved.append(tran_shk_min)
             if unemp_prb > 0.0:
                 probGrid = updateBM_TranMatrix_withUnemp(
                     tran_std, unemp_prb, inc_unemp, self.IncUnemp_Std,
                     self.income_bGrid, self.income_mGrid, YWork=self.YWork,
+                    TranShk_min=tran_shk_min,
                 )
             else:
                 probGrid = updateBM_TranMatrix(
                     tran_std, self.income_bGrid, self.income_mGrid, YWork=self.YWork,
+                    TranShk_min=tran_shk_min,
                 )
             self.incomeTranMatrix.append(probGrid)
 
@@ -665,10 +774,13 @@ def solveRetiredDeaton(solution_next, aXtraGrid, EGMVector, par, Util, UtilP, Ut
 
 
 
-def updateBM_TranMatrix(TranShkStd, bGrid, mGrid, YWork=1.0):
+def updateBM_TranMatrix(TranShkStd, bGrid, mGrid, YWork=1.0, TranShk_min=None):
     """
     Transition matrix from b-grid to m-grid for mean-one lognormal transitory shocks.
     Rows index b, columns index m; each row sums to one.
+
+    If TranShk_min is set, density mass with (m-b)/YWork < TranShk_min is zeroed
+    before row normalization (DurableModel-style truncation).
     """
     s = TranShkStd
     mu = -0.5 * s**2
@@ -676,15 +788,32 @@ def updateBM_TranMatrix(TranShkStd, bGrid, mGrid, YWork=1.0):
     b, m = numpy.meshgrid(bGrid, mGrid, indexing='ij')
     tran_shock = (m - b) / YWork
     probGrid = lognorm_dist.pdf(tran_shock) / YWork
+    if TranShk_min is not None:
+        # Match DurableModel update_prob_grid_list_with_trunc: zero density below
+        # the truncated support floor, then renormalize each row.
+        probGrid = numpy.where(tran_shock < TranShk_min, 0.0, probGrid)
+    # Weight each column by the local m-grid spacing (Delta m). mGrid is exponentially
+    # spaced (non-uniform), so the plain row-sum below assigns every column the same
+    # quadrature weight, over-weighting the dense (low-m) region and under-weighting the
+    # sparse (high-m) region. This biases E[.|b] = sum_m probGrid[b,m] f(m_m) and the bias
+    # does not vanish as the grid is refined. Weighting by dm_j turns the row sum into a
+    # proper Riemann approximation of int f(m) g(m-b) dm; the row normalization then only
+    # rescales away probability mass falling outside [mGridMin, mGridMax].
+    dm = numpy.gradient(mGrid)
+    probGrid = probGrid * dm[numpy.newaxis, :]
     for i_b in range(len(bGrid)):
         row_sum = numpy.sum(probGrid[i_b])
         probGrid[i_b] = probGrid[i_b] / numpy.max([row_sum, 1e-6])
     return probGrid
 
 
-def updateBM_TranMatrix_withUnemp(TranShkStd, UnempPrb, IncUnemp, IncUnemp_Std, bGrid, mGrid, YWork=1.0):
+def updateBM_TranMatrix_withUnemp(TranShkStd, UnempPrb, IncUnemp, IncUnemp_Std, bGrid, mGrid,
+                                  YWork=1.0, TranShk_min=None):
     """
     Transition matrix allowing unemployment via a continuous mixture PDF (no point mass).
+
+    If TranShk_min is set, density mass with (m-b)/YWork < TranShk_min is zeroed
+    before row normalization (DurableModel-style truncation).
     """
     mu_transformed = (1.0 - UnempPrb * IncUnemp) / (1.0 - UnempPrb)
     s_emp = TranShkStd
@@ -701,18 +830,58 @@ def updateBM_TranMatrix_withUnemp(TranShkStd, UnempPrb, IncUnemp, IncUnemp_Std, 
     b, m = numpy.meshgrid(bGrid, mGrid, indexing='ij')
     tran_shock = (m - b) / YWork
     probGrid = mixture_pdf(tran_shock) / YWork
+    if TranShk_min is not None:
+        probGrid = numpy.where(tran_shock < TranShk_min, 0.0, probGrid)
+    # Weight each column by the local m-grid spacing (Delta m); see updateBM_TranMatrix for
+    # the rationale. On the non-uniform (exponential) mGrid this makes the row sum a proper
+    # trapezoidal approximation of int f(m) [ (1-p) g_emp(m-b) + p g_unemp(m-b) ] dm before
+    # the row normalization removes the (small) tail mass outside [mGridMin, mGridMax].
+    dm = numpy.gradient(mGrid)
+    probGrid = probGrid * dm[numpy.newaxis, :]
     for i_b in range(len(bGrid)):
         row_sum = numpy.sum(probGrid[i_b])
         probGrid[i_b] = probGrid[i_b] / numpy.max([row_sum, 1e-6])
     return probGrid
 
 
-def _integrate_via_transition(values_on_m, probGrid, income_bGrid, aXtraGrid, Rfree):
-    """Apply b->m transition matrix, then interpolate onto b=Rfree*a."""
-    values_on_b = probGrid @ values_on_m.reshape(-1, 1)
-    values_on_b = values_on_b.flatten()
+def _integrate_via_transition(values_on_m, probGrid, income_bGrid, aXtraGrid, Rfree,
+                              kind="level", CRRA=1.0):
+    """
+    Apply b->m transition matrix, then interpolate onto b=Rfree*a.
+
+    kind:
+      "level" - linearly interpolate the integrated levels (legacy).
+      "marg"  - CRRA-inverse form for marginal utilities / marginal values:
+                integrate u', convert to (E[u'])^(-1/CRRA), interpolate that,
+                then transform back. Matches HARK MargValueFuncCRRA / DurableModel.
+      "value" - interpolate via this model's V_T = -1/V transform (not utility_inv,
+                because Util includes DisUtil and a level shift of -10).
+    """
+    values_on_b = (probGrid @ values_on_m.reshape(-1, 1)).flatten()
     b_at_a = Rfree * aXtraGrid
-    return numpy.interp(b_at_a, income_bGrid, values_on_b)
+
+    if kind == "level":
+        return numpy.interp(b_at_a, income_bGrid, values_on_b)
+
+    if kind == "marg":
+        # Steep E[u'](b) is a bad object for linear interpolation; the CRRA
+        # inverse is close to linear (exactly c when CRRA=1 and u'=1/c).
+        v = numpy.where(numpy.isfinite(values_on_b), values_on_b, 1e16)
+        v = numpy.maximum(v, 1e-16)
+        inv_b = v ** (-1.0 / CRRA)
+        inv_a = numpy.interp(b_at_a, income_bGrid, inv_b)
+        return inv_a ** (-CRRA)
+
+    if kind == "value":
+        # Same transform used elsewhere in this file (V_T = -1/V).
+        v = numpy.where(numpy.isfinite(values_on_b) & (values_on_b != 0.0), values_on_b, -1e16)
+        inv_b = -1.0 / v
+        inv_a = numpy.interp(b_at_a, income_bGrid, inv_b)
+        with numpy.errstate(divide="ignore", invalid="ignore"):
+            out = -1.0 / inv_a
+        return numpy.where(numpy.isfinite(out), out, -1e16)
+
+    raise ValueError("kind must be 'level', 'marg', or 'value'")
 
 
 def _finish_solveWorkingDeaton(EGMVector, aXtraGrid, mGrid, par, Util, UtilP, UtilP_inv,
@@ -861,10 +1030,18 @@ def _solveWorkingDeaton_transition(solution_next, aXtraGrid, mGrid, EGMVector, p
         ind1_m = inds_m[1]
         UtilP_mixed_m = ind0_m * UtilP(C_R_m, 1) + ind1_m * UtilP(C_W_m, 2)
 
-        gothV1 = _integrate_via_transition(V_RW_m, probGrid, income_bGrid, aXtraGrid, par.Rfree)
-        gothV2 = _integrate_via_transition(V_W_m, probGrid, income_bGrid, aXtraGrid, par.Rfree)
-        RHS1 = _integrate_via_transition(UtilP_mixed_m, probGrid, income_bGrid, aXtraGrid, par.Rfree)
-        RHS2 = _integrate_via_transition(UtilP(C_W_m, 2), probGrid, income_bGrid, aXtraGrid, par.Rfree)
+        gothV1 = _integrate_via_transition(
+            V_RW_m, probGrid, income_bGrid, aXtraGrid, par.Rfree, kind="value", CRRA=par.CRRA,
+        )
+        gothV2 = _integrate_via_transition(
+            V_W_m, probGrid, income_bGrid, aXtraGrid, par.Rfree, kind="value", CRRA=par.CRRA,
+        )
+        RHS1 = _integrate_via_transition(
+            UtilP_mixed_m, probGrid, income_bGrid, aXtraGrid, par.Rfree, kind="marg", CRRA=par.CRRA,
+        )
+        RHS2 = _integrate_via_transition(
+            UtilP(C_W_m, 2), probGrid, income_bGrid, aXtraGrid, par.Rfree, kind="marg", CRRA=par.CRRA,
+        )
     else:
         TasteShk = numpy.asarray(TasteShk)
         TasteShkWeights = numpy.asarray(TasteShkWeights)
@@ -889,10 +1066,18 @@ def _solveWorkingDeaton_transition(solution_next, aXtraGrid, mGrid, EGMVector, p
         RHS2_m = TasteShk[numpy.newaxis, :] * UtilP(C_W_m[:, numpy.newaxis], 2)
         RHS2_m = numpy.dot(RHS2_m, TasteShkWeights)
 
-        gothV1 = _integrate_via_transition(V_RW_m, probGrid, income_bGrid, aXtraGrid, par.Rfree)
-        gothV2 = _integrate_via_transition(V_W_m, probGrid, income_bGrid, aXtraGrid, par.Rfree)
-        RHS1 = _integrate_via_transition(UtilP_mixed_m, probGrid, income_bGrid, aXtraGrid, par.Rfree)
-        RHS2 = _integrate_via_transition(RHS2_m, probGrid, income_bGrid, aXtraGrid, par.Rfree)
+        gothV1 = _integrate_via_transition(
+            V_RW_m, probGrid, income_bGrid, aXtraGrid, par.Rfree, kind="value", CRRA=par.CRRA,
+        )
+        gothV2 = _integrate_via_transition(
+            V_W_m, probGrid, income_bGrid, aXtraGrid, par.Rfree, kind="value", CRRA=par.CRRA,
+        )
+        RHS1 = _integrate_via_transition(
+            UtilP_mixed_m, probGrid, income_bGrid, aXtraGrid, par.Rfree, kind="marg", CRRA=par.CRRA,
+        )
+        RHS2 = _integrate_via_transition(
+            RHS2_m, probGrid, income_bGrid, aXtraGrid, par.Rfree, kind="marg", CRRA=par.CRRA,
+        )
 
     effort_all, cost_t = OutcomeProbsCost_Search(
         numpy.stack((gothV1, gothV2)), par.sigma_s, par.DiscFac, par.prob_opt,

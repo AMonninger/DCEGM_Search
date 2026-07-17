@@ -11,9 +11,13 @@ Day 7/9/2026
 - Version with Transitionmatrix income shocks
 - Created Figures_IncomeDiscMethod.ipynb to compare shock points and Transitionmethod as smoothness
 
+Day 7/17/2026
+- Fixed TransitionMethod: Delta-m weighting + m-grid offset; optional inverse-form interp
+- Optional TranShkMinMethod truncation ('truncation' / 'disc_min'); same-support clip for Discretize
+
 
 To do:
-- Understand code from Sujaat and argument of figures and paper
+- Transitionmatrix: not more efficient than 151 version...
 - Combine Transitionmatrix and Search
 - Add Transitionmatrix version which includes TasteShock (instead of discretizing tasteshock with many points)
 - play around with jax and autodiff
