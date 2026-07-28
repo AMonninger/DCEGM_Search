@@ -14,6 +14,7 @@ Day 7/9/2026
 Day 7/17/2026
 - Fixed TransitionMethod: Delta-m weighting + m-grid offset; optional inverse-form interp
 - Optional TranShkMinMethod truncation ('truncation' / 'disc_min'); same-support clip for Discretize
+- Convergence experiment at sigma=sqrt(0.005); filled §2.5 table/figure + shock-size note in dcegmSearch.tex
 
 
 To do:

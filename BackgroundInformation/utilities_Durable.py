@@ -25,7 +25,6 @@ from HARK.distribution import (
     TimeVaryingDiscreteDistribution,
 )
 from copy import deepcopy
-from consav.grids import nonlinspace
 
 
 ##########################################################################################################

@@ -1,0 +1,87 @@
+\section{Model}\label{sec:Model}
+
+The model consists of heterogeneous agents featuring durable goods and directed search. Its objective is to generate business cycle dynamics of durable and nondurable expenditures consistent with empirical patterns.
+
+In short, the timeline of the model is illustrated in figure \ref{fig:timeline}. The agent starts each period with beginning of period durable stock ($n_t$) and market resources ($m_t$). The agent solves the adjuster and keeper problem separately and chooses optimal levels of non-durable consumption $c_t$, durable stock $d_t$ and assets $a_t$. To combine the discrete choices, the agent chooses the optimal search intensity which dictates the success probability of finding a new durable stock. At the end of the period, the agent holds a durable stock $d_t$ and liquid assets $a_t$. Between period $t$ and $t+1$ income shocks materialize, interest rate is received and maintenance costs need to be paid. 
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{\FigDir/timeline.pdf}
+	\caption{Timeline of the structural model}
+	\label{fig:timeline}
+\end{figure}
+
+Each household is characterized by two state variables: beginning-of-period market resources $m_t$ and the stock of durables $n_t$. Following \cite{Carroll1992-bh}, all variables are normalized by permanent income and written in lowercase letters. Preferences exhibit constant relative risk aversion and combine nondurable consumption $c_t$ and the service flow of durables $d_t$ using a Cobb-Douglas aggregator\footnote{Using this form is standard (eg see \cite{Berger2015-kp, McKay2021-ib}) which is in line with micro-evidence \cite{Berger2018-yb}. An alternative approach is to use a CES aggregator as in \cite{Mankiw1983-za}}:
+\begin{align}
+	u(c_t, d_t) &= \frac{\big(c_t^\alpha d_t^{1-\alpha}\big)^{1-\rho}}{1-\rho}, \qquad \alpha \in (0,1), \ \rho > 0.
+\end{align}
+
+At the start of the period, the household observes $(m_t, n_t)$ and decides whether to keep the durable stock unchanged or attempt an adjustment. If no adjustment occurs, the household sets $d_t = n_t$ and allocates $m_t$ between nondurable consumption and savings. If the household adjusts, it sells the entire beginning-of-period stock at no price risk but incurs a proportional adjustment cost $\tau \in (0,1)$. The resulting liquidity is
+\begin{align}
+	\ell_t = m_t + (1-\tau)n_t,
+\end{align}
+which can then be allocated across nondurable consumption, a new durable stock $d_t$, and savings $a_t$.
+
+Adjustment is not frictionless. To reflect realistic frictions in the durable goods market, the model introduces a directed search mechanism. Households that wish to adjust must exert search effort $\varepsilon_t \in [0,1]$, which determines the probability of finding a suitable durable. The search effort incurs a utility cost scaled by permanent income:
+\begin{align}
+	\sigma(\varepsilon_t) = S\big[\varepsilon_t + (1-\varepsilon_t)\log(1-\varepsilon_t)\big],
+\end{align}
+where $S$ is a smoothing parameter that governs the degree of friction in the market. The expected time to find a match is $1/\varepsilon_t$, so a higher $\varepsilon_t$ implies a shorter expected duration between initiating search and obtaining a good match.  
+
+The household's problem before learning whether an adjustment opportunity arrives is:
+\begin{align}
+	v_t(m_t,n_t) = \max_{\varepsilon_t} \Big[(1-\varepsilon_t) v_t^{\text{keep}}(m_t,n_t) + \varepsilon_t v_t^{\text{adj}}(\ell_t) - \sigma(\varepsilon_t)\Big],
+\end{align}
+where $v_t^{\text{keep}}$ and $v_t^{\text{adj}}$ are the value functions conditional on keeping or adjusting.
+
+Labor income follows an idiosyncratic process with permanent and transitory components:
+\begin{align}
+	y_t &=
+	\begin{cases}
+		(1-T) h w \psi_t \theta_t, & \text{with probability } P(\text{emp}),\\
+		y_{\text{unemp}}, & \text{with probability } 1 - P(\text{emp}),
+	\end{cases}
+\end{align}
+where $h$ is hours worked, $w$ is the real wage, and $\psi_t$ and $\theta_t$ are i.i.d.\ log-normally distributed permanent and transitory shocks with $\mathbb{E}[\psi_t] = \mathbb{E}[\theta_t] = 1$. Unemployment occurs with probability $1-P(\text{emp})$, in which case the agent receives unemployment benefits $y_{\text{unemp}}$ expressed as a fraction of permanent income. 
+
+Assets earn an interest rate $r_t$ when positive and $r_t^B$ if negative. The durable stock depreciates at rate $\delta \in (0,1)$ from which a mandatory maintenance cost $\chi$ needs to be paid \cite{Bachmann2013-ka}. Therefore, normalization implies that the next-period states evolve according to:
+\begin{align}
+	m_{t+1} &= \frac{\mathcal{R} a_t - d_t (\delta \chi)}{\psi_{t+1}} + \theta_{t+1},\\
+	n_{t+1} &= \frac{(1-\delta(1 - \chi))d_t}{\psi_{t+1}}.
+\end{align}
+
+Where:
+	\begin{align}
+	\mathcal{R} = 
+	\begin{cases}
+		1+r_t, & a_t \ge 0,\\
+		1+r_t^B, & a_t < 0.
+	\end{cases}
+\end{align}
+
+Borrowing is limited by a lower bound $\underline{a}$ and a collateral constraint allowing borrowing against the next-period value of durables, up to a loan-to-value ratio $LTV$.
+
+Hence, the Bellman equations conditional on keep and adjust are:
+\begin{align}
+	v_t^{\text{keep}}(m_t,n_t) &= \max_{c_t} \ u(c_t ,d_t) + \beta \mathbb{E}_t \big[ v_{t+1}(m_{t+1},n_{t+1}) \big],\\
+	& \text{s.t. } a_t = m_t - c_t \geq \underline{a} - (1 - \delta(1 - \chi)) (1 - \tau) LTV \cdot d_t,\\
+	m_{t+1} &= \frac{\mathcal{R} a_t - d_t (\delta \chi)}{\psi_{t+1}} + \theta_{t+1},\\
+	n_{t+1} &= \frac{(1-\delta(1 - \chi))d_t}{\psi_{t+1}}.\\[1em]
+	v_t^{\text{adj}}(\ell_t) &= \max_{c_t,d_t} \ u(c_t,d_t) + \beta \mathbb{E}_t \big[ v_{t+1}(m_{t+1},n_{t+1}) \big],\\
+	& \text{s.t. } a_t = \ell_t - c_t - d_t \geq \underline{a} - (1 - \delta(1 - \chi)) (1 - \tau) LTV \cdot d_t,\\
+	m_{t+1} &= \frac{\mathcal{R} a_t - d_t (\delta \chi)}{\psi_{t+1}} + \theta_{t+1},\\
+	n_{t+1} &= \frac{(1-\delta(1 - \chi))d_t}{\psi_{t+1}}.
+\end{align}
+
+With the following first order conditions with respect to non-durable consumption and durable stock:
+
+\begin{align}
+	\frac{\partial v_t^{adj}}{\partial c_t} &= u_c(c_t, d_t) \geq \beta R \mathbb{E}_t [\frac{v_{t+1}^m}{\psi_{t+1}}], \label{eq:FOC_c} \\
+	\frac{\partial v_t^{adj}}{\partial d_t} &= u_d(c_t, d_t) \geq \beta (R + \delta \chi) \mathbb{E}_t[\frac{v_{t+1}^m}{\psi_{t+1}}] -\beta (1 - \delta(1 - \chi)) \mathbb{E}_t[\frac{v_{t+1}^n}{\psi_{t+1}}], \label{eq:FOC_d}
+\end{align}
+
+Equations~\ref{eq:FOC_c} and~\ref{eq:FOC_d} are stated as KKT conditions. Equality holds when the collateral constraint does not bind, and the left-hand side strictly exceeds the right-hand side when it does. Equation~\ref{eq:FOC_c} equates the marginal utility of nondurable consumption with the discounted shadow value of savings. Equation~\ref{eq:FOC_d} shows that the marginal utility of durables equals the net user cost, where the first term on the right is the discounted financing cost combining the opportunity cost $\mathcal{R}$ and the maintenance payment $\delta\chi$, and the second term is the discounted benefit of carrying the remaining durable stock $(1-\delta(1-\chi))d_t$ into the next period. 
+
+I describe the solution method in appendix \ref{sec:appdx_model}. In short, I solve the keeper problem using EGM with an upper envelope algorithm and the adjuster using root-finding and FUES to select the optimal points. Smoothing of the policy functions stems from directed search. Since around the indifference points between two options, agents will choose a search intensity between zero and one, the combined policy function is the linear combination of both options. Furthermore, I calculate end of period variables using continuous shock points instead of approximating the income distribution by a few points. 
+
+I solve the model in infinite horizon and calculate Jacobians using the Fake-News algorithm from \cite{Auclert2021-gk} with respect to interest rates, labor income, and the unemployment probability.

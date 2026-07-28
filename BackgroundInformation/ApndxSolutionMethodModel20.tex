@@ -1,0 +1,806 @@
+% -*- mode: LaTeX; TeX-PDF-mode: t; -*-
+\makeatletter
+\@ifundefined{AMonningerDissertationUnempRisk}{%
+  \input{./econtexRoot}\documentclass[\econtexMain]{subfiles}
+  \input{./econtexRoot}\input{\LaTeXInputs/econtex_onlyinsubfile}
+  \onlyinsubfile{\externaldocument{\LaTeXGenerated/UnempRisk_Durable}} % Get xrefs -- esp to appendix -- from main file; only works properly if main file has already been compiled;
+  %\renewcommand{\LtxDir}{}
+  \onlyinsubfile{\renewcommand{\LtxDir}{../LaTeX/}}
+  \begin{document}
+}{%
+  \input{./econtexRoot}%
+}%
+\makeatother
+	\section{Model Appendix} \label{sec:appdx_model}
+	\subsection{Discussion of the solver algorithm}
+	The solution consists of multiple steps: 
+	\begin{enumerate}
+		\item Calculate Terminal period
+		\item Calculate End-Of-Period Functions
+		\item Solve Keeper: Use Upper-Envelope
+		\item Solve Adjuster: 
+		\begin{enumerate}
+			\item Root-finding problem
+			\item Fast Upper Envelope Scan (FUES)
+			\item Constraint
+			\item Limit function
+		\end{enumerate}
+		\item Discrete Choice
+		\begin{enumerate}
+			\item Solve for Search Factor
+			\item Combine
+		\end{enumerate} 
+	\end{enumerate}
+	
+	
+	\subsection{Derive Beginning-of-Period Marginal Value Functions}
+	
+	Problem in Bellman Form:
+	The value function can be written as the maximum over the value functions of keeping $d_t = n_t$, and adjusting $d_t \neq n_t$. Or:
+	\begin{align}
+		v_t(m_t,n_t) &= \max_{\varepsilon_t \in [0,1]} \Big[ (1-\varepsilon_t)\,v_t^{keep}(m_t,n_t) + \varepsilon_t\,v_t^{adj}(\ell_t) - \sigma(\varepsilon_t) \Big]\\
+		& \text{where:} \nonumber\\
+		\ell_t &= m_t + (1 - \tau) n_t \\
+		a_t &=\ell_t - c_t - d_t \geq \underline{a} - (1 - \delta(1 - \chi)) (1 - \tau) LTV \cdot d_t,\\
+		m_{t+1} &= \frac{\mathcal{R} a_t - d_t (\delta \chi)}{\psi_{t+1}} + \theta_{t+1},\\
+		n_{t+1} &= \frac{(1-\delta(1 - \chi))d_t}{\psi_{t+1}}\\
+		u(c_t,d_t) &= \frac{(c_t^\alpha d_t^{1 - \alpha})^{1 - \rho}}{1 - \rho}
+	\end{align}
+	
+	Where we have the Bellman for the keeper:
+	\begin{align}
+		v_t^{keep}(m_t,n_t) &= \max_{c_t} u(c_t,n_t) + \beta \mathbb{E}_t \Big(v_{t+1}(m_{t+1}, n_{t+1})\Big)\\
+		& \text{s.t.} \nonumber\\
+		a_t &= m_t- c_t \geq \underline{a} - (1 - \delta(1 - \chi)) (1 - \tau) LTV \cdot d_t,\\
+		m_{t+1} &= \frac{\mathcal{R} a_t - d_t (\delta \chi)}{\psi_{t+1}} + \theta_{t+1},\\
+		n_{t+1} &= \frac{(1-\delta(1 - \chi))d_t}{\psi_{t+1}}\\
+		d_t &= n_t \\
+		u(c_t,d_t) &= \frac{(c_t^\alpha d_t^{1 - \alpha})^{1 - \rho}}{1 - \rho}
+	\end{align}
+	
+	And for the adjuster:
+	\begin{align}
+		v_t^{adj}(\ell_t) &= \max_{c_t,d_t} u(c_t,d_t) + \beta \mathbb{E}_t \Big(v_{t+1}(m_{t+1}, n_{t+1})\Big)\\
+		& \text{s.t.} \nonumber \\
+		\ell_t &= m_t + (1 - \tau) n_t \\
+		a_t &= \ell_t - c_t - d_t \geq \underline{a} - (1 - \delta(1 - \chi)) (1 - \tau) LTV \cdot d_t,\\
+		m_{t+1} &= \frac{\mathcal{R} a_t - d_t (\delta \chi)}{\psi_{t+1}} + \theta_{t+1},\\
+		n_{t+1} &= \frac{(1-\delta(1 - \chi))d_t}{\psi_{t+1}}\\
+		u(c_t,d_t) &= \frac{(c_t^\alpha d_t^{1 - \alpha})^{1 - \rho}}{1 - \rho}
+	\end{align}
+	
+
+\textbf{Step 1 (chain rule / envelope):} The adjuster value is a function of \(\ell_t\),
+\[
+v_t^{adj} = v_t^{adj}(\ell_t),\qquad \ell_t = m_t + (1-\tau)n_t.
+\]
+By the chain rule
+\begin{align}
+	\frac{\partial v_t^{adj}(\ell_t)}{\partial m_t}
+	&= \frac{\partial v_t^{adj}(\ell_t)}{\partial \ell_t}\cdot\frac{\partial \ell_t}{\partial m_t}, \\
+	\frac{\partial v_t^{adj}(\ell_t)}{\partial n_t}
+	&= \frac{\partial v_t^{adj}(\ell_t)}{\partial \ell_t}\cdot\frac{\partial \ell_t}{\partial n_t}.
+\end{align}
+
+\textbf{Step 2 (derivatives of \(\ell_t\)):}
+\[
+\frac{\partial\ell_t}{\partial m_t} = 1, \qquad
+\frac{\partial\ell_t}{\partial n_t} = 1-\tau.
+\]
+
+\textbf{Step 3 (envelope for \(\partial v^{adj}/\partial \ell_t\)):} The adjuster problem is
+\[
+\max_{c_t,d_t}\; u(c_t,d_t) + \beta\mathbb{E}_t\big[v_{t+1}(m_{t+1},n_{t+1})\big]
+\quad\text{s.t.}\quad a_t = \ell_t - c_t - d_t,
+\]
+with the stated laws of motion. Because \(\ell_t\) enters only through the linear resource constraint \(a_t=\ell_t-c_t-d_t\), the envelope theorem implies that
+\[
+\frac{\partial v_t^{adj}(\ell_t)}{\partial \ell_t} = \lambda_t^{adj},
+\]
+where \(\lambda_t^{adj}\) is the Lagrange multiplier on the resource constraint (i.e. the marginal value of an extra unit of \(\ell_t\)).
+
+\textbf{Step 4 (relation between \(\lambda_t^{adj}\) and marginal utility):} The FOC w.r.t.\ \(c_t\) (ignoring binding additional constraints) sets
+\[
+\lambda_t^{adj} = u_c(c_t^\ast,d_t^\ast).
+\]
+With the specified utility,
+\[
+u_c(c,d) = (c^\alpha d^{1-\alpha})^{-\rho}\,\alpha c^{\alpha-1} d^{1-\alpha}
+= \alpha\, c^{\alpha(1-\rho)-1}\, d^{(1-\alpha)(1-\rho)}.
+\]
+If a borrowing/collateral constraint or other inequality constraint binds and has multiplier \(\mu_t\), then
+\(\lambda_t^{adj}\) equals \(u_c\) plus the relevant shadow prices (i.e. \(\lambda_t^{adj}=u_c+\) extra multipliers).
+
+\textbf{Step 5 (combine chain rule and envelope):} Using Steps 1--4,
+\begin{align}
+		\frac{\partial v_t^{adj}}{\partial m_t}
+		= \lambda_t^{adj}
+		= u_c(c_t^\ast,d_t^\ast)
+\label{eq:adj_m}
+\end{align}
+and
+\begin{align}
+		\frac{\partial v_t^{adj}}{\partial n_t}
+		= (1-\tau)\,\lambda_t^{adj}
+		= (1-\tau)\,u_c(c_t^\ast,d_t^\ast)
+\label{eq:adj_n}
+\end{align}
+evaluated at the adjuster optimum \((c_t^\ast,d_t^\ast)\) (and with \(\lambda_t^{adj}\) augmented by constraint multipliers if applicable).
+
+\bigskip
+\hrule
+\bigskip
+
+\paragraph{Keeper: stepwise derivation (same style)}
+
+In the keeper regime we have \(d_t = n_t\) (fixed) and the household chooses only \(c_t\). The state is \((m_t,n_t)\) and
+\[
+a_t = m_t - c_t, \qquad
+m_{t+1} = \frac{\mathcal{R}a_t - n_t(\delta\chi)}{\psi_{t+1}} + \theta_{t+1}, \qquad
+n_{t+1} = \frac{(1-\delta(1-\chi))n_t}{\psi_{t+1}}.
+\]
+
+\textbf{Keeper Step 1 (envelope for \(m_t\)):} Since \(m_t\) enters linearly via \(a_t=m_t-c_t\), the envelope theorem gives
+\begin{align}
+		\frac{\partial v_t^{keep}(m_t,n_t)}{\partial m_t}
+		= \lambda_t^{keep}
+		= u_c(c_t^\ast,n_t)
+\label{eq:keep_m}
+\end{align}
+where again \(\lambda_t^{keep}\) is the Lagrange multiplier on the budget and \(u_c\) is as above (add constraint multipliers if any other constraint binds).
+
+\textbf{Keeper Step 2 (envelope for \(n_t\)):} The durable stock \(n_t\) affects the keeper value through three channels:
+\begin{enumerate}
+	\item Directly in current utility because \(d_t=n_t\): marginal contribution \(u_d(c_t^\ast,n_t)\).
+	\item Indirectly via \(n_{t+1} = \dfrac{(1-\delta(1-\chi))n_t}{\psi_{t+1}}\), which affects \(v_{n,t+1}\).
+	\item Indirectly via \(m_{t+1}\) because \(m_{t+1}\) contains \(-n_t(\delta\chi)/\psi_{t+1}\), which affects \(v_{m,t+1}\).
+\end{enumerate}
+Applying the envelope theorem and the chain rule,
+\begin{align}
+	\frac{\partial v_t^{keep}}{\partial n_t}
+	&= u_d(c_t^\ast,n_t)
+	+ \beta\,\mathbb{E}_t\Bigg[ v_{n,t+1}\cdot\frac{\partial n_{t+1}}{\partial n_t}
+	+ v_{m,t+1}\cdot\frac{\partial m_{t+1}}{\partial n_t}\Bigg] \\
+	&= u_d(c_t^\ast,n_t)
+	+ \beta\,\mathbb{E}_t\Bigg[ v_{n,t+1}\cdot\frac{1-\delta(1-\chi)}{\psi_{t+1}}
+	\;+\; v_{m,t+1}\cdot\Big(-\frac{\delta\chi}{\psi_{t+1}}\Big)\Bigg].
+\end{align}
+Thus
+\begin{align}
+		\frac{\partial v_t^{keep}(m_t,n_t)}{\partial n_t}
+		= u_d(c_t^\ast,n_t)
+		+ \beta\,\mathbb{E}_t\Bigg[ v_{n,t+1}\frac{1-\delta(1-\chi)}{\psi_{t+1}}
+		- v_{m,t+1}\frac{\delta\chi}{\psi_{t+1}}\Bigg]
+\label{eq:keep_n}
+\end{align}
+with
+\[
+u_d(c,d) = (1-\alpha)\, c^{\alpha(1-\rho)}\, d^{(1-\alpha)(1-\rho)-1}.
+\]
+
+\bigskip
+\hrule
+\bigskip
+
+\paragraph{Combined expression with adjust / keep indicator}
+
+Let \(\mathcal{I}_t\) be the indicator for \emph{adjusting} at time \(t\) (\(\mathcal{I}_t=1\) if adjust, \(0\) if keep). Then the beginning-of-period partials of the value function can be summarized as
+\begin{align}
+	\frac{\partial v_t(m_t,n_t)}{\partial m_t}
+	&= \mathcal{I}_t \frac{\partial v_t^{adj}}{\partial m_t}
+	+ (1-\mathcal{I}_t) \frac{\partial v_t^{keep}}{\partial m_t} \\
+	&= \mathcal{I}_t \lambda_t^{adj} + (1-\mathcal{I}_t) \lambda_t^{keep}
+	= \frac{\partial u(c_t,d_t)}{\partial c_t}
+	\label{eq:combined_m}
+\end{align}
+(the final equality holds when \(\lambda\)'s equal marginal utility of consumption; add constraint multipliers if necessary).
+
+Similarly,
+\begin{align}
+	\frac{\partial v_t(m_t,n_t)}{\partial n_t}
+	&= \mathcal{I}_t \frac{\partial v_t^{adj}}{\partial n_t}
+	+ (1-\mathcal{I}_t) \frac{\partial v_t^{keep}}{\partial n_t} \\
+	&= \mathcal{I}_t (1-\tau)\lambda_t^{adj}
+	+ (1-\mathcal{I}_t)\Bigg\{ u_d(c_t,n_t)
+	+ \beta\,\mathbb{E}_t\Big[v_{n,t+1}\frac{1-\delta(1-\chi)}{\psi_{t+1}}
+	- v_{m,t+1}\frac{\delta\chi}{\psi_{t+1}}\Big]\Bigg\}.
+	\label{eq:combined_n}
+\end{align}
+
+If \(\lambda_t^{adj}=u_c(c_t^\ast,d_t^\ast)\) and \(\lambda_t^{keep}=u_c(c_t^\ast,n_t)\), you may substitute the explicit formulas for \(u_c\) and \(u_d\) given above to obtain fully expanded expressions.
+
+	
+\paragraph{Last period}
+This terminal-period solution serves as the initial condition for the backward induction used to find the infinite-horizon fixed point; it is not a true end-of-life period but rather a starting guess from which the backward recursion is iterated until convergence. We set the continuation value to zero, $v_{t+1}\equiv 0$. Since there is no future utility cost of debt, both the keeper and the adjuster optimally borrow to the collateral limit, setting end-of-period assets to the minimum feasible level $a = \underline{a} - (1-\delta(1-\chi))(1-\tau)\,LTV\cdot d$. For the keeper ($d_t = n_t$), this gives $c^{keep} = m_t - \bigl[\underline{a} - (1-\delta(1-\chi))(1-\tau)\,LTV\cdot n_t\bigr]$.
+
+For the adjuster problem, the binding borrowing constraint is:
+\begin{align}
+	a = -(1-\delta(1-\chi))(1-\tau)\,LTV\cdot d
+\end{align}
+	
+With $\delta$: depreciation rate, $\tau$: adjustment cost, $\chi$: maintenance cost, and $LTV$: loan-to-value ratio (the fraction of the next-period liquidation value of the durable the agent may borrow against).
+	
+Hence, the BC:
+\begin{align}
+	\ell &= c + d + a \\
+	\ell &= c + d - (1-\delta(1-\chi))(1-\tau)\,LTV\cdot d \\
+	\ell &= c + d\bigl(1 - (1-\delta(1-\chi))(1-\tau)\,LTV\bigr)
+\end{align}
+	
+Meaning we solve:
+\begin{align}
+	\mathscr{L} &= u(c,d) + \lambda\bigl(\ell - c - d\bigl(1 - (1-\delta(1-\chi))(1-\tau)\,LTV\bigr)\bigr)\\
+	\frac{\partial \mathscr{L}}{\partial c} &= u_c(c,d) = \lambda\\
+	\frac{\partial \mathscr{L}}{\partial d} &= u_d(c,d) = \bigl(1-(1-\delta(1-\chi))(1-\tau)\,LTV\bigr)\,\lambda\\
+\end{align}
+	
+Setting both first-order conditions equal and using CRRA utility $u(c,d) = \dfrac{(c^{\alpha} d^{1-\alpha})^{1-\rho}}{1-\rho}$:
+	
+\begin{align}
+	u_c(c,d) &= \frac{u_d(c,d)}{1-(1-\delta(1-\chi))(1-\tau)\,LTV} \\
+	\frac{\alpha (c^\alpha d^{1-\alpha})^{-\rho}}{c} &= \frac{(1-\alpha)(c^\alpha d^{1-\alpha})^{-\rho}}{d\,(1-(1-\delta(1-\chi))(1-\tau)\,LTV)} \\
+	\frac{c}{d} &= \frac{\alpha}{1-\alpha}\,\bigl(1-(1-\delta(1-\chi))(1-\tau)\,LTV\bigr)\\
+	c &= d\,\frac{\alpha}{1-\alpha}\,\bigl(1-(1-\delta(1-\chi))(1-\tau)\,LTV\bigr)
+\end{align}
+	
+Plugging this into the BC:
+\begin{align}
+	\ell &= c + d\bigl(1-(1-\delta(1-\chi))(1-\tau)\,LTV\bigr) \\ 
+	\ell &= d\,\frac{\alpha}{1-\alpha}\,\bigl(1-(1-\delta(1-\chi))(1-\tau)\,LTV\bigr) \\
+	&\quad+ d\,\bigl(1-(1-\delta(1-\chi))(1-\tau)\,LTV\bigr) \\ 
+	\ell &= d \underbrace{\frac{1}{1-\alpha}\,\bigl(1-(1-\delta(1-\chi))(1-\tau)\,LTV\bigr)}_{\tilde{\gamma}}
+\end{align}
+
+Therefore, we have the solutions:
+\begin{align}
+	d^{*} &= \ell / \tilde{\gamma} \\
+	c^{*} &= d^{*}\cdot\frac{\alpha}{1-\alpha}\,\bigl(1-(1-\delta(1-\chi))(1-\tau)\,LTV\bigr) = d^{*}\cdot\alpha\tilde{\gamma} = \ell\alpha
+\end{align}
+Note that $c^* = \alpha\ell$ regardless of the LTV, $\delta$, $\chi$, and $\tau$ parameters. This is a consequence of the Cobb-Douglas aggregator, which fixes budget-share $\alpha$ for nondurables under any relative price.
+
+		
+\paragraph{Calculate End-Of-Period Functions}
+
+The standard approach is to discretize the stochastic variables with a limited amount of discrete points such as in Tauchen and others. The arising problem with a discrete choice problem is that policy functions become discontinuous and the value function is non-smooth. As a result, evaluating the next period's (marginal) value function on a few points can lead to \textit{phantom} secondary non-concavities; that is large point masses are distributed at a few points instead of using all points in the surrounding area. The most straightforward solution is to increase the number of points with which a distribution is discretized. 
+
+Instead, I use a method of \textit{transition matrix} or \textit{lotteries} often used to receive model solutions\footnote{This method was developed by Matthew White for this particular purpose}. That is, splitting up the transitory shock $\theta$ and permanent shock $\psi$ such that the difference between beginning of period
+\begin{align}
+	b_t &= a_{t-1} \frac{R_t}{\psi_t}\\
+	m_t - b_t &= \theta_t 
+\end{align}
+
+The algorithm is as follows:
+\begin{enumerate}
+	\item Pre-solution step
+	\begin{enumerate}
+		\item Specify a fairly dense grid of beginning-of-period market resources and bank balances $m$ and $b$
+		\item Calculate the pdf of $\theta: f_{\theta t}(m - b)$ and create a matrix with probabilties with $b$ values by row and $m$ values by column.
+		\item Create a Markov transition matrix by raking the row-wise sum and divide the row by it.
+	\end{enumerate} 
+	\item Solution step
+	\begin{enumerate}
+		\item Evaluate $v_{t+1}(m_{t+1}, n_{t+1})$ on the cross product of the dense m-grid and some grid of $n$.
+		\item Pre-multiply the Markov matrix by the created matrix. The resulting matrix is $b$ row-wise and $n$ column wise.
+		\item Construct a linear interpolation function.
+		\item Create the end-of-period (marginal) functions over the end-of-period variables $a$ (assets) and $d$ (durable stock) with the typical discretized approximation to the permanent shock by evaluating the interim function denoted by $\mathfrak{v}(d_t, a_t)$, $\mathfrak{v}^{'}_c(d_t, a_t)$, and $\mathfrak{v}^{'}_d(d_t, a_t)$
+	\end{enumerate}
+\end{enumerate}
+	
+	
+\paragraph{Solve Keeper}
+The keeper solution specifies that the beginning-of-period durable stock $n_t$ is equal to the end-of-period durable stock $d_t$. Therefore, we only have to calculate optimal level of $c_t$ and $a_t$ which we can do by EGM and an upper-envelope algorithm to deal with non-concavities.
+
+\begin{enumerate}
+	\item Loop over each point of the end-of-period durable stock $d_t$
+	\item Invert the end-of-period marginal value function to obtain $c_t$. From $u_c(c_t,n_t)=\mathfrak{v}^{'}_c(n_t,a_t)$ with $d_t=n_t$ fixed:\\
+	\begin{align*}
+		c_t = \left[\frac{\mathfrak{v}^{'}_c(n_t,a_t)}{\alpha\,n_t^{(1-\alpha)(1-\rho)}}\right]^{\frac{1}{\alpha(1-\rho)-1}}
+	\end{align*}
+	\item Calculate the endogenous beginning-of-period market resources using the budget constraint
+	\begin{align*}
+		m_t &= c_t + a_t
+	\end{align*}
+	\item Use the upper envelope algorithm
+	\item Construct a function over $n$ and $m$
+\end{enumerate}
+	
+	
+	
+\paragraph{Solve Adjuster}
+Solving the adjuster problem follows the paper by \cite{Dobrescu2022-ii}:
+\begin{enumerate}
+	\item Loop over each end of period durable stock $d_t$
+	\item Calculate $c_t$ over a dense grid of $a_t$ using the EGM step. Setting the first-order condition $u_c(c_t,d_t)=\mathfrak{v}^{'}_c(d_t,a_t)$ and inverting with respect to $c_t$ (holding $d_t$ fixed) yields\\
+	\begin{align}
+		c_t &= \left[\frac{\mathfrak{v}^{'}_c(d_t,a_t)}{\alpha\,d_t^{(1-\alpha)(1-\rho)}}\right]^{\frac{1}{\alpha(1-\rho)-1}}
+	\end{align}
+	\item Find all roots of $a_t$ which obey the first order conditions
+	\begin{align}
+		0 &= u^{'}_d(c, d) - \mathfrak{v}^{'}_c(d_t, a_t) + \mathfrak{v}^{'}_d(d_t, a_t)
+	\end{align}
+	\item Calculate $\ell_t$ with the budget constraint
+	\begin{align}
+		\ell_t &= c_t + d_t + a_t 
+	\end{align}
+	\item Calculate the value:
+	\begin{align}
+		v_t &= u(c_t, d_t) + \mathfrak{v}(d_t, a_t)
+	\end{align}	
+	\item Apply FUES
+	\item Create functions over $(\ell)$
+\end{enumerate}
+	
+	%\paragraph{Last period is solved analytically}
+	%The original version solves the last period similar to all other periods before it. This step does not seem necessary, as there exists an analytical solution for the terminal period.
+	%
+	%In the last period, the agent wants to consume all their wealth meaning $a^*=0$ and $v_{t+1} = 0$. Therefore, the keeper problem boils down to the simple solution:
+	%\begin{align}
+	%	d^* = n\\
+	%	c^* = m
+	%\end{align}
+	%Where the first part is the usual result, as the keeper can not adjust the durable stock and the latter comes from the budget constraint.
+	%
+	%The adjuster problem reduces to:
+	%\begin{align}
+	%	\mathscr{L} &= u(c,d) + \lambda(x - c - d)\\
+	%	\frac{\partial \mathscr{L}}{\partial c} &= u^{'}(c) = \lambda\\
+	%	\frac{\partial \mathscr{L}}{\partial d} &= u^{'}(d) = \lambda\\
+	%\end{align}
+	%Setting both first order conditions equal results in
+	%\begin{align}
+	%	u^{'}(c) &= u^{'}(d)\\
+	%	\frac{\alpha (c^\alpha d^{1 - \alpha})^{- \rho}}{c} &= 	\frac{(1 - \alpha) (c^\alpha d^{1 - \alpha})^{- \rho}}{d}\\
+	%	c &= d \Big(\frac{\alpha}{1 - \alpha}\Big)
+	%\end{align}
+	%Plugging this into the BC:
+	%\begin{align}
+	%	x &= c + d = d\Big(\frac{1}{1 - \alpha}\Big)\\
+	%	\implies d^* &= (1 - \alpha) x\\
+	%	\implies c^* &= \alpha x
+	%\end{align}
+	%
+	%Additionally, we can solve for the optimal (S,s) bands, eg the bands which divide the nNrmGrid times mNrmGrid plane into an adjuster, keeper, and adjuster region. We need to solve for the up to two points where the utility of the keeper solution is the same as of the adjuster.
+	%\begin{align}
+	%	u(adjuster) &= u(keeper)\\
+	%	u(\alpha x, (1 - \alpha) x) &= u(m, n)\\
+	%	\Bigg(\frac{(\alpha x)^\alpha \Big((1 - \alpha)x \Big)^{1 - \alpha}}{1 - \rho}\Bigg)^{1 - \alpha} &= \Bigg(\frac{m^\alpha n^{1 - \alpha}}{1 - \rho}\Bigg)^{1 - \alpha}\\
+	%	(\alpha x)^\alpha \Big((1 - \alpha)x \Big)^{1 - \alpha} &= m^\alpha n^{1 - \alpha}\\
+	%	(\alpha [m + (1 - \tau)n])^\alpha \Big((1 - \alpha)[m + (1 - \tau)n] \Big)^{1 - \alpha} &= m^\alpha n^{1 - \alpha}	
+	%\end{align}
+	%
+	%This problem can be solved for each value of $n$ with a root-finder to get the two points for $m$ in which the utility functions cross.
+	
+
+\paragraph{Limit Function (frictionless perfect foresight solution)}
+
+The full stochastic model converges to this frictionless perfect-foresight solution through two independent channels as total resources $x = m + \ell$ grow large. First, by assumption (\textit{ScaleBool}), both the adjustment cost $\tau(x)$ and the search-cost scale parameter $S(x)$ are decreasing functions of $x$ that tend to zero as $x \to \infty$. This eliminates all adjustment and search frictions. Second, the stochastic income contribution $\theta_{t+1}$ becomes negligible relative to $\mathcal{R}a_t$ as $m_t \to \infty$, so the agent behaves as if in certainty equivalence. Together, these two properties drive the full solution toward the frictionless perfect-foresight limit, justifying the use of this function as an extrapolation device for large $(m,n)$.
+
+With $\tau = 0$, the full trade-in value of the existing durable stock is recovered upon adjustment, so $\ell_t = m_t + (1-\tau)n_t = m_t + n_t$. This collapses the two-dimensional state $(m_t, n_t)$ to the scalar total-resource state $\ell_t$.
+
+Without adjustment costs, operational costs, or income shocks ($\tau = 0$, $\textit{OpCost} = 0$, $\psi_{t+1} = 1$, $\theta_{t+1} = 1$), and with survival probability $\varsigma = 1$ and no permanent-income growth ($G = 1$), the agent will always adjust. The general transition equations
+\begin{align}
+	m_{t+1} &= \frac{\mathcal{R}a_t - d_t(\delta\chi + \textit{OpCost})}{G\,\psi_{t+1}} + \theta_{t+1}, \qquad
+	n_{t+1} = \frac{(1-\delta(1-\chi))\,d_t}{G\,\psi_{t+1}}
+\end{align}
+simplify under these assumptions to $m_{t+1} = \mathcal{R}a_t - d_t\delta\chi + 1$ and $n_{t+1} = (1-\delta(1-\chi))d_t$. The problem therefore simplifies to:
+
+\begin{align}
+	v_t(\ell_t) &= \max_{c_t,d_t} u(c_t,d_t) + \beta\varsigma\, v_{t+1}(\ell_{t+1})\\
+	& \text{s.t.} \nonumber \\
+	\ell_t &= m_t + n_t \\
+	a_t &= \ell_t - c_t - d_t \geq \underline{a} - (1-\delta(1-\chi))\, LTV \cdot d_t \\
+	m_{t+1} &= \mathcal{R}a_t - d_t (\delta \chi) + 1\\
+	n_{t+1} &= (1-\delta(1 - \chi))d_t\\
+	u(c_t, d_t) &= \frac{\big(c_t^\alpha d_t^{1-\alpha}\big)^{1-\rho}}{1-\rho}
+\end{align}
+
+with $\varsigma = 1$. The two-rate interest factor is retained as in the general model:
+\begin{align}
+\mathcal{R} = 
+\begin{cases}
+	1+r_t, & a_t \ge 0,\\
+	1+r_t^B, & a_t < 0.
+\end{cases}
+\end{align}
+We can rewrite next period's total beginning of period resources:
+\begin{align}
+	\ell_{t+1} &= m_{t+1} + n_{t+1}\\
+	&= \mathcal{R}a_t - d_t (\delta \chi) + 1 +(1-\delta(1 - \chi))d_t\\
+	&=  \mathcal{R}(\ell_t - c_t - d_t) - d_t (\delta \chi) + 1 + (1-\delta(1 - \chi))d_t\\
+	&= \mathcal{R}\Big(\ell_t - c_t - d_t (1 + \frac{\delta - 1}{\mathcal{R}})\Big) + 1 
+\end{align}
+
+With this, the Bellman equation and its FOC look as follows:
+
+\begin{align}
+	v_t(\ell_t) &= \max_{c_t,d_t} u(c_t,d_t) + \beta \Big(v_{t+1}\left(\mathcal{R}\left(\ell_t - c_t - d_t \left(1 + \frac{\delta - 1}{\mathcal{R}}\right)\right) + 1\right)\Big)\\
+	\frac{\partial v_t}{\partial c_t}: u_t^{c} &= \beta \mathcal{R} v^{'}_{t+1}\\
+	\frac{\partial v_t}{\partial d_t}: u_t^{d} &= \beta \mathcal{R} \left(1 + \frac{\delta - 1}{\mathcal{R}}\right) v^{'}_{t+1}
+\end{align}
+Combining the FOCs and adding partial derivatives: 
+\begin{align}
+	u_t^{d} &= u_t^{c} (1 + \frac{\delta - 1}{\mathcal{R}})\\
+	\frac{(1 - \alpha) (c^\alpha d^{1 - \alpha})^{-\rho}}{d} &= \frac{\alpha (c^\alpha d^{1 - \alpha})^{-\rho}}{c}\left(1 + \frac{\delta - 1}{\mathcal{R}}\right)\\
+	\frac{c}{d} &= \underbrace{\Big(\frac{\alpha}{1 - \alpha}\Big) \Big((1 + \frac{\delta - 1}{\mathcal{R}})\Big)}_{\gamma}\\
+	c &= \gamma d
+\end{align}
+
+
+As we know the optimal ratio between $c$ and $d$, we can focus on total expenditure $q$:
+\begin{align}
+	q &= c + d \to q = d + \gamma d \to (1 + \gamma)d \\
+	d &= \frac{q}{1 + \gamma} \label{eq:d_of_q} \\
+	c &= \frac{\gamma q}{1 + \gamma} \label{eq:c_of_q}
+\end{align}
+
+Additionally, we can re-write the utility function with respect to $q$:
+
+\begin{align}
+	\lambda(q) &= \frac{\Bigg( \Big(\frac{\gamma q}{1 + \gamma}  \Big)^{\alpha}  \Big( \frac{q}{1 + \gamma}  \Big)^{1-\alpha} \Bigg)^{1-\rho}}{1 - \rho}\\
+	&= \frac{\Bigg( \gamma^{\alpha} \Big( \frac{q}{1 + \gamma}   \Big) \Bigg)^{1-\rho}}{1 - \rho} = \Big( \frac{\gamma^\alpha}{1 + \gamma} \Big)^{1 - \rho} \Big( \frac{q^{1 - \rho}}{1 - \rho}\Big)
+\end{align}
+
+Re-writing the intertemporal budget constraint with respect to $q$
+\begin{align}
+	\ell_{t+1} &= \mathcal{R}\Big(\ell_t - c_t - d_t \Big(1 + \frac{\delta - 1}{\mathcal{R}}\Big)\Big) + 1 \\
+	&= \mathcal{R}\left(\ell_t - \frac{\gamma q_t}{1 + \gamma} - \frac{q_t}{1 + \gamma}\left(1 + \frac{\delta - 1}{\mathcal{R}}\right)\right) + 1\\
+	&= \mathcal{R}\left(\ell_t - q_t \underbrace{\left(\frac{\gamma + 1 + \frac{\delta - 1}{\mathcal{R}}}{1 + \gamma} \right)}_{\Lambda} \right) + 1\\
+	&=  \mathcal{R}(\ell_t - q_t \Lambda) + 1
+\end{align}
+
+Re-writing the Bellman equation:
+\begin{align}
+	v_t(\ell_t) &= \max_{q_t} \lambda(q_t) + \beta\varsigma\, v_{t+1}\left(\mathcal{R}(\ell_t - q_t \Lambda) + 1\right)\\
+	\frac{\partial v_t}{\partial q_t}: \lambda_t^{q} &= \beta \varsigma \mathcal{R} \Lambda v^{'}_{t+1}
+\end{align}
+From the envelope theorem:
+\begin{align}
+	v^{'}_t &= \beta \varsigma \mathcal{R} v^{'}_{t+1}
+\end{align}
+which implies
+\begin{align}
+	\lambda_t^{q} &= \Lambda v^{'}_t 
+\end{align}
+Since $\varsigma = 1$, the problem reduces to the same Euler equation as an agent consuming only a non-durable composite good:
+\begin{align}
+	q_t^{-\rho} &= \mathcal{R}\beta\, q_{t+1}^{-\rho}\\
+	q_{t+1} &= (\mathcal{R}\beta)^{1/\rho} q_t
+\end{align}
+
+\textbf{Remark on the period-dependence of $\gamma$.}\quad
+The Euler equation above implicitly treats $\gamma$ as a time-invariant object.
+This holds within all non-terminal periods, where the optimal ratio follows from
+the intertemporal FOC
+\begin{align}
+	\gamma_t = \frac{\alpha}{1-\alpha}\left(1 + \frac{\delta - 1}{\mathcal{R}}\right),
+\end{align}
+with $\mathcal{R}$ constant.  The effective durable price here is
+$1+(\delta-1)/\mathcal{R}$, which is small because nearly the entire durable
+stock $(1-\delta$ fraction) carries forward and enters future utility.
+
+In the \emph{terminal} period, there is no continuation value.  The agent
+maximises $u(c_T, d_T)$ subject only to the collateral constraint binding at
+$a_T = -(1-\delta(1-\chi))\,\mathrm{LTV}\cdot d_T$, which yields the effective
+budget $c_T + p_d^T d_T = \ell_T$ with $p_d^T = 1-(1-\delta(1-\chi))\,\mathrm{LTV}$.  The FOC gives
+\begin{align}
+	\gamma_T = \frac{\alpha}{1-\alpha}\, p_d^T,
+\end{align}
+which can differ substantially from $\gamma_t$.  To see why: in the non-terminal
+period the durable is effectively cheap because most of its value is recovered
+next period; in the terminal period the agent recovers only the collateralised
+fraction $\mathrm{LTV}\cdot(1-\delta(1-\chi))$, making durables comparatively
+expensive and pushing the optimal mix toward nondurables.
+
+Whenever $\gamma$ changes across consecutive periods the $q$-Euler equation
+acquires a correction factor.  Writing $K_\lambda = \alpha\,\gamma^{\alpha-1}$
+for the scaling constant in $u_c = K_\lambda\, x^{-\rho}$ (where
+$x = c^\alpha d^{1-\alpha}$ is the Cobb-Douglas composite), the general Euler
+equation is
+\begin{align}
+	K_{\lambda,t}\, x_t^{-\rho} &= \mathcal{R}\beta\, K_{\lambda,t+1}\, x_{t+1}^{-\rho},
+\end{align}
+which reduces to $q_t^{-\rho}=\mathcal{R}\beta\,q_{t+1}^{-\rho}$ only when
+$\gamma_t = \gamma_{t+1}$.  In the EGM implementation we therefore use the
+marginal-value form $u_c = \mathcal{R}\beta\,v'_{t+1}(\ell_{t+1})$ and invert
+directly via $x_t = \bigl(K_{\lambda,t}/(\mathcal{R}\beta\,v'_{t+1})\bigr)^{1/\rho}$,
+which is valid for any sequence of $\gamma$.
+
+To solve the problem in backwards-induction, we use EGM. The end-of-period marginal value function is $\mathfrak{v}'_t(w_t) = \beta\varsigma\,\mathcal{R}\,v'_{t+1}(\mathcal{R}\,w_t + 1)$, where $w_t$ is the end-of-period net wealth that maps into beginning-of-period liquidity $\ell_{t+1}$. The FOC with respect to $q_t$ gives $\lambda'(q_t) = \Lambda\,\mathfrak{v}'_t(w_t)$, so:
+
+\begin{align}
+	\lambda'(q_t) &= \Lambda\,\mathfrak{v}'_t(w_t)\\
+	\Big(\frac{\gamma^\alpha}{1+\gamma}\Big)^{1-\rho} q_t^{-\rho} &= \Lambda\,\mathfrak{v}'_t(w_t)\\
+	q_t &= \left(\frac{\Lambda\,\mathfrak{v}'_t(w_t)}{\Big(\frac{\gamma^\alpha}{1+\gamma}\Big)^{1-\rho}}\right)^{-1/\rho}
+\end{align}
+
+We compute the end-of-period marginal value function and invert it to obtain $q_t$ as a function of the endogenous $\ell_t$. To do so, we use the mapping from the end-of-period state to the beginning-of-next-period state $\ell_{t+1}$.
+
+\begin{align}
+	w_t &= \ell_t - c_t - d_t (1 + \frac{\delta - 1}{\mathcal{R}}) \\
+	\ell_{t+1} &= \mathcal{R}(\ell_t - c_t - d_t (1 + \frac{\delta - 1}{\mathcal{R}})) + 1\\
+	\ell_{t+1} &= \mathcal{R}\,w_t + 1 
+\end{align}
+
+Meaning, we can rewrite $a_t$ as:
+\begin{align}
+	w_t  &= \ell_t - c_t - d_t (1 + \frac{\delta - 1}{\mathcal{R}})\\
+	w_t  &= \underbrace{\ell_t - c_t - d_t}_{a_t}  - d_t(\frac{\delta - 1}{\mathcal{R}})\\
+	w_t  &= a_t - d_t (\frac{\delta - 1}{\mathcal{R}})\\
+	a_t &= w_t + d_t (\frac{\delta - 1}{\mathcal{R}})
+\end{align}
+
+Hence, we calculate $\mathfrak{v}'_t(w_t)$ and invert to receive $q_t$. Next, we split up $q_t$ into $c_t$ and $d_t$ using equations \ref{eq:d_of_q} and \ref{eq:c_of_q}. With this, we can calculate the endogenous beginning-of-period state variable $\ell_t$ by substituting $a_t = w_t + d_t\left(\frac{\delta-1}{\mathcal{R}}\right)$:
+\begin{align}
+	\ell_t &= q_t + a_t\\
+	&= q_t + w_t + d_t \left(\frac{\delta - 1}{\mathcal{R}}\right)
+\end{align}
+
+
+
+
+\paragraph{Discrete Choice}
+To solve the discrete choice between adjusting and keeping, I follow the directed search approach of \cite{Khan2019-ew}. For computational efficiency, I discretize effort into 101 grid points between 0 and 1 and select the level that maximizes the value function. The resulting policy functions are linear combinations of adjusting and keeping, weighted by the optimal search effort. When computing (marginal) value functions, note that a positive probability of an infinite conditional value implies that the combined function also takes the value infinity. To facilitate the evaluation of functions involving infinities, I store and assess their inverse representations, and subsequently invert them again when the arrays are used.
+	
+	
+%	\textbf{Deriving the limit function:}
+%	
+%	The present discounted value of total expenditure has to be equal to the present discounted value of resources:
+%	\begin{align}
+%		PDV(q) &= b_t + \underbrace{PDV(\theta)}_{h_t}
+%	\end{align}
+%	
+%	PDV of human wealth:
+%	\begin{align}
+%		PDV(h_t) &= \theta + \theta \frac{G}{R} + \theta \Big( \frac{G}{R}\Big)^2 + \cdots \\
+%		&= \theta \sum_{n=0}^{T-t} \Big(\frac{G}{R}\Big)^n \\
+%		&= \theta \Big(\frac{1 - (G/R)^{T-t+1}}{1 - G/R}   \Big)%\frac{1}{1 - G/R}
+%	\end{align}
+%	
+%	With $\theta = 1$
+%	\begin{align}
+%		PDV(h_t) &= \Big(\frac{1 - (G/R)^{T-t+1}}{1 - G/R}   \Big)%\frac{1}{1 - G/R}
+%	\end{align}
+%	
+%	PDV of Consumption:
+%	\begin{align}
+%		PDV(q_t) &= \Lambda [q_t + \frac{q_{t+1}}{R} + \frac{q_{t+2}}{R^2} + \cdots ] \\
+%		&= \Lambda[q_t + \frac{(R\beta \Lambda)^{1/\rho} q_t}{R} + \frac{q_{t} ((R\beta \Lambda)^{1/\rho})^2 q_t}{R^2} + \cdots] \\
+%		&= \Lambda q_t \sum_{n=0}^{T-t} \Big(\frac{(R\beta \Lambda)^{1/\rho}}{R}\Big)^n \\
+%		&= \Lambda q_t \Big(\frac{1 - \Big((R\beta \Lambda)^{1/\rho}/R\Big)^{T-t+1}}{1 - (R\beta \Lambda)^{1/\rho}/R}  \Big)
+%	\end{align}
+%	
+%	Defining patience as $Thorn_R$:
+%	\begin{align}
+%		Thorn_R &= \frac{(R \beta \Lambda)^{1/\rho}}{R}
+%	\end{align}
+%	
+%	\begin{align}
+%		PDV(q_t) &=  \Lambda q_t \Big(\frac{1 - Thorn_R^{T-t+1}}{1 - Thorn_R}  \Big)
+%	\end{align}
+%	
+%	Now we can rewrite the PDV functions as:
+%	\begin{align}
+%		\Lambda q_t \Big(\frac{1 - Thorn_R^{T-t+1}}{1 - Thorn_R}  \Big) &= b_t + \theta \Big(\frac{1 - (G/R)^{T-t+1}}{1 - G/R}   \Big) \\
+%		q_t &= \underbrace{\Big(\frac{1 - Thorn_R}{1 - Thorn_R^{T-t+1}}  \Big) \Lambda^{-1} }_{MPX}( b_t + \underbrace{\theta \Big(\frac{1 - (G/R)^{T-t+1}}{1 - G/R}   \Big)}_h)
+%	\end{align}
+%	
+%	Limit Total Expenditure Function
+%	\begin{align}
+%		x_t(\ell_t) &= MPX * (h_t + m_t)\\
+%		c_t(\ell_t) &= x_t(\ell_t) \frac{\gamma}{1 + \gamma}\\
+%		d_t(\ell_t) &= x_t(\ell_t) \frac{1}{1 + \gamma}
+%	\end{align}
+%	
+%	\textbf{Infinite Horizon MPX ($T \to \infty$):}
+%	
+%	\begin{align}
+%		MPX &= \Big(\frac{1 - Thorn_R}{1 - Thorn_R^{T-t+1}}  \Big)\Lambda^{-1} = (1 - Thorn_R)\Lambda^{-1}
+%	\end{align}
+%	
+%	\textbf{Infinite Horizon Human Wealth ($T \to \infty$):}
+%	\begin{align}
+%		h = \theta \Big(\frac{1 - (G/R)^{T-t+1}}{1 - G/R}\Big)  = \frac{1}{G/R}
+%	\end{align}
+%	
+%	\textbf{The Finite Horizon MPX:}
+%	\begin{align}
+%		MPX &= \Big(\frac{1 - Thorn_R}{1 - Thorn_R^{T-t+1}}  \Big) =  \frac{1}{1 + Thorn_R/MPX_{t+1}} \Lambda^{-1}
+%	\end{align}
+%	
+%	\textbf{The Finite Horizon Human Wealth:}
+%	\begin{align}
+%		h_t = \theta \Big(\frac{1 - (G/R)^{T-t+1}}{1 - G/R}\Big) = \frac{G}{R}(h_{t+1} + 1)
+%	\end{align}
+%	
+%	\begin{align}
+%		\Lambda^{-1} = \Big(\frac{(1 + \gamma)}{1 + \gamma(r + \delta)/R}\Big)
+%	\end{align}
+%	
+%	
+%	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	
+%	
+%	Limit MPX:
+%	\begin{align}
+%		MPX_t &= 1 - Thorn_R %\Big( \frac{(1 - P)(1 + \gamma)}{1 + \gamma(r + \delta)/R} \Big)
+%	\end{align}
+%	
+%	
+%	\textbf{The lifecycle case:}
+%	Human wealth:
+%	\begin{align}
+%		h_t &= \frac{G}{R} (h_{t+1} + 1)
+%	\end{align}
+%	
+%	Patience:
+%	\begin{align}
+%		Thorn_R &= \frac{(R \beta \Lambda)^{1/\rho}}{R} %P &= \frac{(R \beta)^{1/\rho}}{R} \frac{1 + \gamma}{(1 + \gamma * (r + \delta)/R)}
+%	\end{align}
+%	
+%	Limit MPX:
+%	\begin{align}
+%		MPX_t &=  \frac{1}{1 + Thorn_R/MPC_{t+1}}
+%	\end{align}
+%	Limit Total Expenditure Function
+%	\begin{align}
+%		ex_t(m_t) &= MPX * (h_t + m_t)\\
+%		c_t(m_t) &= ex_t(m_t) \frac{\gamma}{1 + \gamma}\\
+%		d_t(m_t) &= ex_t(m_t) \frac{1}{1 + \gamma}
+%	\end{align}
+%	
+	
+	%\paragraph{Functions and Grids}
+	%Functions:
+	%\begin{itemize}
+	%	\item End of Period Marginal Value Functions: (nNrmGridNow, aNrmGridNow)
+	%	\item Keeper solution: (nNrmGridNow, mNrmGridKeeper)
+	%	\item Keeper value Function: (nNrmGridNow, vFuncmNrmGridNow)
+	%	\item Adjuster solution: (xUpper)
+	%	\item Adjuster value Function: (vFuncxNrmGridNow)
+	%	\item Total Solution: (nNrmGridNow, mNrmGridTotal)
+	%\end{itemize}
+	%
+	%Minimum and maximum of grids:
+	%\begin{itemize}
+	%	\item nNrmGridNow (exogenous): nNrmMin, nNrmMax
+	%	\item aNrmGridNow (exogenous): aXtraGrid(aXtraMin, aXtraMax)+ BoroCnstNat
+	%	\item mNrmGridKeeper (endogenous)
+	%	\item vFuncmNrmGridNow (exogenous): mNrmGridNow(mNrmMin, mNrmMax)
+	%	\item xUpper (endogenous)
+	%	\item vFuncxNrmGridNow (exogenous): xNrmGridNow(mNrmMinNow + (1 - adjC) * nNrmGridNow[0], mNrmGridNow[-1] + (1 - adjC) * nNrmGridNow[-1])
+	%	\item mNrmGridTotal (endogenous)
+	%\end{itemize}
+	%
+	%To assure a stable solution, no policy function is allowed to be decreasing at the last grid point. If so, extrapolation could lead to a negative expenditure prediction.
+	%
+	%the conditional policy functions of the keeper and adjuster have to be defined on a large enough grid that the total solution function works. For this, I need the following:
+	%\begin{itemize}
+	%	\item dUpper >= dNrmGridNow (Found roots can be too low. Why?! Maybe more points in search interval?!)
+	%	\item xUpper > mNrmGridTotal + nNrmGridNow(1 + adjC): If problems: add points to dNrmGridNow (exogenous grid for adjuster)
+	%\end{itemize}
+	%
+	%In this paragraph, I want to document the functions I create, where they are used and which grids I am using. The purpose is to be a transparent as possible.
+	%
+	%\textbf{Last period}: Here I just use an exogenous grid for my two state variables and construct all functions (cFUnc, dFunc, exFunc, Adjuster, vFunc, vPFunc) over them.
+	%
+	%\textbf{Other periods}:
+	%\begin{itemize}
+	%	\item aNrmGridNow: Each period, a new exogenous aNrmGridNow is constructed. In line with HARK, this is the never changing aXtraGrid plus the natural borrowing constraint which updates each period. 
+	%	\item nNrmGrid: Does not change so far
+	%	\item mNrmGrids: 
+	%	\begin{itemize}
+		%		\item mNrmGrid: endogeneous m-Grid from the upper envelope EGM. An array of all unique endogeneous m-Grid points.
+		%		\item mNrmGridUnc: Reduced mNrmGrid from Upper Envelope (mNrmGrid from the first and last nNrmGrid point \textbf{WIP}). Used to create the Unconstrained adjuster and solution function.
+		%		\item mNrmGridCnst:  [0,1]. For the constrained part of the keeper and adjuster.
+		%		\item mNrmGridvFunc: For the value functions (Keeper, Adjuster, Solution). This is similar to the aNrmGridNow (based on HARK make\_vFunc)
+		%		\item mNrmGridvFunc: Also used for the constrained part of the solution function. I have to find the S,s boundary points in the constrained part as well.
+		%	\end{itemize}
+	%\end{itemize}
+	%
+	%\textbf{List of Functions I need, where they are produced, over which grid and where they are used}
+	%
+	%This is important, as Jeppe only creates a w and q func, as well as cFuncs and dFuncs for keeper and adjuster. No overall solution function.
+	%
+	%\input{\TableDir/ModelFunctions.tex}
+	
+	%%\paragraph{Creating stability with a limit}
+	%%The discrete choice creates kinks in the policy functions. Primary kinks appear as it is for a certain combination for beginning of period market resources and durable stock beneficial to adjust the durable stock and pay the adjustment cost. This means the agent just got poorer by deciding to pay this cost while it is optimal to not adjust with just an $\epsilon$ less of market resources. As a result, the nondurable consumption function drops at the kink point.
+	%%
+	%%These kinks propagate backwards creating secondary kink, eg with a certain combination of state variables and optimal choices today, it will be optimal in the next period to adjust.
+	%%
+	%%The problem for the stability of a solution is the following. First, note that the kinks appear at a certain combination of \textit{both} state variables, meaning they are not always at exact the same grid point at one dimension. Therefore, when calculating the end-of-period marginal value function, it can happen that for a certain beginning-of-period durable stock, the kink is at the last grid point of the end-of-period asset grid. At the EGM-step, the last grid point of the consumption function is lower than the previous one due to the kink. Now, when interpolating the function and evaluating it outside the grid, the consumption function becomes negative. The reader might think, then let's just add another grid point after the last one. The problem is here that the kink will be appear at the end for another beginning of period durable stock leading to a hedgehog and hare situation.
+	%%
+	%%To solve this issue, think of a limiting function towards which the consumption functions converges. For a given beginning-of-period durable stock and a large enough beginning-of-period market resources, the cost of adjusting becomes negligible, even the durable stock becomes negligible. Meaning, in the limit, the solution converges to a frictionless case in which the agent allocates market resources into durable and non-durable goods. Additional, wealth becomes so large that (stochastic) income does not play a role anymore. Hence, the limit is the frictionless perfect foresight solution.
+	%%
+	%%\begin{enumerate}
+	%%	\item Frictionless: $\tau$ = 0. \\
+	%%	If your market resources are large enough, the penalty the agent pays to sell its durable stock is negligible
+	%%	\item Perfect foresight: $\Psi = \Theta = 1$\\
+	%%	The income becomes a small part in overall market resources, meaning the solution converges to the perfect foresight case.
+	%%	\item Only $x$ matters as a state variable. \\
+	%%	Without adjustment costs, we have $x_t = m_t + d_t$\\
+	%%	\item In the limit, $x_t$ converges to $m_t$
+	%%	The beginning of period durable stock does not play a role when $m_t$ goes to infinity.  \textbf{Is this too much?}
+	%%\end{enumerate}
+	%%
+	%%\textbf{1: Use the perfect foresight and frictionless solution from durable notes}
+	%%
+	%%Questions:
+	%%\begin{enumerate}
+	%%	\item Either make as $x_t = m_t + d_t$ or just $m_t$ and make the same for all $n$
+	%%	\item Limit for only solution function or also for keeper and adjuster problem?
+	%%\end{enumerate}
+	%
+	%
+	%
+	%
+	%
+	%
+	%
+	%
+	
+% % ============================================================
+% \subsection*{Open Issues / To-Do}
+% \begin{enumerate}
+
+% 	\item \textbf{(Assumption D) Permanent-shock discretization method.}
+% 	Algorithm step~2.4 references a ``typical discretized approximation'' to the permanent shock $\psi$ without specifying which method is used. Candidate approaches include Gauss--Hermite quadrature, Tauchen--Hussey, or Rouwenhorst. State the chosen method and the number of quadrature nodes/grid points.
+
+% 	\item \textbf{(Assumption E) Interior solutions.}
+% 	The Inada conditions on the Cobb-Douglas aggregator ($u_c,u_d\to\infty$ as $c,d\to 0$) rule out corner solutions at an interior adjuster optimum. Verify and state whether corner solutions can arise when the collateral constraint binds, and document how such cases are handled numerically.
+
+% 	\item \textbf{(Missing Derivation A) Closed-form optimal search effort.}
+% 	The first-order condition for $\varepsilon_t$ in the directed-search problem is
+% 	\[
+% 		v_t^{adj}(\ell_t) - v_t^{keep}(m_t,n_t) = \sigma'(\varepsilon^*) = -S\ln(1-\varepsilon^*),
+% 	\]
+% 	which has the closed-form solution
+% 	\[
+% 		\varepsilon^* = 1 - \exp\left(-\frac{v_t^{adj}-v_t^{keep}}{S}\right).
+% 	\]
+% 	Derive this and explain whether the current 101-point grid search is used as an approximation or for a robustness reason.
+
+% 	\item \textbf{(Missing Derivation B) Combined policy functions.}
+% 	Write out the explicit formula for the combined policy functions that result from the directed-choice step, e.g.\
+% 	\[
+% 		c_t = (1-\varepsilon^*)\,c_t^{keep} + \varepsilon^*\,c_t^{adj}, \qquad
+% 		d_t = (1-\varepsilon^*)\,n_t + \varepsilon^*\,d_t^{adj},
+% 	\]
+% 	and state the resulting combined marginal value functions $\partial v_t/\partial m_t$ and $\partial v_t/\partial n_t$ (equations~\eqref{eq:combined_m}--\eqref{eq:combined_n}) that feed into the backward recursion.
+
+% 	\item \textbf{(Missing Derivation C) Constrained policy functions.}
+% 	Derive the constrained consumption and durable policies for the keeper and adjuster when the collateral constraint $a_t = \underline{a} - (1-\delta(1-\chi))(1-\tau)\,LTV\cdot d_t$ binds, showing the explicit substitution into each budget constraint.
+
+% 	\item \textbf{(Missing Derivation D) Necessity of FUES for the adjuster.}
+% 	Explain why the adjuster problem exhibits non-concavities that require the Fast Upper Envelope Scan rather than the standard upper-envelope algorithm, and describe the source of the kinks (e.g.\ the root-finding step producing multiple roots, the collateral constraint, or the discrete-choice interaction).
+
+% 	\item \textbf{(Missing Derivation F) Derivation of the normalized Bellman.}
+% 	Add a brief derivation showing that dividing all level variables by the current permanent income $P_t$ yields the stated laws of motion for $m_{t+1}$ and $n_{t+1}$, following the normalization in \cite{Carroll1992-bh}.
+
+% \end{enumerate}
+% % ============================================================
+
+\makeatletter
+\@ifundefined{AMonningerDissertationUnempRisk}{\end{document}}{}%
+\makeatother
+\endinput
+
+% Local Variables:
+% eval: (setq TeX-command-list  (assq-delete-all (car (assoc "BibTeX" TeX-command-list)) TeX-command-list))
+% eval: (setq TeX-command-list  (assq-delete-all (car (assoc "BibTeX" TeX-command-list)) TeX-command-list))
+% eval: (setq TeX-command-list  (assq-delete-all (car (assoc "BibTeX" TeX-command-list)) TeX-command-list))
+% eval: (setq TeX-command-list  (assq-delete-all (car (assoc "BibTeX" TeX-command-list)) TeX-command-list))
+% eval: (setq TeX-command-list  (assq-delete-all (car (assoc "Biber"  TeX-command-list)) TeX-command-list))
+% eval: (add-to-list 'TeX-command-list '("BibTeX" "bibtex ../LaTeX/%s" TeX-run-BibTeX nil t                                                                              :help "Run BibTeX") t)
+% eval: (add-to-list 'TeX-command-list '("BibTeX" "bibtex ../LaTeX/%s" TeX-run-BibTeX nil (plain-tex-mode latex-mode doctex-mode ams-tex-mode texinfo-mode context-mode) :help "Run BibTeX") t)
+% TeX-PDF-mode: t
+% TeX-file-line-error: t
+% TeX-debug-warnings: t
+% LaTeX-command-style: (("" "%(PDF)%(latex) %(file-line-error) %(extraopts) -output-directory=../LaTeX %S%(PDFout)"))
+% TeX-source-correlate-mode: t
+% TeX-parse-self: t
+% eval: (cond ((string-equal system-type "darwin") (progn (setq TeX-view-program-list '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b %n ../LaTeX/%o %b"))))))
+% eval: (cond ((string-equal system-type "gnu/linux") (progn (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) ../LaTeX/%o"))))))
+% eval: (cond ((string-equal system-type "gnu/linux") (progn (setq TeX-view-program-selection '((output-pdf "Evince"))))))
+% TeX-parse-all-errors: t
+% End:
