@@ -735,8 +735,24 @@ def update_prob_grid_list_with_trunc(
     """
     Computes a list of normalized probability grids (one per period) using
     a truncated mixture lognormal PDF.
+
+    Weights each column by local m-grid spacing (Delta m) before row
+    normalization. On a non-uniform (e.g. exponential) m-grid, a plain
+    row-sum over-weights dense low-m regions; dm turns the sum into a
+    Riemann approximation of int f(m) g(m-b) dm. Spacing is recovered from
+    diff_grid[0] (= m - b_0), which has the same column spacing as m.
     """
     nb, nm = diff_grid.shape
+    # np.gradient equivalent on first row of diff_grid (numba-safe)
+    dm = np.empty(nm)
+    if nm == 1:
+        dm[0] = 1.0
+    else:
+        dm[0] = diff_grid[0, 1] - diff_grid[0, 0]
+        for j in range(1, nm - 1):
+            dm[j] = 0.5 * (diff_grid[0, j + 1] - diff_grid[0, j - 1])
+        dm[nm - 1] = diff_grid[0, nm - 1] - diff_grid[0, nm - 2]
+
     probGridList = []
     for t in range(T_cycle):
         s_emp = TranShkStd[t]
@@ -753,6 +769,8 @@ def update_prob_grid_list_with_trunc(
             for j in range(nm):
                 if row_vals[j] < TranShk_min:
                     row_pdf[j] = 0.0
+                else:
+                    row_pdf[j] *= dm[j]
             row_sum = np.sum(row_pdf)
             if row_sum > 0.0:
                 probGrid[i] = row_pdf / row_sum
