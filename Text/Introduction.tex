@@ -1,0 +1,71 @@
+%============================================================
+\section{Introduction}
+%============================================================
+This paper introduces new methods for efficiently solving dynamic optimization
+problems with both discrete and continuous choices (DC models). These methods
+extend the Endogenous Gridpoint Method (EGM) \citep{Carroll2006-mv} by including
+exogenous outcome probabilities, search frictions, and taste shocks to `concavify' the
+value function of the optimization problem. Compared to existing extensions of the
+EGM for DC models, the methods introduced in this paper have the added advantage
+of not only providing greater smoothness, but also rationalizing the smoothness into
+the agent's choice problem.
+
+For dynamic stochastic optimization problems with continuous choice variables, the
+Endogenous Gridpoint Method (EGM) is significantly more efficient compared to
+standard root-finding methods in finding the optimal decision rules. In these problems,
+the value functions are typically concave and the Euler equation is a necessary and
+sufficient condition for the optimal decision rule. In contrast, when the choice variables
+include both continuous and discrete choices (DC models), the Euler equation has
+multiple solutions for the continuous choice. Therefore, the Euler equation is only a
+necessary, but not sufficient, condition for the optimal decision rule.
+
+The complication in solving a dynamic optimization problem arises due to the kinks
+in the value function and discontinuities in the decision rule at the points in the state
+space where discrete choices are made. These discontinuities make the decision rule
+non-monotonic, which leads to the Euler equation producing suboptimal points. In
+addition, each period's kinks and discontinuities are propagated back in time as the
+solution is solved by backward iteration, thus, exacerbating the problem.
+\citet{Fella2014-pm}, \citet{Druedahl2017-ve}, and \citet{Iskhakov2017-jb}
+provide methods for finding and discarding these suboptimal points from the final
+solution.
+
+In order to mitigate the complications arising from the accumulation of the
+discontinuities, \citet{Iskhakov2017-jb} introduce Extreme
+Value Type I taste shocks that affect the likelihood of the discrete choice outcomes.
+These taste shocks have the advantage of smoothing out the expected value function and
+the expected marginal utility function. With larger taste shocks, the value function can
+be `concavified' to a greater degree. Such taste shocks, however, are in fact `behavioral'
+shocks that add a degree of randomization to the discrete choice outcomes.
+
+In contrast, this paper introduces search frictions whereby agents exert search
+effort that determines the likelihood of changing the discrete state. In addition, it
+includes log-normally distributed taste shocks that affect the utility that agents derive
+from making discrete choices. Combined, these two features not only lead to greater
+smoothness of the decision rule, they also rationalize the smoothness arising from the
+taste shocks, as these shocks determine the search effort that the agents exert.
+
+To illustrate the properties of search as a smoothing mechanism and to compare
+it to other modeling features that can also provide smoothness, we use a standard
+consumption-saving model in which the agent can also receive the `option' to make a
+binary retirement decision, depending on the search effort that they make. If the agent
+makes no search effort, they receive the option to retire with exogenous probability $p$
+and if they make the maximum effort, they receive the option to retire with certainty.
+Effort, however, is costly and the cost function is assumed to be a convex function of
+effort. In addition, households receive taste shocks that affect the relative value they
+derive from working and are also exposed to income uncertainty.
+
+All four of the aforementioned modeling features, i.e.\ search, exogenous switching
+probability, taste shocks, and income shocks, serve to smooth out the decision rule in
+the DC model with varying degrees of effectiveness. While search provides the highest
+degree of smoothness, in terms of reducing the size of the discontinuities in the decision
+rule, it has to be combined with taste shocks to yield uniform smoothness around the
+discontinuities. Moreover, each of the smoothing mechanisms have different economic
+interpretations and affect the decision rules differently. While greater smoothness from
+search and exogenous switching probability shifts the consumption function upwards,
+greater smoothness from taste shocks and income shocks shifts the consumption function
+downwards.
+Separately, we show that a coarse income-shock discretization introduces
+\emph{phantom kinks}---spurious numerical non-monotonicities that should not be
+confused with the economic discontinuities from discrete retirement---and that
+integrating the continuous income density with a transition-matrix method removes
+those artifacts at moderate computational cost (Section~\ref{sec:incdisc}).
