@@ -1,16 +1,23 @@
 """
 Simplified durable–nondurable consumption-saving model.
 
-Port of the Combined one-period notebook logic (taste shocks + directed search +
-stochastic prices) into a self-contained class API similar to Figures.ipynb usage:
+Port of the one-period notebook suite into a self-contained class API:
 
     from DurableModel import DurableConsumer
-    model = DurableConsumer(cycles=1, SearchCost=0.1, sigma_xi=0.1, PriceShkStd=0.1)
+    # Search + stochastic prices (Combined notebook):
+    model = DurableConsumer(cycles=1, SearchCost=0.1, sigma_eps=0.0, PriceShkStd=0.1)
+    # EV Type I taste only (TasteShock notebook):
+    model = DurableConsumer(cycles=1, SearchCost=0.0, sigma_eps=0.05, PriceShkStd=0.0)
     model.solve()
     sol = model.solution[0]   # first period; solution[-1] is terminal
     sol.cFunc(n, m), sol.dFunc(n, m), sol.adjusting(n, m)
 
-Channel shutoffs: sigma_xi=0, SearchCost=0, PriceShkStd=0.
+Channels (turn off with zeros):
+  - Directed search: SearchCost (mutually exclusive with EV taste)
+  - EV Type I taste shocks: sigma_eps (closed-form logit / log-sum; no xi grid)
+  - Stochastic prices: PriceShkStd
+
+Supports the four pedagogical cases: taste only, search only, price only, search+price.
 Requires LTV=0, ScaleBool=False, MaintCost=OpCost=0 (simplified).
 """
 from __future__ import annotations
@@ -45,19 +52,109 @@ def TranShkMean_Func(taxrate, labor, wage):
     return (1.0 - taxrate) * labor * wage
 
 
-def combine_search_taste_price(
+def calcLogSumChoiceProbs(Vals, sigma):
+    """
+    Inclusive value and logit probabilities for i.i.d. EV Type I taste shocks.
+
+    Matches ``calcLogSumChoiceProbs(..., smoothtype='type1')`` in the retirement
+    code and ``DurableModel_TasteShock_One_Period.ipynb``. Non-finite entries are
+    treated as infeasible (sentinel before the exp, else ``(-inf)-(-inf)`` → NaN).
+    """
+    Vals = np.asarray(Vals, dtype=float)
+    if sigma == 0.0:
+        Vals_rank = np.where(np.isfinite(Vals), Vals, -np.inf)
+        Pflat = np.argmax(Vals_rank, axis=0)
+        V = np.full(Vals[0].shape, -np.inf)
+        Probs = np.zeros(Vals.shape)
+        for i in range(Vals.shape[0]):
+            optimal = Pflat == i
+            V[optimal] = Vals_rank[i][optimal]
+            Probs[i][optimal] = 1.0
+        return V, Probs
+
+    finite = np.isfinite(Vals)
+    Vals_work = np.where(finite, Vals, -1.0e300)
+    maxV = np.max(Vals_work, axis=0)
+    sumexp = np.sum(np.exp((Vals_work - maxV) / sigma), axis=0)
+    LogSumV = maxV + sigma * np.log(sumexp)
+    Probs = np.exp((Vals_work - LogSumV) / sigma)
+
+    all_bad = ~np.any(finite, axis=0)
+    LogSumV = np.where(all_bad, -np.inf, LogSumV)
+    Probs = np.where(all_bad, 0.0, Probs)
+    Probs = np.where(finite, Probs, 0.0)
+    mass = Probs.sum(axis=0, keepdims=True)
+    Probs = np.where(mass > 0.0, Probs / np.where(mass > 0.0, mass, 1.0), Probs)
+    return LogSumV, Probs
+
+
+def _mix_marg(P0, x0, P1, x1):
+    """Probability-weighted mix; propagate +inf when a positive-prob branch is non-finite."""
+    bad = ((P0 > 0) & ~np.isfinite(x0)) | ((P1 > 0) & ~np.isfinite(x1))
+    x0s = np.where(np.isfinite(x0), x0, 0.0)
+    x1s = np.where(np.isfinite(x1), x1, 0.0)
+    return np.where(bad, np.inf, P0 * x0s + P1 * x1s)
+
+
+def combine_ev_taste_price(
     price_vals, price_weights,
-    taste_vals, taste_weights,
+    cAdj, dAdj, aAdj, inv_vAdj, vPAdj, vPDAdj,
+    cKeep, dKeep, aKeep, inv_vKeep, vPKeep, vPDKeep,
+    sigma, CRRA_,
+):
+    """
+    EV Type I (or hard-max) combine over keep vs adjust, then integrate over prices.
+
+    For each price node p_k:
+      v = sigma * log(exp(vKeep/sigma) + exp(vAdj(p_k)/sigma)),
+      P^adj = logit weight on adjust,
+    then average with price weights mu_p. ``sigma=0`` collapses to hard max.
+    Adjuster arrays: (n_price, n_n, n_m). Keeper: (n_n, n_m).
+    ``adjusting`` returned is E_p[P^adj].
+    """
+    n_price = cAdj.shape[0]
+    keep_shape = cKeep.shape
+
+    vKeep_level = utility(inv_vKeep, CRRA_)
+    vAdj_level = utility(inv_vAdj, CRRA_)
+
+    barC = np.zeros(keep_shape)
+    barD = np.zeros(keep_shape)
+    barA = np.zeros(keep_shape)
+    barV = np.zeros(keep_shape)
+    barVP = np.zeros(keep_shape)
+    barVPD = np.zeros(keep_shape)
+    barAdj = np.zeros(keep_shape)
+
+    for i_p in range(n_price):
+        w = price_weights[i_p]
+        Vals = np.stack([vKeep_level, vAdj_level[i_p]], axis=0)
+        V, Probs = calcLogSumChoiceProbs(Vals, sigma)
+        Pkeep, Padj = Probs[0], Probs[1]
+
+        barC += w * (Pkeep * cKeep + Padj * cAdj[i_p])
+        barD += w * (Pkeep * dKeep + Padj * dAdj[i_p])
+        barA += w * (Pkeep * aKeep + Padj * aAdj[i_p])
+        barV += w * V
+        barVP += w * _mix_marg(Pkeep, vPKeep, Padj, vPAdj[i_p])
+        barVPD += w * _mix_marg(Pkeep, vPDKeep, Padj, vPDAdj[i_p])
+        barAdj += w * Padj
+
+    return barC, barD, barA, barV, barVP, barVPD, barAdj
+
+
+def combine_search_price(
+    price_vals, price_weights,
     cAdj, dAdj, aAdj, inv_vAdj, vPAdj, vPDAdj,
     cKeep, dKeep, aKeep, inv_vKeep, vPKeep, vPDKeep,
     nGrid, mGrid, SearchCost_func_, e_grid_, CRRA_,
 ):
     """
-    Nested combine over (p_k, xi_j):
-      v = max_eps[(1-eps) vKeep + eps * xi * vAdj(p) - sigma(eps)],
-    then integrate with mu_p * mu_xi.
+    Nested combine over price nodes with directed search (Combined notebook):
+      v = max_eps[(1-eps) vKeep + eps * vAdj(p) - sigma(eps)],
+    then integrate with mu_p.
 
-    Shutoffs: PriceShkStd=0, sigma_xi=0, SearchCost=0 (hard max via zero costs).
+    Shutoffs: PriceShkStd=0, SearchCost=0 (hard max via zero costs).
     Adjuster arrays: (n_price, n_n, n_m). Keeper: (n_n, n_m).
     """
     n_price = cAdj.shape[0]
@@ -82,68 +179,66 @@ def combine_search_taste_price(
     barEps = np.zeros(keep_shape)
 
     for i_p in range(n_price):
-        w_p = price_weights[i_p]
-        for xi_j, w_xi in zip(taste_vals, taste_weights):
-            w = w_p * w_xi
-            vAdj_scaled = xi_j * vAdj_level[i_p]
-            vPAdj_scaled = xi_j * vPAdj[i_p]
-            vPDAdj_scaled = xi_j * vPDAdj[i_p]
+        w = price_weights[i_p]
+        vAdj_p = vAdj_level[i_p]
+        vPAdj_p = vPAdj[i_p]
+        vPDAdj_p = vPDAdj[i_p]
 
-            vAdj_aux = np.where(vAdj_scaled == -np.inf, -1e12, vAdj_scaled)
-            vKeep_aux = np.where(vKeep_level == -np.inf, -1e12, vKeep_level)
-            vPAdj_aux = np.where(vPAdj_scaled == np.inf, 1e12, vPAdj_scaled)
-            vPDAdj_aux = np.where(vPDAdj_scaled == np.inf, 1e12, vPDAdj_scaled)
-            vPKeep_aux = np.where(vPKeep == np.inf, 1e12, vPKeep)
-            vPDKeep_aux = np.where(vPDKeep == np.inf, 1e12, vPDKeep)
+        vAdj_aux = np.where(vAdj_p == -np.inf, -1e12, vAdj_p)
+        vKeep_aux = np.where(vKeep_level == -np.inf, -1e12, vKeep_level)
+        vPAdj_aux = np.where(vPAdj_p == np.inf, 1e12, vPAdj_p)
+        vPDAdj_aux = np.where(vPDAdj_p == np.inf, 1e12, vPDAdj_p)
+        vPKeep_aux = np.where(vPKeep == np.inf, 1e12, vPKeep)
+        vPDKeep_aux = np.where(vPDKeep == np.inf, 1e12, vPDKeep)
 
-            (
-                eps_ij, _cost_ij, v_ij,
-                c_ij, d_ij, a_ij, vP_ij, vPD_ij,
-            ) = directed_search_function_scaled_matrix(
-                nGrid, mGrid, mNrmGridMin, e_grid_, Costs_matrix,
-                vAdj_aux, vKeep_aux,
-                cAdj[i_p], cKeep,
-                dAdj[i_p], dKeep,
-                aAdj[i_p], aKeep,
-                vPAdj_aux, vPKeep_aux,
-                vPDAdj_aux, vPDKeep_aux,
-            )
+        (
+            eps_ij, _cost_ij, v_ij,
+            c_ij, d_ij, a_ij, vP_ij, vPD_ij,
+        ) = directed_search_function_scaled_matrix(
+            nGrid, mGrid, mNrmGridMin, e_grid_, Costs_matrix,
+            vAdj_aux, vKeep_aux,
+            cAdj[i_p], cKeep,
+            dAdj[i_p], dKeep,
+            aAdj[i_p], aKeep,
+            vPAdj_aux, vPKeep_aux,
+            vPDAdj_aux, vPDKeep_aux,
+        )
 
-            v_ij = np.array(v_ij, copy=True)
-            vP_ij = np.array(vP_ij, copy=True)
-            vPD_ij = np.array(vPD_ij, copy=True)
+        v_ij = np.array(v_ij, copy=True)
+        vP_ij = np.array(vP_ij, copy=True)
+        vPD_ij = np.array(vPD_ij, copy=True)
 
-            cond_inf_v = (
-                ((eps_ij == 1.0) & (vAdj_scaled == -np.inf))
-                | ((eps_ij == 0.0) & (vKeep_level == -np.inf))
-                | (((eps_ij > 0.0) & (eps_ij < 1.0))
-                   & ((vAdj_scaled == -np.inf) | (vKeep_level == -np.inf)))
-            )
-            v_ij[cond_inf_v] = -np.inf
+        cond_inf_v = (
+            ((eps_ij == 1.0) & (vAdj_p == -np.inf))
+            | ((eps_ij == 0.0) & (vKeep_level == -np.inf))
+            | (((eps_ij > 0.0) & (eps_ij < 1.0))
+               & ((vAdj_p == -np.inf) | (vKeep_level == -np.inf)))
+        )
+        v_ij[cond_inf_v] = -np.inf
 
-            cond_inf_vP = (
-                ((eps_ij == 1.0) & (vPAdj_scaled == np.inf))
-                | ((eps_ij == 0.0) & (vPKeep == np.inf))
-                | (((eps_ij > 0.0) & (eps_ij < 1.0))
-                   & ((vPAdj_scaled == np.inf) | (vPKeep == np.inf)))
-            )
-            vP_ij[cond_inf_vP] = np.inf
+        cond_inf_vP = (
+            ((eps_ij == 1.0) & (vPAdj_p == np.inf))
+            | ((eps_ij == 0.0) & (vPKeep == np.inf))
+            | (((eps_ij > 0.0) & (eps_ij < 1.0))
+               & ((vPAdj_p == np.inf) | (vPKeep == np.inf)))
+        )
+        vP_ij[cond_inf_vP] = np.inf
 
-            cond_inf_vPD = (
-                ((eps_ij == 1.0) & (vPDAdj_scaled == np.inf))
-                | ((eps_ij == 0.0) & (vPDKeep == np.inf))
-                | (((eps_ij > 0.0) & (eps_ij < 1.0))
-                   & ((vPDAdj_scaled == np.inf) | (vPDKeep == np.inf)))
-            )
-            vPD_ij[cond_inf_vPD] = np.inf
+        cond_inf_vPD = (
+            ((eps_ij == 1.0) & (vPDAdj_p == np.inf))
+            | ((eps_ij == 0.0) & (vPDKeep == np.inf))
+            | (((eps_ij > 0.0) & (eps_ij < 1.0))
+               & ((vPDAdj_p == np.inf) | (vPDKeep == np.inf)))
+        )
+        vPD_ij[cond_inf_vPD] = np.inf
 
-            barC += w * c_ij
-            barD += w * d_ij
-            barA += w * a_ij
-            barV += w * v_ij
-            barVP += w * vP_ij
-            barVPD += w * vPD_ij
-            barEps += w * eps_ij
+        barC += w * c_ij
+        barD += w * d_ij
+        barA += w * a_ij
+        barV += w * v_ij
+        barVP += w * vP_ij
+        barVPD += w * vPD_ij
+        barEps += w * eps_ij
 
     return barC, barD, barA, barV, barVP, barVPD, barEps
 
@@ -262,8 +357,8 @@ durable_defaults = dict(
     LTV=0.0,
     BoroCnstArt=0.0,
     # Channels
-    sigma_xi=0.10,
-    TasteShkCount=11,
+    # EV Type I taste (alternative to search; mutually exclusive with SearchCost > 0)
+    sigma_eps=0.0,
     SearchCost=0.1,
     ScaleBool=False,
     e_grid_count=101,
@@ -306,7 +401,14 @@ durable_defaults = dict(
 
 class DurableConsumer:
     """
-    Simplified durable consumer with optional taste, search, and price channels.
+    Simplified durable consumer with optional EV taste, search, and price channels.
+
+    Discrete-choice smoothers (mutually exclusive):
+      - Directed search when ``SearchCost > 0`` (Combined / Search notebooks)
+      - EV Type I taste shocks when ``sigma_eps > 0`` and ``SearchCost == 0``
+      - Hard max when both are zero
+
+    Stochastic prices (``PriceShkStd``) nest with either smoother.
 
     Parameters
     ----------
@@ -317,6 +419,11 @@ class DurableConsumer:
     """
 
     def __init__(self, **kwds):
+        if "sigma_xi" in kwds or "TasteShkCount" in kwds:
+            raise ValueError(
+                "Multiplicative log-normal taste shocks (sigma_xi / TasteShkCount) were "
+                "removed. Use sigma_eps for EV Type I taste shocks (and SearchCost=0)."
+            )
         params = dict(durable_defaults)
         params.update(kwds)
         for k, v in params.items():
@@ -330,6 +437,11 @@ class DurableConsumer:
             raise NotImplementedError("Simplified DurableConsumer requires LTV=0.")
         if not (bool(self.use_expected) ^ bool(self.use_TransitionMatrix)):
             raise ValueError("Set exactly one of use_expected / use_TransitionMatrix.")
+        if self.SearchCost > 0.0 and self.sigma_eps > 0.0:
+            raise ValueError(
+                "Search and EV Type I taste shocks are alternative discrete smoothers; "
+                "set either SearchCost=0 or sigma_eps=0."
+            )
 
         self.solution = None
         self.solution_terminal = None
@@ -386,15 +498,6 @@ class DurableConsumer:
             self.PriceShkVals = np.array([1.0])
             self.PriceShkWeights = np.array([1.0])
         self.nPrice = len(self.PriceShkVals)
-
-        # Taste shocks
-        if self.sigma_xi > 0.0:
-            dstn = MeanOneLogNormal(sigma=self.sigma_xi).discretize(self.TasteShkCount)
-            self.tasteShkVals = np.asarray(dstn.atoms[0], dtype=float)
-            self.tasteShkWeights = np.asarray(dstn.pmv, dtype=float)
-        else:
-            self.tasteShkVals = np.array([1.0])
-            self.tasteShkWeights = np.array([1.0])
 
         # State grids
         gtype, nest = self.grid_type, self.NestFac
@@ -482,10 +585,41 @@ class DurableConsumer:
             self.probGrid_income = None
 
         self._updated = True
+        discrete = (
+            "search" if self.SearchCost > 0
+            else ("EV taste" if self.sigma_eps > 0 else "hard max")
+        )
         self._log(
-            f"Updated. Channels — taste: {'ON' if self.sigma_xi > 0 else 'OFF'}, "
-            f"search: {'ON' if self.SearchCost > 0 else 'OFF'}, "
-            f"price: {'ON' if self.PriceShkStd > 0 else 'OFF'} (nPrice={self.nPrice})"
+            f"Updated. Discrete: {discrete}"
+            + (f" (sigma_eps={self.sigma_eps})" if self.sigma_eps > 0 and self.SearchCost == 0 else "")
+            + (f" (S={self.SearchCost})" if self.SearchCost > 0 else "")
+            + f"; price: {'ON' if self.PriceShkStd > 0 else 'OFF'} (nPrice={self.nPrice})"
+        )
+
+    def _combine(
+        self,
+        cAdj, dAdj, aAdj, inv_vAdj, vPAdj, vPDAdj,
+        cKeep, dKeep, aKeep, inv_vKeep, vPKeep, vPDKeep,
+        nGrid, mGrid,
+    ):
+        """
+        Discrete combine + price integration.
+
+        Uses directed search when SearchCost > 0 (Combined notebook); otherwise
+        EV Type I / hard-max via sigma_eps (TasteShock / Price / baseline notebooks).
+        """
+        if self.SearchCost > 0.0:
+            return combine_search_price(
+                self.PriceShkVals, self.PriceShkWeights,
+                cAdj, dAdj, aAdj, inv_vAdj, vPAdj, vPDAdj,
+                cKeep, dKeep, aKeep, inv_vKeep, vPKeep, vPDKeep,
+                nGrid, mGrid, self.SearchCost_func, self.e_grid, self.CRRA,
+            )
+        return combine_ev_taste_price(
+            self.PriceShkVals, self.PriceShkWeights,
+            cAdj, dAdj, aAdj, inv_vAdj, vPAdj, vPDAdj,
+            cKeep, dKeep, aKeep, inv_vKeep, vPKeep, vPDKeep,
+            self.sigma_eps, self.CRRA,
         )
 
     # ----------------------------------------------------------- terminal
@@ -552,14 +686,12 @@ class DurableConsumer:
         (
             cFunc_T_arr, dFunc_T_arr, aFunc_T_arr,
             barV_T_arr, vPFunc_T_arr, vPDFunc_T_arr, adjusting_T_arr,
-        ) = combine_search_taste_price(
-            PriceShkVals, self.PriceShkWeights,
-            self.tasteShkVals, self.tasteShkWeights,
+        ) = self._combine(
             cFuncAdj_SOL_T, dFuncAdj_SOL_T, aFuncAdj_SOL_T,
             inv_vFuncAdj_SOL_T, vPFuncAdj_SOL_T, vPDFuncAdj_SOL_T,
             cFuncKeep_T_arr, dFuncKeep_T_arr, aFuncKeep_T_arr,
             inv_vFuncKeep_T_arr, vPFuncKeep_T_arr, vPDFuncKeep_T_arr,
-            nNrmGrid_T, mNrmGrid_T, self.SearchCost_func, self.e_grid, CRRA,
+            nNrmGrid_T, mNrmGrid_T,
         )
 
         inv_vFunc_T_arr = utility_inv(barV_T_arr, CRRA)
@@ -669,7 +801,8 @@ class DurableConsumer:
                         ),
                     )
                 )
-                inv_EndOfPrdv[i_d, 1:] = utility_inv(EndOfPrdv[i_d, 1:], CRRA)
+                # inv_EndOfPrdv[i_d, 1:] = utility_inv(EndOfPrdv[i_d, 1:], CRRA)
+                inv_EndOfPrdv[i_d] = utility_inv(EndOfPrdv[i_d], CRRA)
         else:
             nNrmGridNow = dNrmGrid
             _n2d = np.repeat(nNrmGridNow[:, np.newaxis], len(self.mNrmGrid_income), axis=1)
@@ -1082,10 +1215,24 @@ class DurableConsumer:
                         inv_v_upper[:-1],
                     )
 
-            cFuncAdj_list.append(LinearFast(c_upper, [x_upper]))
-            dFuncAdj_list.append(LinearFast(d_upper, [x_upper]))
-            aFuncAdj_list.append(LinearFast(a_upper, [x_upper]))
-            inv_vFuncAdj_1d_list.append(LinearFast(inv_v_upper, [x_upper]))
+            cFuncAdj_p = LinearFast(c_upper, [x_upper])
+            dFuncAdj_p = LinearFast(d_upper, [x_upper])
+            aFuncAdj_p = LinearFast(a_upper, [x_upper])
+            cFuncAdj_list.append(cFuncAdj_p)
+            dFuncAdj_list.append(dFuncAdj_p)
+            aFuncAdj_list.append(aFuncAdj_p)
+
+            # Recompute inv_v on xNrmGrid: linear interp of inv_v between 0 and
+            # the first FUES node poorly approximates the nonlinear transform.
+            c_aux = np.maximum(cFuncAdj_p(self.xNrmGrid), 0.0)
+            d_aux = np.maximum(dFuncAdj_p(self.xNrmGrid), 0.0)
+            a_aux = self.xNrmGrid - c_aux - p0 * d_aux
+            vAdj_aux = self.CRRAutility(c_aux, d_aux) + EndOfPrdvFunc(d_aux, a_aux)
+            inv_vAdj_aux_array = utility_inv(vAdj_aux, CRRA)
+            inv_vAdj_aux_array = np.nan_to_num(
+                inv_vAdj_aux_array, nan=0.0, posinf=0.0, neginf=0.0
+            )
+            inv_vFuncAdj_1d_list.append(LinearFast(inv_vAdj_aux_array, [self.xNrmGrid]))
 
         shape_nm = (nPrice, len(nNrmGrid), len(mNrmGrid))
         cFuncAdj_NM_arr = np.zeros(shape_nm)
@@ -1147,14 +1294,12 @@ class DurableConsumer:
         (
             cFunc_arr, dFunc_arr, aFunc_arr,
             barV_arr, vPFunc_arr, vPDFunc_arr, adjusting_arr,
-        ) = combine_search_taste_price(
-            self.PriceShkVals, self.PriceShkWeights,
-            self.tasteShkVals, self.tasteShkWeights,
+        ) = self._combine(
             adj["cFuncAdj_NM_arr"], adj["dFuncAdj_NM_arr"], adj["aFuncAdj_NM_arr"],
             adj["inv_vFuncAdj_NM_arr"], adj["vPFuncAdj_NM_arr"], adj["vPDFuncAdj_NM_arr"],
             keep["cKeep_arr"], keep["dKeep_arr"], keep["aFuncKeep_arr"],
             keep["inv_vFuncKeep_arr"], keep["vPFuncKeep_arr"], keep["vPDFuncKeep_arr"],
-            self.nNrmGrid, self.mNrmGrid, self.SearchCost_func, self.e_grid, self.CRRA,
+            self.nNrmGrid, self.mNrmGrid,
         )
 
         inv_vFunc_arr = utility_inv(barV_arr, self.CRRA)
@@ -1235,4 +1380,11 @@ class DurableConsumer:
         return self.solution
 
 
-__all__ = ["DurableConsumer", "DurableConsumerSolution", "durable_defaults", "combine_search_taste_price"]
+__all__ = [
+    "DurableConsumer",
+    "DurableConsumerSolution",
+    "durable_defaults",
+    "calcLogSumChoiceProbs",
+    "combine_ev_taste_price",
+    "combine_search_price",
+]
