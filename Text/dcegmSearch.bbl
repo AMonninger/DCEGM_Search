@@ -1,4 +1,4 @@
-\begin{thebibliography}{13}
+\begin{thebibliography}{12}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -24,12 +24,6 @@ Christopher~D Carroll.
 \newblock The method of endogenous gridpoints for solving dynamic stochastic
   optimization problems.
 \newblock \emph{Econ. Lett.}, 91\penalty0 (3):\penalty0 312--320, June 2006.
-
-\bibitem[Carroll et~al.(1992)Carroll, Hall, and Zeldes]{Carroll1992-bh}
-Christopher~D Carroll, Robert~E Hall, and Stephen~P Zeldes.
-\newblock The buffer-stock theory of saving: Some macroeconomic evidence.
-\newblock \emph{Brookings Pap. Econ. Act.}, 1992\penalty0 (2):\penalty0
-  61--156, 1992.
 
 \bibitem[Dobrescu and Shanker(2022)]{Dobrescu2022-ii}
 Loretti~Isabella Dobrescu and Akshay Shanker.

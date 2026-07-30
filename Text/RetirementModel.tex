@@ -67,58 +67,14 @@ does not receive the option to switch, then they continue to work. Having made t
 discrete choice, the agent makes a consumption decision. If the agent chooses to retire,
 they stay as a retiree, because the assumption that retirement is self-absorbing. If the
 agent chooses to continue working, they exert search effort, which then determines
-the likelihood of receiving the option to switch in the next period. Fig.~\ref{fig:timing} outlines the
+the likelihood of receiving the option to switch in the next period. Fig.~\ref{fig:timing_RetirementModel} outlines the
 timeline of the realization of various shocks and the decisions in the worker's problem.
 
-%---- Figure 1: timing diagram (rendered with TikZ) ----
-\begin{figure}[htbp]
-\centering
-\begin{tikzpicture}[
-    >=Stealth,
-    node distance=8mm and 16mm,
-    every node/.style={font=\small},
-    dot/.style={circle,fill,inner sep=1.5pt},
-    box/.style={draw,rounded corners,inner sep=3pt}
-]
-    % time axis anchors
-    \node (t)   at (0,3)   {$t$};
-    \node (tp1) at (10,3)  {$t+1$};
-    \draw[dashed] (0,2.7) -- (0,-2.5);
-    \draw[dashed] (10,2.7) -- (10,-2.5);
-
-    % period t nodes
-    \node (A) at (0,2)   [dot,label=left:$A_{t-1}$] {};
-    \node (eps) at (0,1.2) {$\eff_{t-1}(A_{t-1})$};
-    \node (y) at (2.2,2)  {$y_t$};
-    \node (M) at (3.6,2)  [dot,label=above:$M_t$] {};
-    \node (xi) at (3.6,1.2) {$\xi_t$};
-
-    \node (d) at (5.4,2) [box] {$d_t(M_t,\xi_t)\in\{0,1\}$};
-
-    % retire branch
-    \node (cR) at (8.0,3.1) {$c_t(M_t,d_t=0)$};
-    \node (absorb) at (10.8,3.1) {\parbox{2cm}{\centering Absorbing retirement}};
-    % work branch
-    \node (cW) at (8.0,0.9) {$c_t(M_t,d_t=1)$};
-    \node (At) at (10,0.2) [dot,label=below:$A_t$] {};
-    \node (epst) at (10,-0.6) {$\eff_t(A_t)$};
-
-    % outcomes next period
-    \node (P1) at (12.5,0.9) {$P_1 \Rightarrow d_{t}=0$};
-    \node (P2) at (12.5,-0.4){$P_2 \Rightarrow d_{t}=1$};
-
-    % arrows
-    \draw[->] (A) -- (M);
-    \draw[->] (M) -- (d);
-    \draw[->] (d) -- (cR);
-    \draw[->] (d) -- (cW);
-    \draw[->] (cR) -- (absorb);
-    \draw[->] (cW) -- (At);
-    \draw[->] (At) -- (P1);
-    \draw[->] (At) -- (P2);
-\end{tikzpicture}
-\caption{Timing of shock realizations and decisions in the worker's problem.}
-\label{fig:timing}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{timeline_RetirementModel.pdf}
+	\caption{Timeline of the worker's problem}
+	\label{fig:timing_RetirementModel}
 \end{figure}
 
 Let the set of possible choice sets for the worker's discrete choice be given by

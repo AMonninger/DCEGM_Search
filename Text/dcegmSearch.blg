@@ -6,45 +6,45 @@ Database file #1: References.bib
 Warning--I didn't find a database entry for "Carroll2017-hk"
 Warning--empty journal in Mankiw1983-za
 Warning--there's a number but no volume in Mankiw1983-za
-You've used 13 entries,
+You've used 12 entries,
             2773 wiz_defined-function locations,
-            693 strings with 7199 characters,
-and the built_in function-call counts, 5469 in all, are:
-= -- 500
-> -- 252
+            685 strings with 6983 characters,
+and the built_in function-call counts, 4972 in all, are:
+= -- 455
+> -- 222
 < -- 10
-+ -- 88
-- -- 75
-* -- 443
-:= -- 845
-add.period$ -- 39
-call.type$ -- 13
-change.case$ -- 64
-chr.to.int$ -- 13
-cite$ -- 28
-duplicate$ -- 259
-empty$ -- 483
-format.name$ -- 96
-if$ -- 1126
++ -- 78
+- -- 66
+* -- 396
+:= -- 769
+add.period$ -- 36
+call.type$ -- 12
+change.case$ -- 58
+chr.to.int$ -- 12
+cite$ -- 26
+duplicate$ -- 238
+empty$ -- 443
+format.name$ -- 86
+if$ -- 1024
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 13
-newline$ -- 73
-num.names$ -- 52
-pop$ -- 117
+missing$ -- 12
+newline$ -- 68
+num.names$ -- 48
+pop$ -- 107
 preamble$ -- 1
-purify$ -- 51
+purify$ -- 46
 quote$ -- 0
-skip$ -- 179
+skip$ -- 164
 stack$ -- 0
-substring$ -- 251
-swap$ -- 22
+substring$ -- 227
+swap$ -- 21
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 143
+type$ -- 132
 warning$ -- 2
-while$ -- 57
+while$ -- 52
 width$ -- 0
-write$ -- 172
+write$ -- 159
 (There were 3 warnings)

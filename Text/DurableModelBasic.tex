@@ -1,13 +1,20 @@
-\section{Durable Model}
+\section{Durable model}
 
-The second example is a consumption-savings model with durable and nondurable goods. It is a simplified version of the model in \cite{Monninger2025-cz} which uses endogeneous search as a numnerical tool to solve the model. This section focuses on the solution method and compares the usage of taste shocks, endogeneous search, and stochastic durable prices.
+The second example is a consumption-savings model with durable and nondurable goods. It is a simplified version of the model in \cite{Monninger2025-cz} which uses endogeneous search as a numerical tool to solve the model. This section focuses on the solution method and compares the usage of taste shocks, endogeneous search, and stochastic durable prices.
 
-\subsection{Model Setup}\label{sec:ModelBasic}
-The model consists of heterogeneous agents featuring durable and nondurable goods. Its objective is to provide a transparent benchmark durable--nondurable problem that nests as a special case of the richer environment with search, collateralized borrowing, maintenance costs, and permanent income risk.
+\subsection{Model setup}\label{sec:ModelBasic}
+The model consists of ex-ante identical agents who face uninsurable income risk and can consume non-durable goods, receive flow utility from a durable good, and can save in one single risk-free liquit asset.
 
-In short, the timeline of the model is as follows. The agent starts each period with beginning-of-period durable stock ($n_t$) and market resources ($m_t$). The agent solves the adjuster and keeper problems separately and chooses optimal levels of nondurable consumption $c_t$, durable stock $d_t$, and assets $a_t$. The discrete keep-versus-adjust decision is then resolved by a hard maximum over the two conditional value functions. At the end of the period, the agent holds a durable stock $d_t$ and liquid assets $a_t$. Between period $t$ and $t+1$, the transitory income shock materializes, interest is received, and the durable stock depreciates.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{timeline_DurableModel.pdf}
+	\caption{Timeline of the durable model}
+	\label{fig:timeline_DurableModel}
+\end{figure}
 
-Each household is characterized by two state variables: beginning-of-period market resources $m_t$ and the stock of durables $n_t$. Following \cite{Carroll1992-bh}, all variables are normalized by permanent income and written in lowercase letters. There are no permanent income shocks and no permanent-income growth. Preferences exhibit constant relative risk aversion and combine nondurable consumption $c_t$ and the service flow of durables $d_t$ using a Cobb-Douglas aggregator\footnote{Using this form is standard (eg see \cite{Berger2015-kp, McKay2021-ib}) which is in line with micro-evidence \cite{Berger2018-yb}. An alternative approach is to use a CES aggregator as in \cite{Mankiw1983-za}}:
+The agent starts each period with beginning-of-period durable stock ($n_t$) and market resources ($m_t$). The agent solves the adjuster and keeper problems separately and chooses optimal levels of nondurable consumption $c_t$, durable stock $d_t$, and assets $a_t$. The discrete keep-versus-adjust decision is then resolved by a hard maximum over the two conditional value functions. At the end of the period, the agent holds a durable stock $d_t$ and liquid assets $a_t$. Between period $t$ and $t+1$, the transitory income shock materializes, interest is received, and the durable stock depreciates.
+
+Each household is characterized by two state variables: beginning-of-period market resources $m_t$ and the stock of durables $n_t$. Preferences exhibit constant relative risk aversion and combine nondurable consumption $c_t$ and the service flow of durables $d_t$ using a Cobb-Douglas aggregator\footnote{Using this form is standard (eg see \cite{Berger2015-kp, McKay2021-ib}) which is in line with micro-evidence \cite{Berger2018-yb}. An alternative approach is to use a CES aggregator as in \cite{Mankiw1983-za}}:
 \begin{align}
 	u(c_t, d_t) &= \frac{\big(c_t^\alpha d_t^{1-\alpha}\big)^{1-\rho}}{1-\rho}, \qquad \alpha \in (0,1), \ \rho > 0.
 \end{align}
@@ -59,7 +66,125 @@ With the following first-order conditions with respect to nondurable consumption
 
 Equations~\ref{eq:FOC_c_basic} and~\ref{eq:FOC_d_basic} are stated as KKT conditions. Equality holds when the borrowing constraint does not bind, and the left-hand side strictly exceeds the right-hand side when it does. Equation~\ref{eq:FOC_c_basic} equates the marginal utility of nondurable consumption with the discounted shadow value of savings. Equation~\ref{eq:FOC_d_basic} shows that the marginal utility of durables equals the net user cost: the first term on the right is the discounted opportunity cost $\mathcal{R}$ of diverting a unit of resources into durables rather than liquid assets, and the second term is the discounted benefit of carrying the remaining durable stock $(1-\delta)d_t$ into the next period.
 
-I describe the solution method in appendix \ref{sec:appdx_model_basic}. In short, I solve the keeper problem using EGM with an upper envelope algorithm and the adjuster using root-finding and FUES to select the optimal points. The combined policy is the argmax of the keep and adjust branches. Furthermore, I calculate end-of-period variables using continuous shock points for the transitory income distribution instead of approximating it by only a few points.
+\subsection{Algorithm}\label{subsec:AlgorithmBasic}
+This section outlines the algorithm for one recursive period of the baseline model: no Extreme Value Type~I taste shocks, no directed search, and no durable-price dispersion. The discrete keep-versus-adjust choice is resolved by a hard maximum. The terminal period is closed form---the keeper sets $c_T=m_T$ and $d_T=n_T$, the adjuster sets $c_T=\alpha\ell_T$ and $d_T=(1-\alpha)\ell_T$, and the two branches are combined by a hard max---so Algorithm~\ref{alg:durable_baseline} starts from a given next-period solution $(v_{t+1},\,v_{t+1}^{m},\,v_{t+1}^{n})$.
+
+Define the end-of-period (gothic) objects on $(d_t,a_t)$ by
+\begin{align}
+	\mathfrak{v}_c'(d_t,a_t) &= \beta\,\mathcal{R}\,\mathbb{E}_t\big[v_{t+1}^{m}(n_{t+1},m_{t+1})\big],\\
+	\mathfrak{v}_d'(d_t,a_t) &= \beta\,(1-\delta)\,\mathbb{E}_t\big[v_{t+1}^{n}(n_{t+1},m_{t+1})\big],\\
+	\mathfrak{v}(d_t,a_t) &= \beta\,\mathbb{E}_t\big[v_{t+1}(n_{t+1},m_{t+1})\big],
+\end{align}
+with $m_{t+1}=\mathcal{R}a_t+\theta_{t+1}$ and $n_{t+1}=(1-\delta)d_t$. The expectation over $\theta_{t+1}$ may be evaluated by quadrature (as written below) or by the transition-matrix integration described in Appendix~\ref{sec:appdx_model_basic}. Because adjustment costs make the first-order conditions only necessary, the keeper step applies a DC-EGM upper envelope \citep{Iskhakov2017-jb} and the adjuster step applies FUES \citep{Dobrescu2022-ii}.
+
+\begin{algorithm}[htbp]
+\caption{EGM step for the baseline durable model (hard max)}
+\label{alg:durable_baseline}
+\DontPrintSemicolon
+Let $\vec{\theta}=\{\theta_1,\dots,\theta_J\}$ be quadrature points for the transitory income shock with weights $\vec{\omega}=\{\omega_1,\dots,\omega_J\}$.\;
+Form ascending grids $\vec{a}_t=\{a^1,\dots,a^I\}$, $\vec{d}_t=\{d^1,\dots,d^L\}$, a fine durable grid $\vec{d}_t^{\mathrm{adj}}$ for the adjuster FOC scan, and beginning-of-period grids $\vec{n}_t$, $\vec{m}_t$.\;
+\BlankLine
+\tcc{End-of-period (gothic) functions}
+\For{$i = 1,\dots,I$}{
+	\For{$q = 1,\dots,L$}{
+		\For{$j = 1,\dots,J$}{
+			Compute $m_{t+1}^{j}(a^i)=\mathcal{R}a^i+\theta_j$ and $n_{t+1}(d^q)=(1-\delta)d^q$\;
+			Interpolate $v_{t+1}$, $v_{t+1}^{m}$, and $v_{t+1}^{n}$ at $(n_{t+1}(d^q),\,m_{t+1}^{j}(a^i))$\;
+		}
+		Compute $\mathfrak{v}_c'(d^q,a^i)=\beta\mathcal{R}\sum_{j=1}^{J}\omega_j\,v_{t+1}^{m}(n_{t+1}(d^q),m_{t+1}^{j}(a^i))$\;
+		Compute $\mathfrak{v}_d'(d^q,a^i)=\beta(1-\delta)\sum_{j=1}^{J}\omega_j\,v_{t+1}^{n}(n_{t+1}(d^q),m_{t+1}^{j}(a^i))$\;
+		Compute $\mathfrak{v}(d^q,a^i)=\beta\sum_{j=1}^{J}\omega_j\,v_{t+1}(n_{t+1}(d^q),m_{t+1}^{j}(a^i))$\;
+	}
+}
+\BlankLine
+\tcc{Keeper: EGM with $d_t=n_t$, then DC-EGM upper envelope}
+\For{each $n\in\vec{n}_t$}{
+	\For{$i = 1,\dots,I$}{
+		Compute $c_t^{\mathrm{keep}}(a^i;n)=u_c^{-1}\big(\mathfrak{v}_c'(n,a^i);\,n\big)$\;
+		Compute endogenous resources $m_t^{\mathrm{EGM}}(a^i;n)=a^i+c_t^{\mathrm{keep}}(a^i;n)$\;
+		Compute $v_t^{\mathrm{EGM}}(a^i;n)=u\big(c_t^{\mathrm{keep}}(a^i;n),n\big)+\mathfrak{v}(n,a^i)$\;
+	}
+	Apply a DC-EGM upper envelope to $\{(m_t^{\mathrm{EGM}},\,c_t^{\mathrm{keep}},\,v_t^{\mathrm{EGM}})\}$ and interpolate onto $\vec{m}_t$ to obtain $c_t^{\mathrm{keep}}(n,m)$, $a_t^{\mathrm{keep}}=\max\{m-c_t^{\mathrm{keep}},0\}$, and $d_t^{\mathrm{keep}}=n$\;
+	Compute $v_t^{\mathrm{keep}}(n,m)=u(c_t^{\mathrm{keep}},n)+\mathfrak{v}(n,a_t^{\mathrm{keep}})$, $v_t^{m,\mathrm{keep}}=u_c(c_t^{\mathrm{keep}},n)$, and $v_t^{n,\mathrm{keep}}=u_d(c_t^{\mathrm{keep}},n)+\mathfrak{v}_d'(n,a_t^{\mathrm{keep}})$\;
+}
+\BlankLine
+\tcc{Adjuster: FOC roots in $a$ on a fine $d$-grid, then FUES in liquidity}
+Initialize empty candidate clouds for $(\ell_t,c_t,d_t,a_t,v_t)$\;
+\For{each $d\in\vec{d}_t^{\mathrm{adj}}$}{
+	Find all roots $a$ of $u_d(c,d)-\mathfrak{v}_c'(d,a)+\mathfrak{v}_d'(d,a)=0$ with $c=u_c^{-1}\big(\mathfrak{v}_c'(d,a);\,d\big)$\;
+	\For{each root $a$}{
+		Compute $\ell_t=a+c+d$ and $v_t^{\mathrm{adj}}=u(c,d)+\mathfrak{v}(d,a)$\;
+		Append $(\ell_t,c,d,a,v_t^{\mathrm{adj}})$ to the candidate cloud\;
+	}
+}
+Sort candidates by $\ell_t$ and apply FUES to obtain refined points $(\ell_t,c_t^{\mathrm{adj}},d_t^{\mathrm{adj}},a_t^{\mathrm{adj}},v_t^{\mathrm{adj}})$\;
+Construct one-dimensional interpolants $c_t^{\mathrm{adj}}(\ell)$, $d_t^{\mathrm{adj}}(\ell)$, and $a_t^{\mathrm{adj}}(\ell)$\;
+\For{each $(n,m)\in\vec{n}_t\times\vec{m}_t$}{
+	Compute $\ell_t=m+(1-\tau)n$\;
+	Evaluate $c_t^{\mathrm{adj}}(\ell_t)$, $d_t^{\mathrm{adj}}(\ell_t)$, and $a_t^{\mathrm{adj}}=\max\{\ell_t-c_t^{\mathrm{adj}}-d_t^{\mathrm{adj}},0\}$\;
+	Compute $v_t^{\mathrm{adj}}(\ell_t)=u(c_t^{\mathrm{adj}},d_t^{\mathrm{adj}})+\mathfrak{v}(d_t^{\mathrm{adj}},a_t^{\mathrm{adj}})$, $v_t^{m,\mathrm{adj}}=u_c(c_t^{\mathrm{adj}},d_t^{\mathrm{adj}})$, and $v_t^{n,\mathrm{adj}}=(1-\tau)\,u_c(c_t^{\mathrm{adj}},d_t^{\mathrm{adj}})$\;
+}
+\BlankLine
+\tcc{Hard-max discrete choice}
+\For{each $(n,m)\in\vec{n}_t\times\vec{m}_t$}{
+	Set $\mathcal{I}_t(n,m)=1$ if $v_t^{\mathrm{adj}}\big(m+(1-\tau)n\big)\ge v_t^{\mathrm{keep}}(n,m)$ and $0$ otherwise\;
+	Set $(c_t,d_t,a_t,v_t,v_t^{m},v_t^{n})$ to the adjuster branch if $\mathcal{I}_t=1$ and to the keeper branch if $\mathcal{I}_t=0$\;
+}
+Collect the combined policies and (inverse) value functions on $(\vec{n}_t,\vec{m}_t)$ for use in period $t-1$.\;
+\end{algorithm}
+
+\subsection{Illustration of the numerical challenge}
+
+Fig.~\ref{fig:baseline_T} illustrates the terminal solution. Taking the hard-max between the options of adjusting and keeping, the S,s structure emerges (fig.~\ref{fig:baseline_ss_T}) which leads to a sharp switch between fully adjusting or fully keeping. As a result, the optimal policy functions of the model conditional on adjusting and keeping experience discontinuities along the switchpoints as illustrated for the durable consumption function (fig.~\ref{fig:baseline_d_T}).
+
+\begin{figure}[htbp]
+	\centering
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{Baseline_Ss_T.pdf}
+		\caption{Adjustment region (S,s bands).}
+		\label{fig:baseline_ss_T}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{Baseline_d_T.pdf}
+		\caption{Durable policy $d_t(n_t,m_t)$.}
+		\label{fig:baseline_d_T}
+	\end{subfigure}
+	\caption{Terminal-period solution of the baseline durable model (hard max). The left panel shows the keep--adjust regions in $(m_t,n_t)$ space; the right panel shows the combined durable policy for selected beginning-of-period durable stocks $n_t$.}
+	\label{fig:baseline_T}
+\end{figure}
+	
+	
+In period T-1, the agent incorporates the switchpoints in the next period into the solution of today's problem.Together with non-convex adjustment costs, the first order conditions are only necessary, but not sufficient. Hence, we need to incorporate an upper envelope algorithm such as FUES. But even with this algorithm, discontinuities arise as seen in fig~\ref{fig:baseline_adj_Tm1}. 
+
+	
+	\begin{figure}[htbp]
+	\centering
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{Baseline_cAdj.pdf}
+		\caption{Nondurable consumption $c_t^{\mathrm{adj}}(\ell_t)$.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{Baseline_dAdj.pdf}
+		\caption{Durable consumption $d_t^{\mathrm{adj}}(\ell_t)$.}
+	\end{subfigure}
+	
+	\vspace{0.5em}
+	
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{Baseline_cAdj_MPC.pdf}
+		\caption{MPC out of liquidity, $\partial c_t^{\mathrm{adj}}/\partial \ell_t$.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{Baseline_dAdj_MPC.pdf}
+		\caption{MPC out of liquidity, $\partial d_t^{\mathrm{adj}}/\partial \ell_t$.}
+	\end{subfigure}
+	\caption{Adjuster policy functions in period $T-1$ of the baseline durable model (hard max). Top row: optimal nondurable and durable consumption as functions of liquidity $\ell_t$. Bottom row: corresponding marginal propensities to consume out of liquidity. The kinks reflect discontinuities induced by the hard keep--adjust threshold.}
+	\label{fig:baseline_adj_Tm1}
+	\end{figure}
+	
 
 \subsection{Extension: Extreme Value Type I Taste Shocks}\label{subsec:ModelBasicTaste}
 
@@ -99,6 +224,47 @@ The expected (ex-ante) policy functions are the probability-weighted averages of
 \end{align}
 As $\sigma_\varepsilon \to 0$, the logit probabilities collapse to the hard indicators of the baseline model and~\eqref{eq:taste_logsum} collapses to the hard maximum. Larger $\sigma_\varepsilon$ spreads probability mass onto the inferior branch near indifference, so $c_t$ and $d_t$ (and the marginal-value functions derived from the inclusive value~\eqref{eq:taste_logsum}) are smooth in $(m_t,n_t)$. No quadrature over taste nodes is required: the EV Type I assumption delivers the inclusive value and choice probabilities in closed form. The taste shocks do not alter the household's budget set, so the no-borrowing constraint $a_t \ge 0$ is unaffected. I derive the envelope conditions, the Euler equations, and the EGM algorithm with EV Type I taste shocks in appendix~\ref{subsec:appdx_taste_basic}.
 
+As a result, the S,s curve in the terminal period is smoothened and adjuster values between zero and one are optimal. In the aggregate, the policy functions are a convex combination of adjuster and keeper policy functions around the S,s thresholds. Fig~\ref{tasteshock_T} illustrates the point clearly.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=\linewidth]{TasteShock_Ss_T.pdf}
+	\caption{Adjustment region (S,s bands).}
+	\label{fig:tasteshock_ss_T}
+	\caption{Terminal-period keep--adjust regions in $(m_t,n_t)$ space under EV Type I taste shocks for $\sigma_\varepsilon \in \{0, 0.05, 0.1, 0.2\}$.}
+	\label{fig:tasteshock_T}
+\end{figure}
+
+As a result, the discontinuities in period T-1 disapear with a small EV shock parameter. Fig~\ref{fig:taste_adj} show the now continuous consumption functions and marginal propensities to consume and expend.
+
+	\begin{figure}[htbp]
+	\centering
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{TasteShock_cAdj.pdf}
+		\caption{Nondurable consumption $c_t^{\mathrm{adj}}(\ell_t)$.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{TasteShock_dAdj.pdf}
+		\caption{Durable consumption $d_t^{\mathrm{adj}}(\ell_t)$.}
+	\end{subfigure}
+	
+	\vspace{0.5em}
+	
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{TasteShock_cAdj_MPC.pdf}
+		\caption{MPC out of liquidity, $\partial c_t^{\mathrm{adj}}/\partial \ell_t$.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{TasteShock_dAdj_MPC.pdf}
+		\caption{MPC out of liquidity, $\partial d_t^{\mathrm{adj}}/\partial \ell_t$.}
+	\end{subfigure}
+	\caption{Adjuster policies and MPCs in period $T-1$ under EV Type I taste shocks for $\sigma_\varepsilon \in \{0, 0.05, 0.1, 0.2\}$. Relative to the hard-max baseline, larger $\sigma_\varepsilon$ smooths the kink in both levels and marginal propensities.}
+	\label{fig:taste_adj}
+	\end{figure}
+
+
 \subsection{Extension: Search Frictions}\label{subsec:ModelBasicSearch}
 
 This subsection instead reintroduces the directed-search mechanism of the full model into the basic environment, without taste shocks. Rather than resolving the keep-versus-adjust margin with a hard maximum, the household chooses a search intensity $\varepsilon_t \in [0,1]$ that determines the weight placed on the adjuster's conditional value in the current period. Exerting search effort is costly, with cost function
@@ -112,6 +278,44 @@ where $S>0$ governs the degree of friction in the market for durables, following
 where $v_t^{\text{keep}}$ and $v_t^{\text{adj}}$ retain exactly the same Bellman definitions as in the baseline model, except that the continuation value $v_{t+1}(m_{t+1},n_{t+1})$ appearing inside them is now itself given recursively by equation~\eqref{eq:search_discrete_basic} one period ahead, rather than by the hard maximum of the baseline model. All other features of the basic environment---the single interest rate $\mathcal{R}$, the absence of maintenance costs, and the no-borrowing constraint $a_t \ge 0$---are unchanged.
 
 Search effort is chosen before the discrete outcome is known: $\varepsilon_t$ can be interpreted as the probability with which the household successfully locates a suitable durable this period, so the combined value function~\eqref{eq:search_discrete_basic} is a probability-weighted average of the two conditional values, net of the search cost. As $S \to 0$, search becomes costless, the household sets $\varepsilon_t \in \{0,1\}$, and the model collapses to the hard-maximum baseline; as $S \to \infty$, search becomes prohibitively costly, $\varepsilon_t^\ast \to 0$, and the household never adjusts. I derive the optimal search-effort rule, the smooth combined marginal-value functions, and the associated EGM steps in appendix~\ref{subsec:appdx_search_basic}.
+
+Endogeneous search achieves a similar smoothing compared to the EV shocks. Fig~\ref{fig:search_ss_T} illustrates the terminal period solution. A small search cost is sufficient to lead to a smoothened S,s region.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=\linewidth]{Search_Ss_T.pdf}
+	\caption{Adjustment region (S,s bands).}
+	\label{fig:search_ss_T}
+	\caption{Terminal-period keep--adjust regions in $(m_t,n_t)$ space under endogeneous search for search-cost scales $S \in \{0, 0.05, 0.1, 0.2\}$.}
+\end{figure}
+
+As a result, optimal consumption functions in T-1 are smooth as well (see fig~\ref{fig:search_adj}).
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{Search_cAdj.pdf}
+    \caption{Nondurable consumption $c_t^{\mathrm{adj}}(\ell_t)$.}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{Search_dAdj.pdf}
+    \caption{Durable consumption $d_t^{\mathrm{adj}}(\ell_t)$.}
+\end{subfigure}
+
+\vspace{0.5em}
+
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{Search_cAdj_MPC.pdf}
+    \caption{MPC out of liquidity, $\partial c_t^{\mathrm{adj}}/\partial \ell_t$.}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{Search_dAdj_MPC.pdf}
+    \caption{MPC out of liquidity, $\partial d_t^{\mathrm{adj}}/\partial \ell_t$.}
+\end{subfigure}
+\caption{Adjuster policies and MPCs in period $T-1$ under directed search for $S \in \{0, 0.05, 0.1, 0.2\}$. Endogenous search effort smooths the adjuster's kink analogously to EV Type I taste shocks.}
+\label{fig:search_adj}
+\end{figure}
 
 \subsection{Extension: Stochastic Durable Prices}\label{subsec:ModelBasicPrice}
 
@@ -135,18 +339,104 @@ in place of $a_t=\ell_t-c_t-d_t$, so the conditional value function becomes a fu
 \end{align}
 Everything else about the household's environment---the interest rate $\mathcal{R}$, the depreciation rate $\delta$, and the no-borrowing constraint $a_t \ge 0$---is unchanged, and next period's durable stock $n_{t+1}$ continues to be measured in physical units, so $p_t$ affects only the current-period cost of acquiring $d_t$, not its future service flow beyond ordinary depreciation.
 
+With the price-contingent budget constraint~\eqref{eq:price_budget}, the adjuster's Lagrangian is
+\begin{align}
+	\mathscr{L} = u(c_t,d_t) + \beta \mathbb{E}_t\big[v_{t+1}(m_{t+1},n_{t+1})\big] + \lambda_t^{\mathrm{adj}}\big(\ell_t - c_t - p_t\, d_t - a_t\big),
+\end{align}
+with $m_{t+1}=\mathcal{R}a_t+\theta_{t+1}$ and $n_{t+1}=(1-\delta)d_t$. The first-order conditions with respect to $c_t$, $a_t$, and $d_t$ are
+\begin{align}
+	\frac{\partial \mathscr{L}}{\partial c_t} &= u_c(c_t,d_t) - \lambda_t^{\mathrm{adj}} = 0
+	&&\Longrightarrow\quad \lambda_t^{\mathrm{adj}} = u_c(c_t,d_t), \label{eq:price_foc_c}\\
+	\frac{\partial \mathscr{L}}{\partial a_t} &= \beta \mathcal{R}\, \mathbb{E}_t\big[v_{t+1}^m\big] - \lambda_t^{\mathrm{adj}} = 0
+	&&\Longrightarrow\quad \lambda_t^{\mathrm{adj}} = \beta \mathcal{R}\, \mathbb{E}_t\big[v_{t+1}^m\big], \label{eq:price_foc_a}\\
+	\frac{\partial \mathscr{L}}{\partial d_t} &= u_d(c_t,d_t) + \beta(1-\delta)\,\mathbb{E}_t\big[v_{t+1}^n\big] - p_t\,\lambda_t^{\mathrm{adj}} = 0
+	&&\Longrightarrow\quad u_d(c_t,d_t) = p_t\,\lambda_t^{\mathrm{adj}} - \beta(1-\delta)\,\mathbb{E}_t\big[v_{t+1}^n\big]. \label{eq:price_foc_d}
+\end{align}
+In KKT form, these are the price-modified analogues of the baseline conditions~\eqref{eq:FOC_c_basic}--\eqref{eq:FOC_d_basic}:
+\begin{align}
+	u_c(c_t, d_t) &\geq \beta \mathcal{R}\, \mathbb{E}_t \big[v_{t+1}^m\big], \\
+	u_d(c_t, d_t) &\geq p_t\,\beta \mathcal{R}\, \mathbb{E}_t\big[v_{t+1}^m\big] - \beta (1 - \delta)\, \mathbb{E}_t\big[v_{t+1}^n\big].
+\end{align}
+Equation~\eqref{eq:price_foc_c} is identical in form to~\eqref{eq:FOC_c_basic}: because $p_t$ multiplies only $d_t$ in the budget, it does not appear in the $c_t$ first-order condition, so $c_t^{\mathrm{adj},\ast}$ solves the same equation as in the baseline model \emph{given} $d_t$. Equation~\eqref{eq:price_foc_d} differs from~\eqref{eq:FOC_d_basic}: the marginal cost of an extra unit of durables is now $p_t\lambda_t^{\mathrm{adj}}$ rather than $\lambda_t^{\mathrm{adj}}$, since each unit of $d_t$ costs $p_t$ units of $\ell_t$ instead of one. Equality holds when the borrowing constraint does not bind.
+
 Because $p_t$ is observed before the discrete choice is made, the household's beginning-of-period problem is the price-contingent hard maximum
 \begin{align}
 	v_t(m_t,n_t,p_t) = \max\Big\{ v_t^{\text{keep}}(m_t,n_t),\; v_t^{\text{adj}}(\ell_t,p_t)\Big\}. \label{eq:price_discrete}
 \end{align}
-A high realization of $p_t$ raises the marginal cost of adjusting and, other things equal, makes the household less likely to adjust and, conditional on adjusting, to purchase a smaller quantity of the durable; a low realization has the opposite effect. Because $\mathbb{E}[p_t]=1$, this leaves the \emph{average} cost of adjusting unchanged relative to the baseline model, but it introduces state-contingent variation in both the adjustment margin and the size of the resulting durable purchase.
+A high realization of $p_t$ raises the marginal cost of adjusting and, other things equal, makes the household less likely to adjust and, conditional on adjusting, to purchase a smaller quantity of the durable; a low realization has the opposite effect. Because agents can reject an offer when the drawn price leads to an allocation which is worse than the keeper solution, the model induces state-contingent variation in both the adjustment margin and the size of the resulting durable purchase.
 
 As with the EV Type I inclusive value, the object that matters for the previous period's continuation value is the price-integrated value function
 \begin{align}
 	\bar v_t(m_t,n_t) \equiv \mathbb{E}_{p_t}\Big[v_t(m_t,n_t,p_t)\Big]
 	= \mathbb{E}_{p_t}\Big[\max\big\{ v_t^{\text{keep}}(m_t,n_t),\; v_t^{\text{adj}}(\ell_t,p_t) \big\}\Big], \label{eq:price_barv}
 \end{align}
-which replaces $v_t(m_t,n_t)$ inside the Bellman equations for $v_{t-1}^{\text{keep}}$ and $v_{t-1}^{\text{adj}}$. Unlike EV Type I taste shocks, which leave the adjuster's optimal continuous choices unchanged and only reweight the discrete comparison through logit probabilities, the price shock changes the adjuster's optimal consumption-durable split itself, so $v_t^{\text{adj}}(\ell_t,p_t)$ must be solved separately for every relevant realization of $p_t$; the resulting policy functions $c_t^{\text{adj}}(\ell_t,p_t)$ and $d_t^{\text{adj}}(\ell_t,p_t)$ are likewise price-contingent, and the model's reported (ex-ante) nondurable-consumption and durable-purchase functions are price-weighted averages of these state-contingent choices, in the same spirit as $\bar v_t$. As $\sigma_p \to 0$, $p_t \to 1$ almost surely and the model collapses to the hard-maximum baseline of Section~\ref{sec:ModelBasic}. I derive the modified first-order conditions, the envelope conditions, the terminal-period solution, and the EGM algorithm with stochastic durable prices in appendix~\ref{subsec:appdx_price_basic}.
+which replaces $v_t(m_t,n_t)$ inside the Bellman equations for $v_{t-1}^{\text{keep}}$ and $v_{t-1}^{\text{adj}}$. Unlike EV Type I taste shocks, which leave the adjuster's optimal continuous choices unchanged and only reweight the discrete comparison through logit probabilities, the price shock changes the adjuster's optimal consumption-durable split itself, so $v_t^{\text{adj}}(\ell_t,p_t)$ must be solved separately for every relevant realization of $p_t$; the resulting policy functions $c_t^{\text{adj}}(\ell_t,p_t)$ and $d_t^{\text{adj}}(\ell_t,p_t)$ are likewise price-contingent, and the model's reported (ex-ante) nondurable-consumption and durable-purchase functions are price-weighted averages of these state-contingent choices, in the same spirit as $\bar v_t$. As $\sigma_p \to 0$, $p_t \to 1$ almost surely and the model collapses to the hard-maximum baseline of Section~\ref{sec:ModelBasic}. I derive the envelope conditions, the terminal-period solution, and the EGM algorithm with stochastic durable prices in appendix~\ref{subsec:appdx_price_basic}.
+
+Even stochastic prices induce enough uncertainty to lead to adjusting intensities between zero and one as seen in
+fig~\ref{fig:pricestd_Ss_T}. However, since sharp thresholds still exist, the consumption functions in T-1 are not as smooth as with taste shocks or endogeneous search.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.85\linewidth]{PriceStd_Ss_T.pdf}
+	\caption{Adjustment regions in period $T$ under stochastic durable prices for $\sigma_p \in \{0, 0.05, 0.1, 0.2\}$ (fixed number of price nodes). Greater price dispersion softens the hard keep--adjust threshold.}
+	\label{fig:pricestd_Ss_T}
+\end{figure}
+
+Figure~\ref{fig:pricestd_adj} shows the adjusting policy functions for variation in the price dispersion and figure~\ref{fig:pricecount_adj} for a coraser grid of price points.
+
+\begin{figure}[htbp]
+	\centering
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{PriceStd_cAdj.pdf}
+		\caption{Nondurable consumption $c_t^{\mathrm{adj}}(\ell_t)$.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{PriceStd_dAdj.pdf}
+		\caption{Durable consumption $d_t^{\mathrm{adj}}(\ell_t)$.}
+	\end{subfigure}
+	
+	\vspace{0.5em}
+	
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{PriceStd_cAdj_MPC.pdf}
+		\caption{MPC out of liquidity, $\partial c_t^{\mathrm{adj}}/\partial \ell_t$.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{PriceStd_dAdj_MPC.pdf}
+		\caption{MPC out of liquidity, $\partial d_t^{\mathrm{adj}}/\partial \ell_t$.}
+	\end{subfigure}
+	\caption{Adjuster policies and MPCs in period $T-1$ as the durable-price standard deviation $\sigma_p$ rises. Price risk smooths the adjuster's policies through the price-integrated continuation value.}
+	\label{fig:pricestd_adj}
+	\end{figure}
+	
+	\begin{figure}[htbp]
+	\centering
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{PriceCount_cAdj.pdf}
+		\caption{Nondurable consumption $c_t^{\mathrm{adj}}(\ell_t)$.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{PriceCount_dAdj.pdf}
+		\caption{Durable consumption $d_t^{\mathrm{adj}}(\ell_t)$.}
+	\end{subfigure}
+	
+	\vspace{0.5em}
+	
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{PriceCount_cAdj_MPC.pdf}
+		\caption{MPC out of liquidity, $\partial c_t^{\mathrm{adj}}/\partial \ell_t$.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{PriceCount_dAdj_MPC.pdf}
+		\caption{MPC out of liquidity, $\partial d_t^{\mathrm{adj}}/\partial \ell_t$.}
+	\end{subfigure}
+	\caption{Adjuster policies and MPCs in period $T-1$ as the number of durable-price nodes $N_p$ increases at fixed $\sigma_p = 0.1$.}
+	\label{fig:pricecount_adj}
+	\end{figure}
 
 \subsection{Extension: Search and Stochastic Prices}\label{subsec:ModelBasicFull}
 
@@ -175,236 +465,32 @@ Because $p_{t+1}$ is drawn afresh every period, the object that enters today's E
 \end{align}
 which replaces $v_t(m_t,n_t)$ inside the Bellman equations for $v_{t-1}^{\text{keep}}$ and $v_{t-1}^{\text{adj}}$. The two frictions play complementary roles: $p_t$ shifts the adjuster's continuous problem and therefore the level of $v_t^{\text{adj}}$; and $\varepsilon_t^\ast$ translates the resulting gap $v_t^{\text{adj}}-v_t^{\text{keep}}$ into a smooth probability of adjusting. I derive the optimal search-effort rule, the combined envelope conditions, the Euler equations, the terminal-period solution, and the EGM algorithm for the nested model in appendix~\ref{subsec:appdx_full_basic}.
 
-\subsection{Results Durable Model}
+Using a combination of endogeneous search and stochastic prices can smooth policy functions when searchfrictions are not enough.
 
-Fist, let's look at the optimal solution in the terminal period.
-
+Figures~\ref{fig:pricesearch_adj} show the T-1 solutions for different combinations of search friction and price shocks.
 \begin{figure}[htbp]
-\centering
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{Baseline_Ss_T.pdf}
-    \caption{Adjustment region (S,s bands).}
-\end{subfigure}
-\hfill
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{Baseline_d_T.pdf}
-    \caption{Durable policy $d_t(n_t,m_t)$.}
-\end{subfigure}
-\caption{Terminal-period solution of the baseline durable model (hard max). The left panel shows the keep--adjust regions in $(m_t,n_t)$ space; the right panel shows the combined durable policy for selected beginning-of-period durable stocks $n_t$.}
-\label{fig:baseline_T}
-\end{figure}
-
-The baseline model uses the hard-max between the options of adjusting and keeping. The S,s model leads to a sharp switch between fully adjusting or fully keeping. As a result, the optimal policy functions of the model conditional on adjusting and keeping experience a sharp discontinuity.
-
-In period T-1, this leads to discontinuities in the policy function of the adjuster.
-
-\begin{figure}[htbp]
-\centering
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{Baseline_cAdj.pdf}
-    \caption{Nondurable consumption $c_t^{\mathrm{adj}}(\ell_t)$.}
-\end{subfigure}
-\hfill
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{Baseline_dAdj.pdf}
-    \caption{Durable consumption $d_t^{\mathrm{adj}}(\ell_t)$.}
-\end{subfigure}
-
-\vspace{0.5em}
-
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{Baseline_cAdj_MPC.pdf}
-    \caption{MPC out of liquidity, $\partial c_t^{\mathrm{adj}}/\partial \ell_t$.}
-\end{subfigure}
-\hfill
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{Baseline_dAdj_MPC.pdf}
-    \caption{MPC out of liquidity, $\partial d_t^{\mathrm{adj}}/\partial \ell_t$.}
-\end{subfigure}
-\caption{Adjuster policy functions in period $T-1$ of the baseline durable model (hard max). Top row: optimal nondurable and durable consumption as functions of liquidity $\ell_t$. Bottom row: corresponding marginal propensities to consume out of liquidity. The kinks reflect discontinuities induced by the hard keep--adjust threshold.}
-\label{fig:baseline_adj_Tm1}
-\end{figure}
-
-Even in the presence of FUES, these discontinuities are optimal in the setting without smoothing
-
-\paragraph{EV I: taste shocks}
-In the presence of EV I taste shocks, the S,s bands become smoother and with it the policy functions of the combined solution.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\linewidth]{TasteShock_Ss.pdf}
-\caption{Adjustment probabilities in period $T-1$ under EV Type I taste shocks for $\sigma_\varepsilon \in \{0, 0.05, 0.1, 0.2\}$. Larger taste-shock scale spreads probability mass near the keep--adjust margin and smooths the S,s bands.}
-\label{fig:taste_Ss}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{TasteShock_cAdj.pdf}
-    \caption{Nondurable consumption $c_t^{\mathrm{adj}}(\ell_t)$.}
-\end{subfigure}
-\hfill
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{TasteShock_dAdj.pdf}
-    \caption{Durable consumption $d_t^{\mathrm{adj}}(\ell_t)$.}
-\end{subfigure}
-
-\vspace{0.5em}
-
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{TasteShock_cAdj_MPC.pdf}
-    \caption{MPC out of liquidity, $\partial c_t^{\mathrm{adj}}/\partial \ell_t$.}
-\end{subfigure}
-\hfill
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{TasteShock_dAdj_MPC.pdf}
-    \caption{MPC out of liquidity, $\partial d_t^{\mathrm{adj}}/\partial \ell_t$.}
-\end{subfigure}
-\caption{Adjuster policies and MPCs in period $T-1$ under EV Type I taste shocks for $\sigma_\varepsilon \in \{0, 0.05, 0.1, 0.2\}$. Relative to the hard-max baseline, larger $\sigma_\varepsilon$ smooths the kink in both levels and marginal propensities.}
-\label{fig:taste_adj}
-\end{figure}
-
-\paragraph{Search}
-The similar effect can be created with endogeneous search.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\linewidth]{Search_Ss.pdf}
-\caption{Expected search effort / adjustment intensity in period $T-1$ for search-cost scales $S \in \{0, 0.05, 0.1, 0.2\}$. Higher $S$ smooths the keep--adjust margin in the same qualitative way as taste shocks.}
-\label{fig:search_Ss}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{Search_cAdj.pdf}
-    \caption{Nondurable consumption $c_t^{\mathrm{adj}}(\ell_t)$.}
-\end{subfigure}
-\hfill
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{Search_dAdj.pdf}
-    \caption{Durable consumption $d_t^{\mathrm{adj}}(\ell_t)$.}
-\end{subfigure}
-
-\vspace{0.5em}
-
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{Search_cAdj_MPC.pdf}
-    \caption{MPC out of liquidity, $\partial c_t^{\mathrm{adj}}/\partial \ell_t$.}
-\end{subfigure}
-\hfill
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{Search_dAdj_MPC.pdf}
-    \caption{MPC out of liquidity, $\partial d_t^{\mathrm{adj}}/\partial \ell_t$.}
-\end{subfigure}
-\caption{Adjuster policies and MPCs in period $T-1$ under directed search for $S \in \{0, 0.05, 0.1, 0.2\}$. Endogenous search effort smooths the adjuster's kink analogously to EV Type I taste shocks.}
-\label{fig:search_adj}
-\end{figure}
-
-\paragraph{Stochastic Prices}
-An additional way to smooth is to have stochastic prices. Here, we can either change the spread of price dispersion (Fig.~\ref{fig:pricestd_Ss}) or increase the number of price points (Fig.~\ref{fig:pricecount_Ss}).
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\linewidth]{PriceStd_Ss.pdf}
-\caption{Adjustment regions in period $T-1$ under stochastic durable prices for $\sigma_p \in \{0, 0.05, 0.1, 0.2\}$ (fixed number of price nodes). Greater price dispersion softens the hard keep--adjust threshold.}
-\label{fig:pricestd_Ss}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{PriceStd_cAdj.pdf}
-    \caption{Nondurable consumption $c_t^{\mathrm{adj}}(\ell_t)$.}
-\end{subfigure}
-\hfill
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{PriceStd_dAdj.pdf}
-    \caption{Durable consumption $d_t^{\mathrm{adj}}(\ell_t)$.}
-\end{subfigure}
-
-\vspace{0.5em}
-
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{PriceStd_cAdj_MPC.pdf}
-    \caption{MPC out of liquidity, $\partial c_t^{\mathrm{adj}}/\partial \ell_t$.}
-\end{subfigure}
-\hfill
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{PriceStd_dAdj_MPC.pdf}
-    \caption{MPC out of liquidity, $\partial d_t^{\mathrm{adj}}/\partial \ell_t$.}
-\end{subfigure}
-\caption{Adjuster policies and MPCs in period $T-1$ as the durable-price standard deviation $\sigma_p$ rises. Price risk smooths the adjuster's policies through the price-integrated continuation value.}
-\label{fig:pricestd_adj}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\linewidth]{PriceCount_Ss.pdf}
-\caption{Adjustment regions in period $T-1$ for a fixed price dispersion $\sigma_p = 0.1$ and an increasing number of price nodes $N_p \in \{1, 5, 13, 21\}$. Finer quadrature over $p_t$ improves the approximation of the price-integrated value and further smooths the S,s bands.}
-\label{fig:pricecount_Ss}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{PriceCount_cAdj.pdf}
-    \caption{Nondurable consumption $c_t^{\mathrm{adj}}(\ell_t)$.}
-\end{subfigure}
-\hfill
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{PriceCount_dAdj.pdf}
-    \caption{Durable consumption $d_t^{\mathrm{adj}}(\ell_t)$.}
-\end{subfigure}
-
-\vspace{0.5em}
-
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{PriceCount_cAdj_MPC.pdf}
-    \caption{MPC out of liquidity, $\partial c_t^{\mathrm{adj}}/\partial \ell_t$.}
-\end{subfigure}
-\hfill
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{PriceCount_dAdj_MPC.pdf}
-    \caption{MPC out of liquidity, $\partial d_t^{\mathrm{adj}}/\partial \ell_t$.}
-\end{subfigure}
-\caption{Adjuster policies and MPCs in period $T-1$ as the number of durable-price nodes $N_p$ increases at fixed $\sigma_p = 0.1$.}
-\label{fig:pricecount_adj}
-\end{figure}
-
-\paragraph{Combining Search and Stochastic Prices}
-In case endogeneous search does not lead to \textit{enough} smoothing, search and stochastic prices can be combined.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\linewidth]{PriceStd_Search_Ss.pdf}
-\caption{Adjustment intensity in period $T-1$ for the nested search--price environment with $(S,\sigma_p) \in \{(0,0),(0.1,0),(0,0.1),(0.1,0.1)\}$. Combining search frictions with price risk yields smoother keep--adjust margins than either channel alone.}
-\label{fig:pricesearch_Ss}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{PriceStd_Search_cAdj.pdf}
-    \caption{Nondurable consumption $c_t^{\mathrm{adj}}(\ell_t)$.}
-\end{subfigure}
-\hfill
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{PriceStd_Search_dAdj.pdf}
-    \caption{Durable consumption $d_t^{\mathrm{adj}}(\ell_t)$.}
-\end{subfigure}
-
-\vspace{0.5em}
-
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{PriceStd_Search_cAdj_MPC.pdf}
-    \caption{MPC out of liquidity, $\partial c_t^{\mathrm{adj}}/\partial \ell_t$.}
-\end{subfigure}
-\hfill
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width=\linewidth]{PriceStd_Search_dAdj_MPC.pdf}
-    \caption{MPC out of liquidity, $\partial d_t^{\mathrm{adj}}/\partial \ell_t$.}
-\end{subfigure}
-\caption{Adjuster policies and MPCs in period $T-1$ when search and stochastic prices are nested. The joint $(S,\sigma_p)=(0.1,0.1)$ case delivers the smoothest adjuster response.}
-\label{fig:pricesearch_adj}
-\end{figure}
+	\centering
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{PriceStd_Search_cAdj.pdf}
+		\caption{Nondurable consumption $c_t^{\mathrm{adj}}(\ell_t)$.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{PriceStd_Search_dAdj.pdf}
+		\caption{Durable consumption $d_t^{\mathrm{adj}}(\ell_t)$.}
+	\end{subfigure}
+	
+	\vspace{0.5em}
+	
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{PriceStd_Search_cAdj_MPC.pdf}
+		\caption{MPC out of liquidity, $\partial c_t^{\mathrm{adj}}/\partial \ell_t$.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{PriceStd_Search_dAdj_MPC.pdf}
+		\caption{MPC out of liquidity, $\partial d_t^{\mathrm{adj}}/\partial \ell_t$.}
+	\end{subfigure}
+	\caption{Adjuster policies and MPCs in period $T-1$ when search and stochastic prices are nested. The joint $(S,\sigma_p)=(0.1,0.1)$ case delivers the smoothest adjuster response.}
+	\label{fig:pricesearch_adj}
+	\end{figure}

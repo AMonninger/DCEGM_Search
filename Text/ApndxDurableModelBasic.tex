@@ -1,24 +1,4 @@
 \section{Model Appendix}\label{sec:appdx_model_basic}
-\subsection{Discussion of the solver algorithm}
-The solution consists of multiple steps:
-\begin{enumerate}
-	\item Calculate Terminal period
-	\item Calculate End-Of-Period Functions
-	\item Solve Keeper: Use Upper-Envelope
-	\item Solve Adjuster:
-	\begin{enumerate}
-		\item Root-finding problem
-		\item Fast Upper Envelope Scan (FUES)
-		\item Constraint
-	\end{enumerate}
-	\item Discrete Choice
-	\begin{enumerate}
-		\item Hard maximum over keep and adjust
-		\item Combine
-	\end{enumerate}
-\end{enumerate}
-
-
 \subsection{Derive Beginning-of-Period Marginal Value Functions}
 
 Problem in Bellman Form:
@@ -440,23 +420,10 @@ When a conditional value is infinite (for example because a branch is infeasible
 
 \subsection{Derivations: Stochastic Durable Prices (Section~\ref{subsec:ModelBasicPrice})}\label{subsec:appdx_price_basic}
 
-This subsection derives the modified first-order conditions, the envelope conditions, the terminal-period solution, and the EGM algorithm for the stochastic-price extension of Section~\ref{subsec:ModelBasicPrice}. The keeper's Bellman problem, first-order condition, and envelope results, equations~\eqref{eq:keep_m_basic}--\eqref{eq:keep_n_basic}, carry over unchanged, since the keeper never transacts in the durable market. What changes is the adjuster's budget constraint, its first-order condition with respect to $d_t$, and, consequently, how the two branches are combined.
+This subsection derives the envelope conditions, the terminal-period solution, and the EGM algorithm for the stochastic-price extension of Section~\ref{subsec:ModelBasicPrice}. The keeper's Bellman problem, first-order condition, and envelope results, equations~\eqref{eq:keep_m_basic}--\eqref{eq:keep_n_basic}, carry over unchanged, since the keeper never transacts in the durable market. What changes is the adjuster's budget constraint, its first-order condition with respect to $d_t$ (equations~\eqref{eq:price_foc_c}--\eqref{eq:price_foc_d} in the main text), and, consequently, how the two branches are combined.
 
 \paragraph{Adjuster first-order conditions with a stochastic price}
-With the price-contingent budget constraint~\eqref{eq:price_budget}, the adjuster's Lagrangian is
-\begin{align}
-	\mathscr{L} = u(c_t,d_t) + \beta \mathbb{E}_t\big[v_{t+1}(m_{t+1},n_{t+1})\big] + \lambda_t^{adj}\big(\ell_t - c_t - p_t\, d_t - a_t\big),
-\end{align}
-with $m_{t+1}=\mathcal{R}a_t+\theta_{t+1}$ and $n_{t+1}=(1-\delta)d_t$ substituted in. The first-order conditions with respect to $c_t$, $a_t$, and $d_t$ are
-\begin{align}
-	\frac{\partial \mathscr{L}}{\partial c_t} &= u_c(c_t,d_t) - \lambda_t^{adj} = 0
-	&&\Longrightarrow\quad \lambda_t^{adj} = u_c(c_t,d_t), \label{eq:price_foc_c}\\
-	\frac{\partial \mathscr{L}}{\partial a_t} &= \beta \mathcal{R}\, \mathbb{E}_t\big[v_{t+1}^m\big] - \lambda_t^{adj} = 0
-	&&\Longrightarrow\quad \lambda_t^{adj} = \beta \mathcal{R}\, \mathbb{E}_t\big[v_{t+1}^m\big], \label{eq:price_foc_a}\\
-	\frac{\partial \mathscr{L}}{\partial d_t} &= u_d(c_t,d_t) + \beta(1-\delta)\,\mathbb{E}_t\big[v_{t+1}^n\big] - p_t\,\lambda_t^{adj} = 0
-	&&\Longrightarrow\quad u_d(c_t,d_t) = p_t\,\lambda_t^{adj} - \beta(1-\delta)\,\mathbb{E}_t\big[v_{t+1}^n\big]. \label{eq:price_foc_d}
-\end{align}
-Equation~\eqref{eq:price_foc_c} is identical in form to the baseline first-order condition~\eqref{eq:FOC_c_basic}: because $p_t$ multiplies only $d_t$ in the budget constraint, it does not appear in the $c_t$ first-order condition, so $c_t^{adj,\ast}$ solves the same equation as in the baseline model \emph{given} $d_t$. Equation~\eqref{eq:price_foc_d} is the price-modified analogue of the baseline condition~\eqref{eq:FOC_d_basic}: the marginal cost of an extra unit of durables is now $p_t\lambda_t^{adj}$ rather than $\lambda_t^{adj}$, since each unit of $d_t$ now costs $p_t$ units of $\ell_t$ instead of one. As KKT conditions, equality in~\eqref{eq:price_foc_c}--\eqref{eq:price_foc_d} holds whenever the borrowing constraint does not bind, and the left-hand side exceeds the right-hand side otherwise.
+The price-modified first-order conditions~\eqref{eq:price_foc_c}--\eqref{eq:price_foc_d} are stated in the main text (Section~\ref{subsec:ModelBasicPrice}). Equation~\eqref{eq:price_foc_c} is identical in form to the baseline first-order condition~\eqref{eq:FOC_c_basic}: because $p_t$ multiplies only $d_t$ in the budget constraint, it does not appear in the $c_t$ first-order condition, so $c_t^{adj,\ast}$ solves the same equation as in the baseline model \emph{given} $d_t$. Equation~\eqref{eq:price_foc_d} is the price-modified analogue of the baseline condition~\eqref{eq:FOC_d_basic}: the marginal cost of an extra unit of durables is now $p_t\lambda_t^{adj}$ rather than $\lambda_t^{adj}$, since each unit of $d_t$ now costs $p_t$ units of $\ell_t$ instead of one. As KKT conditions, equality in~\eqref{eq:price_foc_c}--\eqref{eq:price_foc_d} holds whenever the borrowing constraint does not bind, and the left-hand side exceeds the right-hand side otherwise.
 
 \paragraph{Envelope conditions}
 Because $\ell_t$ still enters the adjuster's problem only through the linear resource constraint~\eqref{eq:price_budget}, and $p_t$ is a scalar parameter rather than a function of $\ell_t$, the envelope argument of Steps 1--5 above goes through unchanged with $p_t$ held fixed:
