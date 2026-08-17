@@ -266,6 +266,8 @@ class DurableConsumerSolution(MetricObject):
         dFuncAdj=None,
         cFuncAdj_1d=None,
         dFuncAdj_1d=None,
+        cFuncAdj_1d_list=None,
+        dFuncAdj_1d_list=None,
         adjusting_arr=None,
         cFunc_arr=None,
         dFunc_arr=None,
@@ -310,6 +312,9 @@ class DurableConsumerSolution(MetricObject):
         # 1-D adjuster policies in liquidity ℓ (representative price ≈ 1)
         self.cFuncAdj_1d = cFuncAdj_1d
         self.dFuncAdj_1d = dFuncAdj_1d
+        # All price-node-specific 1-D adjuster policies
+        self.cFuncAdj_1d_list = cFuncAdj_1d_list
+        self.dFuncAdj_1d_list = dFuncAdj_1d_list
         self.adjusting_arr = adjusting_arr
         self.cFunc_arr = cFunc_arr
         self.dFunc_arr = dFunc_arr
@@ -710,6 +715,14 @@ class DurableConsumer:
         # 1-D adjuster in liquidity (analytical terminal)
         c_1d = alpha * self.xNrmGrid
         d_1d = (1.0 - alpha) * self.xNrmGrid / PriceShkVals[i_p0]
+        c_1d_list = [
+            LinearFast(alpha * self.xNrmGrid, [self.xNrmGrid])
+            for _ in PriceShkVals
+        ]
+        d_1d_list = [
+            LinearFast((1.0 - alpha) * self.xNrmGrid / p0, [self.xNrmGrid])
+            for p0 in PriceShkVals
+        ]
         sol = DurableConsumerSolution(
             cFunc=cFunc_T,
             dFunc=dFunc_T,
@@ -727,6 +740,8 @@ class DurableConsumer:
             dFuncAdj=dFuncAdj_NM_T if nPrice == 1 else LinearFast(dFuncAdj_SOL_T[i_p0], [nNrmGrid_T, mNrmGrid_T]),
             cFuncAdj_1d=LinearFast(c_1d, [self.xNrmGrid]),
             dFuncAdj_1d=LinearFast(d_1d, [self.xNrmGrid]),
+            cFuncAdj_1d_list=c_1d_list,
+            dFuncAdj_1d_list=d_1d_list,
             adjusting_arr=adjusting_T_arr,
             cFunc_arr=cFunc_T_arr,
             dFunc_arr=dFunc_T_arr,
@@ -1335,6 +1350,8 @@ class DurableConsumer:
             dFuncAdj=adj["dFuncAdj"],
             cFuncAdj_1d=adj["cFuncAdj_list"][i_p0],
             dFuncAdj_1d=adj["dFuncAdj_list"][i_p0],
+            cFuncAdj_1d_list=adj["cFuncAdj_list"],
+            dFuncAdj_1d_list=adj["dFuncAdj_list"],
             adjusting_arr=adjusting_arr,
             cFunc_arr=cFunc_arr,
             dFunc_arr=dFunc_arr,
