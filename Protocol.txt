@@ -16,6 +16,14 @@ Day 7/17/2026
 - Optional TranShkMinMethod truncation ('truncation' / 'disc_min'); same-support clip for Discretize
 - Convergence experiment at sigma=sqrt(0.005); filled §2.5 table/figure + shock-size note in dcegmSearch.tex
 
+Day 8/17/2026
+- Figures_Durable.ipynb: combined (total) policy MPCs `plot_combined_mpcs` (c/d vs m at t=T; same n curves)
+- Combined MPC decomp `plot_combined_mpcs_decomp`: combined / adjuster(2D) / keeper at fixed n=0.5
+  - left axis black MPCs, right axis red policies (solid / dashed / dotted)
+  - S,s background via continuous viridis of adjusting(n,m), transparent
+  - figures for both t=T and t=T-1
+- Price adjuster plots (PriceStd, PriceCount, PriceStd_Search): per-model subplots with all price-node
+  c/d adjuster policies and MPCs (not only p≈1); DurableModel retains cFuncAdj_1d_list / dFuncAdj_1d_list
 
 To do:
 - Transitionmatrix: not more efficient than 151 version...
@@ -23,3 +31,4 @@ To do:
 - Add Transitionmatrix version which includes TasteShock (instead of discretizing tasteshock with many points)
 - play around with jax and autodiff
 - Example 2: durable vs non-durable
+- MPC for price looks not smooth!
