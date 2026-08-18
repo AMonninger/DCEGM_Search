@@ -509,6 +509,9 @@ class DurableConsumer:
         self.nNrmGrid = np.unique(
             np.append(0.0, construct_grid(0.001, self.nNrmMax, self.nNrmCount - 1, gtype, nest))
         )
+        # add n = 0.5 to the grid (for figure purposes)
+        self.nNrmGrid = np.sort(np.unique(np.append(self.nNrmGrid, 0.5)))
+
         self.mNrmGrid = np.unique(
             np.append(0.0, construct_grid(0.001, self.mNrmMax, self.mNrmCount - 1, gtype, nest))
         )
