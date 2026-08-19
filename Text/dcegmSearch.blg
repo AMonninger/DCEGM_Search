@@ -1,50 +1,53 @@
-This is BibTeX, Version 0.99d (TeX Live 2023)
+This is BibTeX, Version 0.99e
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: dcegmSearch.aux
+Reallocating 'name_of_file' (item size: 1) to 9 items.
 The style file: plainnat.bst
+Reallocating 'name_of_file' (item size: 1) to 11 items.
 Database file #1: References.bib
 Warning--I didn't find a database entry for "Carroll2017-hk"
+Warning--I didn't find a database entry for "McKay2021"
 Warning--empty journal in Mankiw1983-za
 Warning--there's a number but no volume in Mankiw1983-za
-You've used 12 entries,
+You've used 19 entries,
             2773 wiz_defined-function locations,
-            685 strings with 6983 characters,
-and the built_in function-call counts, 4972 in all, are:
-= -- 455
-> -- 222
-< -- 10
-+ -- 78
-- -- 66
-* -- 396
-:= -- 769
-add.period$ -- 36
-call.type$ -- 12
-change.case$ -- 58
-chr.to.int$ -- 12
-cite$ -- 26
-duplicate$ -- 238
-empty$ -- 443
-format.name$ -- 86
-if$ -- 1024
+            736 strings with 8157 characters,
+and the built_in function-call counts, 8007 in all, are:
+= -- 740
+> -- 376
+< -- 15
++ -- 130
+- -- 111
+* -- 642
+:= -- 1239
+add.period$ -- 58
+call.type$ -- 19
+change.case$ -- 94
+chr.to.int$ -- 19
+cite$ -- 40
+duplicate$ -- 375
+empty$ -- 700
+format.name$ -- 146
+if$ -- 1656
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 12
-newline$ -- 68
-num.names$ -- 48
-pop$ -- 107
+missing$ -- 19
+newline$ -- 103
+num.names$ -- 76
+pop$ -- 167
 preamble$ -- 1
-purify$ -- 46
+purify$ -- 75
 quote$ -- 0
-skip$ -- 164
+skip$ -- 267
 stack$ -- 0
-substring$ -- 227
-swap$ -- 21
+substring$ -- 369
+swap$ -- 28
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 132
+type$ -- 204
 warning$ -- 2
-while$ -- 52
+while$ -- 83
 width$ -- 0
-write$ -- 159
-(There were 3 warnings)
+write$ -- 251
+(There were 4 warnings)

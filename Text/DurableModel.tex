@@ -1,4 +1,4 @@
-\section{Durable model}
+\section{Durable model}\label{sec:DurableModel}
 
 The second example is a consumption-savings model with durable and nondurable goods. It is a simplified version of the model in \cite{Monninger2025-cz} which uses endogeneous search as a numerical tool to solve the model. This section focuses on the solution method and compares the usage of taste shocks, endogeneous search, and stochastic durable prices.
 
@@ -167,7 +167,7 @@ Fig.~\ref{fig:baseline_T} illustrates the terminal solution. Taking the hard-max
 \end{figure}
 	
 	
-In earlier period, the agent incorporates the switchpoints in the next period into the solution of today's problem. Together with non-convex adjustment costs, the first order conditions are only necessary, but not sufficient. Hence, we need to incorporate an upper envelope algorithm such as FUES. However, even with this algorithm, small discontinuities still arise in the adjuster policy functions. Additionally, by combining the keeper and adjuster functions each period, these non-convexities propagade backwards similar to the retirement problem. Figure~\ref{fig:baseline_t_MPC_decomp} illustrates this for a fixed beginning-of-period durable stock $n_t$. In the yellow adjuster region, the policy function and MPC follows the adjuster policy function. With higher market resources, the S,s border gets crossed resulting in stark spikes in MPCs.
+In earlier periods, the agent incorporates the switchpoints in the next period into the solution of today's problem. Together with non-convex adjustment costs, the first order conditions are only necessary, but not sufficient. Hence, we need to incorporate an upper envelope algorithm such as FUES. However, even with this algorithm, small discontinuities still arise in the adjuster policy functions. Additionally, by combining the keeper and adjuster functions each period, these non-convexities propagade backwards similar to the retirement problem. Figure~\ref{fig:baseline_t_MPC_decomp} illustrates this for a fixed beginning-of-period durable stock $n_t$. In the yellow adjuster region, the policy function and MPC follows the adjuster policy function. With higher market resources, the S,s border gets crossed resulting in stark spikes in MPCs.
 
 \begin{figure}[htbp]
 	\centering
