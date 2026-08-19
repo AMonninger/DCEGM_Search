@@ -1,112 +1,108 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.18)  18 AUG 2026 18:05
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.11.27)  18 AUG 2026 21:20
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**./dcegmSearch.tex
-(dcegmSearch.tex
-LaTeX2e <2025-11-01>
-L3 programming layer <2025-12-24>
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
-Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/base\size11.clo
-File: size11.clo 2025/01/22 v1.4n Standard LaTeX file (size option)
+**dcegmSearch.tex
+(./dcegmSearch.tex
+LaTeX2e <2023-11-01>
+L3 programming layer <2023-11-09>
+(c:/texlive/2023/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(c:/texlive/2023/texmf-dist/tex/latex/base/size11.clo
+File: size11.clo 2023/05/17 v1.4n Standard LaTeX file (size option)
 )
-\c@part=\count275
-\c@section=\count276
-\c@subsection=\count277
-\c@subsubsection=\count278
-\c@paragraph=\count279
-\c@subparagraph=\count280
-\c@figure=\count281
-\c@table=\count282
-\abovecaptionskip=\skip49
-\belowcaptionskip=\skip50
-\bibindent=\dimen148
+\c@part=\count186
+\c@section=\count187
+\c@subsection=\count188
+\c@subsubsection=\count189
+\c@paragraph=\count190
+\c@subparagraph=\count191
+\c@figure=\count192
+\c@table=\count193
+\abovecaptionskip=\skip48
+\belowcaptionskip=\skip49
+\bibindent=\dimen140
 )
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/base\inputenc.sty
-Package: inputenc 2024/02/08 v1.3d Input encoding file
+(c:/texlive/2023/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2021/02/14 v1.3d Input encoding file
 \inpenc@prehook=\toks17
 \inpenc@posthook=\toks18
-) (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/base\fontenc.sty
-Package: fontenc 2025/07/18 v2.1d Standard LaTeX package
 )
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsmath.st
-y
-Package: amsmath 2025/07/09 v2.17z AMS math features
-\@mathmargin=\skip51
+(c:/texlive/2023/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
+)
+(c:/texlive/2023/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2023/05/13 v2.17o AMS math features
+\@mathmargin=\skip50
 
 For additional information on amsmath, use the `?' option.
+(c:/texlive/2023/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2021/08/26 v2.01 AMS text
 
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amstext.st
-y
-Package: amstext 2024/11/17 v2.01 AMS text
-
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsgen.sty
+(c:/texlive/2023/texmf-dist/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks19
-\ex@=\dimen149
+\ex@=\dimen141
 ))
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsbsy.sty
+(c:/texlive/2023/texmf-dist/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
-\pmbraise@=\dimen150
+\pmbraise@=\dimen142
 )
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsopn.sty
+(c:/texlive/2023/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 2022/04/08 v2.04 operator names
 )
-\inf@bad=\count283
-LaTeX Info: Redefining \frac on input line 233.
-\uproot@=\count284
-\leftroot@=\count285
-LaTeX Info: Redefining \overline on input line 398.
-LaTeX Info: Redefining \colon on input line 409.
-\classnum@=\count286
-\DOTSCASE@=\count287
-LaTeX Info: Redefining \ldots on input line 495.
-LaTeX Info: Redefining \dots on input line 498.
-LaTeX Info: Redefining \cdots on input line 619.
-\Mathstrutbox@=\box53
-\strutbox@=\box54
-LaTeX Info: Redefining \big on input line 721.
-LaTeX Info: Redefining \Big on input line 722.
-LaTeX Info: Redefining \bigg on input line 723.
-LaTeX Info: Redefining \Bigg on input line 724.
-\big@size=\dimen151
-LaTeX Font Info:    Redeclaring font encoding OML on input line 742.
-LaTeX Font Info:    Redeclaring font encoding OMS on input line 743.
-\macc@depth=\count288
-LaTeX Info: Redefining \bmod on input line 904.
-LaTeX Info: Redefining \pmod on input line 909.
-LaTeX Info: Redefining \smash on input line 939.
-LaTeX Info: Redefining \relbar on input line 969.
-LaTeX Info: Redefining \Relbar on input line 970.
-\c@MaxMatrixCols=\count289
-\dotsspace@=\muskip17
-\c@parentequation=\count290
-\dspbrk@lvl=\count291
+\inf@bad=\count194
+LaTeX Info: Redefining \frac on input line 234.
+\uproot@=\count195
+\leftroot@=\count196
+LaTeX Info: Redefining \overline on input line 399.
+LaTeX Info: Redefining \colon on input line 410.
+\classnum@=\count197
+\DOTSCASE@=\count198
+LaTeX Info: Redefining \ldots on input line 496.
+LaTeX Info: Redefining \dots on input line 499.
+LaTeX Info: Redefining \cdots on input line 620.
+\Mathstrutbox@=\box51
+\strutbox@=\box52
+LaTeX Info: Redefining \big on input line 722.
+LaTeX Info: Redefining \Big on input line 723.
+LaTeX Info: Redefining \bigg on input line 724.
+LaTeX Info: Redefining \Bigg on input line 725.
+\big@size=\dimen143
+LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
+\macc@depth=\count199
+LaTeX Info: Redefining \bmod on input line 905.
+LaTeX Info: Redefining \pmod on input line 910.
+LaTeX Info: Redefining \smash on input line 940.
+LaTeX Info: Redefining \relbar on input line 970.
+LaTeX Info: Redefining \Relbar on input line 971.
+\c@MaxMatrixCols=\count266
+\dotsspace@=\muskip16
+\c@parentequation=\count267
+\dspbrk@lvl=\count268
 \tag@help=\toks20
-\row@=\count292
-\column@=\count293
-\maxfields@=\count294
+\row@=\count269
+\column@=\count270
+\maxfields@=\count271
 \andhelp@=\toks21
-\eqnshift@=\dimen152
-\alignsep@=\dimen153
-\tagshift@=\dimen154
-\tagwidth@=\dimen155
-\totwidth@=\dimen156
-\lineht@=\dimen157
+\eqnshift@=\dimen144
+\alignsep@=\dimen145
+\tagshift@=\dimen146
+\tagwidth@=\dimen147
+\totwidth@=\dimen148
+\lineht@=\dimen149
 \@envbody=\toks22
-\multlinegap=\skip52
-\multlinetaggap=\skip53
+\multlinegap=\skip51
+\multlinetaggap=\skip52
 \mathdisplay@stack=\toks23
-LaTeX Info: Redefining \[ on input line 2950.
-LaTeX Info: Redefining \] on input line 2951.
+LaTeX Info: Redefining \[ on input line 2953.
+LaTeX Info: Redefining \] on input line 2954.
 )
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amssymb.s
-ty
+(c:/texlive/2023/texmf-dist/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
 
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amsfonts.
-sty
+(c:/texlive/2023/texmf-dist/tex/latex/amsfonts/amsfonts.sty
 Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
 \symAMSa=\mathgroup4
 \symAMSb=\mathgroup5
@@ -114,421 +110,1180 @@ LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
 ))
+(c:/texlive/2023/texmf-dist/tex/latex/mathtools/mathtools.sty
+Package: mathtools 2022/06/29 v1.29 mathematical typesetting tools
 
-! LaTeX Error: File `mathtools.sty' not found.
-
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: sty)
-
-Enter file name: 
-
-! LaTeX Error: File `mathrsfs.sty' not found.
-
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: sty)
-
-Enter file name: 
-
-! LaTeX Error: File `bbm.sty' not found.
-
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: sty)
-
-Enter file name: 
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/tools\bm.sty
-Package: bm 2025/10/21 v1.2g Bold Symbol Support (DPC/FMi)
-\symboldoperators=\mathgroup6
-\symboldletters=\mathgroup7
-\symboldsymbols=\mathgroup8
-Package bm Info: No bold for \OMX/cmex/m/n, using \pmb.
-Package bm Info: No bold for \U/msa/m/n, using \pmb.
-Package bm Info: No bold for \U/msb/m/n, using \pmb.
-LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 149.
-)
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.
-sty
-Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
-
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.st
-y
+(c:/texlive/2023/texmf-dist/tex/latex/graphics/keyval.sty
 Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
 \KV@toks@=\toks24
 )
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.
-sty
-Package: graphics 2024/08/06 v1.4g Standard LaTeX Graphics (DPC,SPQR)
-
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty
-Package: trig 2023/12/02 v1.11 sin cos tan (DPC)
+(c:/texlive/2023/texmf-dist/tex/latex/tools/calc.sty
+Package: calc 2023/07/08 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count272
+\calc@Bcount=\count273
+\calc@Adimen=\dimen150
+\calc@Bdimen=\dimen151
+\calc@Askip=\skip53
+\calc@Bskip=\skip54
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count274
+\calc@Cskip=\skip55
 )
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graph
-ics.cfg
+(c:/texlive/2023/texmf-dist/tex/latex/mathtools/mhsetup.sty
+Package: mhsetup 2021/03/18 v1.4 programming setup (MH)
+)
+\g_MT_multlinerow_int=\count275
+\l_MT_multwidth_dim=\dimen152
+\origjot=\skip56
+\l_MT_shortvdotswithinadjustabove_dim=\dimen153
+\l_MT_shortvdotswithinadjustbelow_dim=\dimen154
+\l_MT_above_intertext_sep=\dimen155
+\l_MT_below_intertext_sep=\dimen156
+\l_MT_above_shortintertext_sep=\dimen157
+\l_MT_below_shortintertext_sep=\dimen158
+\xmathstrut@box=\box53
+\xmathstrut@dim=\dimen159
+)
+(c:/texlive/2023/texmf-dist/tex/latex/jknapltx/mathrsfs.sty
+Package: mathrsfs 1996/01/01 Math RSFS package v1.0 (jk)
+\symrsfs=\mathgroup6
+)
+(c:/texlive/2023/texmf-dist/tex/latex/bbm-macros/bbm.sty
+Package: bbm 1999/03/15 V 1.2 provides fonts for set symbols - TH
+LaTeX Font Info:    Overwriting math alphabet `\mathbbm' in version `bold'
+(Font)                  U/bbm/m/n --> U/bbm/bx/n on input line 33.
+LaTeX Font Info:    Overwriting math alphabet `\mathbbmss' in version `bold'
+(Font)                  U/bbmss/m/n --> U/bbmss/bx/n on input line 35.
+)
+(c:/texlive/2023/texmf-dist/tex/latex/tools/bm.sty
+Package: bm 2023/07/08 v1.2f Bold Symbol Support (DPC/FMi)
+\symboldoperators=\mathgroup7
+\symboldletters=\mathgroup8
+\symboldsymbols=\mathgroup9
+Package bm Info: No bold for \OMX/cmex/m/n, using \pmb.
+Package bm Info: No bold for \U/msa/m/n, using \pmb.
+Package bm Info: No bold for \U/msb/m/n, using \pmb.
+Package bm Info: No bold for \U/rsfs/m/n, using \pmb.
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 149.
+)
+(c:/texlive/2023/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
+
+(c:/texlive/2023/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2022/03/10 v1.4e Standard LaTeX Graphics (DPC,SPQR)
+
+(c:/texlive/2023/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
+)
+(c:/texlive/2023/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
-Package graphics Info: Driver file: pdftex.def on input line 106.
+Package graphics Info: Driver file: pdftex.def on input line 107.
 
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdfte
-x.def
-File: pdftex.def 2025/09/29 v1.2d Graphics/color driver for pdftex
+(c:/texlive/2023/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2022/09/22 v1.2b Graphics/color driver for pdftex
 ))
-\Gin@req@height=\dimen158
-\Gin@req@width=\dimen159
+\Gin@req@height=\dimen160
+\Gin@req@width=\dimen161
 )
+(c:/texlive/2023/texmf-dist/tex/latex/caption/subcaption.sty
+Package: subcaption 2023/07/28 v1.6b Sub-captions (AR)
 
-! LaTeX Error: File `subcaption.sty' not found.
+(c:/texlive/2023/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2023/08/05 v3.6o Customizing captions (AR)
 
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: sty)
-
-Enter file name: 
-
-! LaTeX Error: File `booktabs.sty' not found.
-
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: sty)
-
-Enter file name: 
-
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.
-sty
-Package: hyperref 2025-07-12 v7.01o Hypertext links for LaTeX
-
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty
-Package: iftex 2024/12/12 v1.0g TeX engine tests
+(c:/texlive/2023/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
+\caption@tempdima=\dimen162
+\captionmargin=\dimen163
+\caption@leftmargin=\dimen164
+\caption@rightmargin=\dimen165
+\caption@width=\dimen166
+\caption@indent=\dimen167
+\caption@parindent=\dimen168
+\caption@hangindent=\dimen169
+Package caption Info: Standard document class detected.
 )
-
-! LaTeX Error: File `kvsetkeys.sty' not found.
-
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: sty)
-
-Enter file name: 
-
-! LaTeX Error: File `kvdefinekeys.sty' not found.
-
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: sty)
-
-Enter file name: 
-
-! LaTeX Error: File `pdfescape.sty' not found.
-
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: sty)
-
-Enter file name: 
-
-! LaTeX Error: File `hycolor.sty' not found.
-
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: sty)
-
-Enter file name: 
-
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.s
-ty
-Package: nameref 2025-06-21 v2.57 Cross-referencing by name of section
-
-
-! LaTeX Error: File `refcount.sty' not found.
-
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: sty)
-
-Enter file name: 
-
-! LaTeX Error: File `gettitlestring.sty' not found.
-
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: sty)
-
-Enter file name: 
-\c@section@level=\count295
+\c@caption@flags=\count276
+\c@continuedfloat=\count277
 )
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.
-sty
-Package: etoolbox 2025/10/02 v2.5m e-TeX tools for LaTeX (JAW)
-\etb@tempcnta=\count296
+Package caption Info: New subtype `subfigure' on input line 238.
+\c@subfigure=\count278
+Package caption Info: New subtype `subtable' on input line 238.
+\c@subtable=\count279
 )
+(c:/texlive/2023/texmf-dist/tex/latex/booktabs/booktabs.sty
+Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
+\heavyrulewidth=\dimen170
+\lightrulewidth=\dimen171
+\cmidrulewidth=\dimen172
+\belowrulesep=\dimen173
+\belowbottomsep=\dimen174
+\aboverulesep=\dimen175
+\abovetopsep=\dimen176
+\cmidrulesep=\dimen177
+\cmidrulekern=\dimen178
+\defaultaddspace=\dimen179
+\@cmidla=\count280
+\@cmidlb=\count281
+\@aboverulesep=\dimen180
+\@belowrulesep=\dimen181
+\@thisruleclass=\count282
+\@lastruleclass=\count283
+\@thisrulewidth=\dimen182
+)
+(c:/texlive/2023/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2023-11-26 v7.01g Hypertext links for LaTeX
 
-! LaTeX Error: File `stringenc.sty' not found.
+(c:/texlive/2023/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2022/02/03 v1.0f TeX engine tests
+)
+(c:/texlive/2023/texmf-dist/tex/generic/infwarerr/infwarerr.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
+(c:/texlive/2023/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty
+Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
+)
+(c:/texlive/2023/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty
+Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
 
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: sty)
+(c:/texlive/2023/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
+Package: ltxcmds 2020-05-10 v1.25 LaTeX kernel commands for general use (HO)
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
+)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+))
+(c:/texlive/2023/texmf-dist/tex/latex/hycolor/hycolor.sty
+Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
+)
+(c:/texlive/2023/texmf-dist/tex/latex/letltxmacro/letltxmacro.sty
+Package: letltxmacro 2019/12/03 v1.6 Let assignment for LaTeX macros (HO)
+)
+(c:/texlive/2023/texmf-dist/tex/latex/auxhook/auxhook.sty
+Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
+)
+(c:/texlive/2023/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2023-11-26 v2.56 Cross-referencing by name of section
 
-Enter file name: 
+(c:/texlive/2023/texmf-dist/tex/latex/refcount/refcount.sty
+Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
+)
+(c:/texlive/2023/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 
-! LaTeX Error: File `kvoptions.sty' not found.
+(c:/texlive/2023/texmf-dist/tex/latex/kvoptions/kvoptions.sty
+Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
+))
+\c@section@level=\count284
+)
+(c:/texlive/2023/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count285
+)
+\@linkdim=\dimen183
+\Hy@linkcounter=\count286
+\Hy@pagecounter=\count287
 
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: sty)
-
-Enter file name: 
-\@linkdim=\dimen160
-\Hy@linkcounter=\count297
-\Hy@pagecounter=\count298
-
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.de
-f
-File: pd1enc.def 2025-07-12 v7.01o Hyperref: PDFDocEncoding definition (HO)
+(c:/texlive/2023/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2023-11-26 v7.01g Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
 ... no UTF-8 mapping file for font encoding PD1
 )
+(c:/texlive/2023/texmf-dist/tex/generic/intcalc/intcalc.sty
+Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
+)
+\Hy@SavedSpaceFactor=\count288
 
-! LaTeX Error: File `intcalc.sty' not found.
-
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: sty)
-
-Enter file name: 
-\Hy@SavedSpaceFactor=\count299
-! Undefined control sequence.
-l.2167 \SetupKeyvalOptions
-                          {%
-? 
-
-! LaTeX Error: Missing \begin{document}.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2168   f
-          amily=Hyp,%
-? 
-
-(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def
-File: puenc.def 2025-07-12 v7.01o Hyperref: PDF Unicode definition (HO)
+(c:/texlive/2023/texmf-dist/tex/latex/hyperref/puenc.def
+File: puenc.def 2023-11-26 v7.01g Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
 ... no UTF-8 mapping file for font encoding PU
 )
-! Undefined control sequence.
-l.2539 \DeclareVoidOption
-                         {tex4ht}{%
-? 
+Package hyperref Info: Hyper figures OFF on input line 4181.
+Package hyperref Info: Link nesting OFF on input line 4186.
+Package hyperref Info: Hyper index ON on input line 4189.
+Package hyperref Info: Plain pages OFF on input line 4196.
+Package hyperref Info: Backreferencing OFF on input line 4201.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4448.
+\c@Hy@tempcnt=\count289
 
-! LaTeX Error: Missing \begin{document}.
+(c:/texlive/2023/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip17
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+LaTeX Info: Redefining \url on input line 4786.
+\XeTeXLinkMargin=\dimen184
 
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2539 \DeclareVoidOption{t
-                           ex4ht}{%
-? 
-! Undefined control sequence.
-l.2541   \kvsetkeys
-                   {Hyp}{colorlinks=true}%
-? 
-! Undefined control sequence.
-l.2553 \DeclareVoidOption
-                         {pdftex}{%
-? 
-! Undefined control sequence.
-l.2564 \DeclareVoidOption
-                         {luatex}{%
-? 
-! Undefined control sequence.
-l.2580 \DeclareVoidOption
-                         {nativepdf}{%
-? 
+(c:/texlive/2023/texmf-dist/tex/generic/bitset/bitset.sty
+Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
 
-! Package hyperref Error: Wrong DVI mode driver option `nativepdf',
-(hyperref)                because pdfTeX or LuaTeX is running in PDF mode.
+(c:/texlive/2023/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
+Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
+)
+))
+\Fld@menulength=\count290
+\Field@Width=\dimen185
+\Fld@charsize=\dimen186
+Package hyperref Info: Hyper figures OFF on input line 6065.
+Package hyperref Info: Link nesting OFF on input line 6070.
+Package hyperref Info: Hyper index ON on input line 6073.
+Package hyperref Info: backreferencing OFF on input line 6080.
+Package hyperref Info: Link coloring OFF on input line 6085.
+Package hyperref Info: Link coloring with OCG OFF on input line 6090.
+Package hyperref Info: PDF/A mode OFF on input line 6095.
 
-See the hyperref package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2581   \HyOpt@CheckDvi{nativepdf}
-                                   {%
-? 
-! Undefined control sequence.
-l.2586 \DeclareVoidOption
-                         {dvipdfm}{%
-? 
+(c:/texlive/2023/texmf-dist/tex/latex/base/atbegshi-ltx.sty
+Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
+package with kernel methods
+)
+\Hy@abspage=\count291
+\c@Item=\count292
+\c@Hfootnote=\count293
+)
+Package hyperref Info: Driver (autodetected): hpdftex.
 
-! Package hyperref Error: Wrong DVI mode driver option `dvipdfm',
-(hyperref)                because pdfTeX or LuaTeX is running in PDF mode.
+(c:/texlive/2023/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2023-11-26 v7.01g Hyperref driver for pdfTeX
 
-See the hyperref package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2587   \HyOpt@CheckDvi{dvipdfm}
-                                 {%
-? 
-! Undefined control sequence.
-l.2591 \DeclareVoidOption
-                         {dvipdfmx}{%
-? 
+(c:/texlive/2023/texmf-dist/tex/latex/base/atveryend-ltx.sty
+Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend pac
+kage
+with kernel methods
+)
+\Fld@listcount=\count294
+\c@bookmark@seq@number=\count295
 
-! Package hyperref Error: Wrong DVI mode driver option `dvipdfmx',
-(hyperref)                because pdfTeX or LuaTeX is running in PDF mode.
+(c:/texlive/2023/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+Package: rerunfilecheck 2022-07-10 v1.10 Rerun checks for auxiliary files (HO)
 
-See the hyperref package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2592   \HyOpt@CheckDvi{dvipdfmx}
-                                  {%
-? 
-! Undefined control sequence.
-l.2605 \DeclareVoidOption
-                         {xetex}{%
-? 
+(c:/texlive/2023/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
+Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
+)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+85.
+)
+\Hy@SectionHShift=\skip57
+)
+(c:/texlive/2023/texmf-dist/tex/latex/natbib/natbib.sty
+Package: natbib 2010/09/13 8.31b (PWD, AO)
+\bibhang=\skip58
+\bibsep=\skip59
+LaTeX Info: Redefining \cite on input line 694.
+\c@NAT@ctr=\count296
+)
+(c:/texlive/2023/texmf-dist/tex/latex/geometry/geometry.sty
+Package: geometry 2020/01/02 v5.9 Page Geometry
 
-! Package hyperref Error: Wrong driver option `xetex',
-(hyperref)                because XeTeX is not detected.
+(c:/texlive/2023/texmf-dist/tex/generic/iftex/ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+)
+\Gm@cnth=\count297
+\Gm@cntv=\count298
+\c@Gm@tempcnt=\count299
+\Gm@bindingoffset=\dimen187
+\Gm@wd@mp=\dimen188
+\Gm@odd@mp=\dimen189
+\Gm@even@mp=\dimen190
+\Gm@layoutwidth=\dimen191
+\Gm@layoutheight=\dimen192
+\Gm@layouthoffset=\dimen193
+\Gm@layoutvoffset=\dimen194
+\Gm@dimlist=\toks25
+)
+(c:/texlive/2023/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty
+(c:/texlive/2023/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty
+(c:/texlive/2023/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/utilities/pgfutil-common.tex
+\pgfutil@everybye=\toks26
+\pgfutil@tempdima=\dimen195
+\pgfutil@tempdimb=\dimen196
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/utilities/pgfutil-latex.def
+\pgfutil@abb=\box54
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.tex
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/pgf.revision.tex)
+Package: pgfrcs 2023-01-15 v3.1.10 (3.1.10)
+))
+Package: pgf 2023-01-15 v3.1.10 (3.1.10)
 
-See the hyperref package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2612     }\@ehc
-                 
-? 
-! Undefined control sequence.
-l.2615 \DeclareVoidOption
-                         {pdfmark}{%
-? 
+(c:/texlive/2023/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty
+(c:/texlive/2023/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.code.tex
+Package: pgfsys 2023-01-15 v3.1.10 (3.1.10)
 
-! Package hyperref Error: Wrong DVI mode driver option `pdfmark',
-(hyperref)                because pdfTeX or LuaTeX is running in PDF mode.
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex
+\pgfkeys@pathtoks=\toks27
+\pgfkeys@temptoks=\toks28
 
-See the hyperref package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2616   \HyOpt@CheckDvi{pdfmark}
-                                 {%
-? 
-! Undefined control sequence.
-l.2620 \DeclareVoidOption
-                         {dvips}{%
-? 
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/utilities/pgfkeyslibraryfiltered.co
+de.tex
+\pgfkeys@tmptoks=\toks29
+))
+\pgf@x=\dimen197
+\pgf@y=\dimen198
+\pgf@xa=\dimen199
+\pgf@ya=\dimen256
+\pgf@xb=\dimen257
+\pgf@yb=\dimen258
+\pgf@xc=\dimen259
+\pgf@yc=\dimen260
+\pgf@xd=\dimen261
+\pgf@yd=\dimen262
+\w@pgf@writea=\write3
+\r@pgf@reada=\read2
+\c@pgf@counta=\count300
+\c@pgf@countb=\count301
+\c@pgf@countc=\count302
+\c@pgf@countd=\count303
+\t@pgf@toka=\toks30
+\t@pgf@tokb=\toks31
+\t@pgf@tokc=\toks32
+\pgf@sys@id@count=\count304
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg
+File: pgf.cfg 2023-01-15 v3.1.10 (3.1.10)
+)
+Driver file for pgf: pgfsys-pdftex.def
 
-! Package hyperref Error: Wrong DVI mode driver option `dvips',
-(hyperref)                because pdfTeX or LuaTeX is running in PDF mode.
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-pdftex.def
+File: pgfsys-pdftex.def 2023-01-15 v3.1.10 (3.1.10)
 
-See the hyperref package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2621   \HyOpt@CheckDvi{dvips}
-                               {%
-? 
-! Undefined control sequence.
-l.2626 \DeclareVoidOption
-                         {hypertex}{%
-? 
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-common-pdf.def
+File: pgfsys-common-pdf.def 2023-01-15 v3.1.10 (3.1.10)
+)))
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/systemlayer/pgfsyssoftpath.code.tex
+File: pgfsyssoftpath.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfsyssoftpath@smallbuffer@items=\count305
+\pgfsyssoftpath@bigbuffer@items=\count306
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/systemlayer/pgfsysprotocol.code.tex
+File: pgfsysprotocol.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)) (c:/texlive/2023/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2023/11/15 v3.01 LaTeX color extensions (UK)
 
-! Package hyperref Error: Wrong DVI mode driver option `hypertex',
-(hyperref)                because pdfTeX or LuaTeX is running in PDF mode.
+(c:/texlive/2023/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 274.
 
-See the hyperref package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2627   \HyOpt@CheckDvi{hypertex}
-                                  {%
-? 
-! Undefined control sequence.
-l.2632 \DeclareVoidOption
-                         {vtex}{%
-? 
+(c:/texlive/2023/texmf-dist/tex/latex/graphics/mathcolor.ltx)
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1350.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1354.
+Package xcolor Info: Model `RGB' extended on input line 1366.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1368.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1370.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1371.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1372.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1373.
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.code.tex
+Package: pgfcore 2023-01-15 v3.1.10 (3.1.10)
 
-! Package hyperref Error: Wrong driver option `vtex',
-(hyperref)                because VTeX is not running.
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.tex)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathparser.code.tex
+\pgfmath@dimen=\dimen263
+\pgfmath@count=\count307
+\pgfmath@box=\box55
+\pgfmath@toks=\toks33
+\pgfmath@stack@operand=\toks34
+\pgfmath@stack@operation=\toks35
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.code.tex)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.basic.code.te
+x)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.trigonometric
+.code.tex)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.random.code.t
+ex)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.comparison.co
+de.tex)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.base.code.tex
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.round.code.te
+x)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.misc.code.tex
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.integerarithm
+etics.code.tex)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.tex)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code.tex
+\c@pgfmathroundto@lastzeros=\count308
+))
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfint.code.tex)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoints.code.tex
+File: pgfcorepoints.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@picminx=\dimen264
+\pgf@picmaxx=\dimen265
+\pgf@picminy=\dimen266
+\pgf@picmaxy=\dimen267
+\pgf@pathminx=\dimen268
+\pgf@pathmaxx=\dimen269
+\pgf@pathminy=\dimen270
+\pgf@pathmaxy=\dimen271
+\pgf@xx=\dimen272
+\pgf@xy=\dimen273
+\pgf@yx=\dimen274
+\pgf@yy=\dimen275
+\pgf@zx=\dimen276
+\pgf@zy=\dimen277
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathconstruct.cod
+e.tex
+File: pgfcorepathconstruct.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@path@lastx=\dimen278
+\pgf@path@lasty=\dimen279
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathusage.code.te
+x
+File: pgfcorepathusage.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@shorten@end@additional=\dimen280
+\pgf@shorten@start@additional=\dimen281
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescopes.code.tex
+File: pgfcorescopes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfpic=\box56
+\pgf@hbox=\box57
+\pgf@layerbox@main=\box58
+\pgf@picture@serial@count=\count309
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregraphicstate.code
+.tex
+File: pgfcoregraphicstate.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgflinewidth=\dimen282
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransformations.c
+ode.tex
+File: pgfcoretransformations.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@pt@x=\dimen283
+\pgf@pt@y=\dimen284
+\pgf@pt@temp=\dimen285
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorequick.code.tex
+File: pgfcorequick.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreobjects.code.tex
+File: pgfcoreobjects.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathprocessing.co
+de.tex
+File: pgfcorepathprocessing.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorearrows.code.tex
+File: pgfcorearrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfarrowsep=\dimen286
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreshade.code.tex
+File: pgfcoreshade.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@max=\dimen287
+\pgf@sys@shading@range@num=\count310
+\pgf@shadingcount=\count311
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreimage.code.tex
+File: pgfcoreimage.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexternal.code.tex
+File: pgfcoreexternal.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfexternal@startupbox=\box59
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelayers.code.tex
+File: pgfcorelayers.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransparency.code
+.tex
+File: pgfcoretransparency.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepatterns.code.tex
+File: pgfcorepatterns.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorerdf.code.tex
+File: pgfcorerdf.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))) (c:/texlive/2023/texmf-dist/tex/generic/pgf/modules/pgfmoduleshapes.code.te
+x
+File: pgfmoduleshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfnodeparttextbox=\box60
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.code.tex
+File: pgfmoduleplot.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(c:/texlive/2023/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-0-65.st
+y
+Package: pgfcomp-version-0-65 2023-01-15 v3.1.10 (3.1.10)
+\pgf@nodesepstart=\dimen288
+\pgf@nodesepend=\dimen289
+)
+(c:/texlive/2023/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-1-18.st
+y
+Package: pgfcomp-version-1-18 2023-01-15 v3.1.10 (3.1.10)
+)) (c:/texlive/2023/texmf-dist/tex/latex/pgf/utilities/pgffor.sty
+(c:/texlive/2023/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex))
+(c:/texlive/2023/texmf-dist/tex/latex/pgf/math/pgfmath.sty
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex))
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/utilities/pgffor.code.tex
+Package: pgffor 2023-01-15 v3.1.10 (3.1.10)
+\pgffor@iter=\dimen290
+\pgffor@skip=\dimen291
+\pgffor@stack=\toks36
+\pgffor@toks=\toks37
+))
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tikz.code.tex
+Package: tikz 2023-01-15 v3.1.10 (3.1.10)
 
-See the hyperref package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2658     }\@ehc
-                 
-? 
-! Undefined control sequence.
-l.2661 \DeclareVoidOption
-                         {vtexpdfmark}{%
-? 
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/libraries/pgflibraryplothandlers.co
+de.tex
+File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@plot@mark@count=\count312
+\pgfplotmarksize=\dimen292
+)
+\tikz@lastx=\dimen293
+\tikz@lasty=\dimen294
+\tikz@lastxsaved=\dimen295
+\tikz@lastysaved=\dimen296
+\tikz@lastmovetox=\dimen297
+\tikz@lastmovetoy=\dimen298
+\tikzleveldistance=\dimen299
+\tikzsiblingdistance=\dimen300
+\tikz@figbox=\box61
+\tikz@figbox@bg=\box62
+\tikz@tempbox=\box63
+\tikz@tempbox@bg=\box64
+\tikztreelevel=\count313
+\tikznumberofchildren=\count314
+\tikznumberofcurrentchild=\count315
+\tikz@fig@count=\count316
 
-! Package hyperref Error: Wrong driver option `vtexpdfmark,
-(hyperref)                because VTeX is not running.
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/modules/pgfmodulematrix.code.tex
+File: pgfmodulematrix.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfmatrixcurrentrow=\count317
+\pgfmatrixcurrentcolumn=\count318
+\pgf@matrix@numberofcolumns=\count319
+)
+\tikz@expandcount=\count320
 
-See the hyperref package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2675     }\@ehc
-                 
-? 
-! Undefined control sequence.
-l.2678 \DeclareVoidOption
-                         {dviwindo}{%
-? 
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzli
+brarytopaths.code.tex
+File: tikzlibrarytopaths.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)))
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/libraries/pgflibraryarrows.meta.cod
+e.tex
+File: pgflibraryarrows.meta.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfarrowinset=\dimen301
+\pgfarrowlength=\dimen302
+\pgfarrowwidth=\dimen303
+\pgfarrowlinewidth=\dimen304
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzli
+brarypositioning.code.tex
+File: tikzlibrarypositioning.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzli
+brarycalc.code.tex
+File: tikzlibrarycalc.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(c:/texlive/2023/texmf-dist/tex/latex/algorithm2e/algorithm2e.sty
+Package: algorithm2e 2017/07/18 v5.2 algorithms environments
+\c@AlgoLine=\count321
 
-! Package hyperref Error: Wrong DVI mode driver option `dviwindo',
-(hyperref)                because pdfTeX or LuaTeX is running in PDF mode.
+(c:/texlive/2023/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2022/04/13 v1.1d Standard LaTeX ifthen package (DPC)
+)
+\algocf@hangindent=\skip60
 
-See the hyperref package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2679   \HyOpt@CheckDvi{dviwindo}
-                                  {%
-? 
-! Undefined control sequence.
-l.2685 \DeclareVoidOption
-                         {dvipsone}{%
-? 
+(c:/texlive/2023/texmf-dist/tex/latex/ifoddpage/ifoddpage.sty
+Package: ifoddpage 2022/10/18 v1.2 Conditionals for odd/even page detection
+\c@checkoddpage=\count322
+)
+(c:/texlive/2023/texmf-dist/tex/latex/tools/xspace.sty
+Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
+)
+(c:/texlive/2023/texmf-dist/tex/latex/relsize/relsize.sty
+Package: relsize 2013/03/29 ver 4.1
+)
+\skiptotal=\skip61
+\skiplinenumber=\skip62
+\skiprule=\skip63
+\skiphlne=\skip64
+\skiptext=\skip65
+\skiplength=\skip66
+\algomargin=\skip67
+\skipalgocfslide=\skip68
+\algowidth=\dimen305
+\inoutsize=\dimen306
+\inoutindent=\dimen307
+\interspacetitleruled=\dimen308
+\interspacealgoruled=\dimen309
+\interspacetitleboxruled=\dimen310
+\algocf@ruledwidth=\skip69
+\algocf@inoutbox=\box65
+\algocf@inputbox=\box66
+\AlCapSkip=\skip70
+\AlCapHSkip=\skip71
+\algoskipindent=\skip72
+\algocf@nlbox=\box67
+\algocf@hangingbox=\box68
+\algocf@untilbox=\box69
+\algocf@skipuntil=\skip73
+\algocf@capbox=\box70
+\algocf@lcaptionbox=\skip74
+\algoheightruledefault=\skip75
+\algoheightrule=\skip76
+\algotitleheightruledefault=\skip77
+\algotitleheightrule=\skip78
+\c@algocfline=\count323
+\c@algocfproc=\count324
+\c@algocf=\count325
+\algocf@algoframe=\box71
+\algocf@algobox=\box72
+)
+Package hyperref Info: Option `colorlinks' set `true' on input line 27.
 
-! Package hyperref Error: Wrong DVI mode driver option `dvipsone',
-(hyperref)                because pdfTeX or LuaTeX is running in PDF mode.
+(c:/texlive/2023/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2023-11-09 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count326
+\l__pdf_internal_box=\box73
+)
+(./dcegmSearch.aux)
+\openout1 = `dcegmSearch.aux'.
 
-See the hyperref package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2686   \HyOpt@CheckDvi{dvipsone}
-                                  {%
-? 
-! Undefined control sequence.
-l.2691 \DeclareVoidOption
-                         {textures}{%
-? 
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 40.
+LaTeX Font Info:    ... okay on input line 40.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 40.
+LaTeX Font Info:    ... okay on input line 40.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 40.
+LaTeX Font Info:    ... okay on input line 40.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 40.
+LaTeX Font Info:    ... okay on input line 40.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 40.
+LaTeX Font Info:    ... okay on input line 40.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 40.
+LaTeX Font Info:    ... okay on input line 40.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 40.
+LaTeX Font Info:    ... okay on input line 40.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 40.
+LaTeX Font Info:    ... okay on input line 40.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 40.
+LaTeX Font Info:    ... okay on input line 40.
 
-! Package hyperref Error: Wrong DVI mode driver option `textures',
-(hyperref)                because pdfTeX or LuaTeX is running in PDF mode.
+(c:/texlive/2023/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count327
+\scratchdimen=\dimen311
+\scratchbox=\box74
+\nofMPsegments=\count328
+\nofMParguments=\count329
+\everyMPshowfont=\toks38
+\MPscratchCnt=\count330
+\MPscratchDim=\dimen312
+\MPnumerator=\count331
+\makeMPintoPDFobject=\count332
+\everyMPtoPDFconversion=\toks39
+) (c:/texlive/2023/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+85.
 
-See the hyperref package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2692   \HyOpt@CheckDvi{textures}
-                                  {%
-? 
-! Undefined control sequence.
-l.2696 \DeclareVoidOption
-                         {latex2html}{%
-? 
+(c:/texlive/2023/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: hyperref package is loaded.
+Package caption Info: End \AtBeginDocument code.
+Package hyperref Info: Link coloring ON on input line 40.
 
-Package hyperref Warning: Option `latex2html` is obsolete. 
-(hyperref)                A current html.sty will do all necessary (re)definiti
-ons on input line 2699.
+(./dcegmSearch.out) (./dcegmSearch.out)
+\@outlinefile=\write4
+\openout4 = `dcegmSearch.out'.
 
-! Undefined control sequence.
-l.2701 \DeclareVoidOption
-                         {hitex}{%
-? 
 
-! Package hyperref Error: Wrong driver option `hitex',
-(hyperref)                because HiTeX is not detected.
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: <default>
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: 
+* h-part:(L,W,R)=(72.26999pt, 469.75502pt, 72.26999pt)
+* v-part:(T,H,B)=(72.26999pt, 650.43001pt, 72.26999pt)
+* \paperwidth=614.295pt
+* \paperheight=794.96999pt
+* \textwidth=469.75502pt
+* \textheight=650.43001pt
+* \oddsidemargin=0.0pt
+* \evensidemargin=0.0pt
+* \topmargin=-37.0pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=11.0pt
+* \footskip=30.0pt
+* \marginparwidth=59.0pt
+* \marginparsep=10.0pt
+* \columnsep=10.0pt
+* \skip\footins=10.0pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-See the hyperref package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2713     }\@ehc
-                 
-? 
+(./Title.tex
+LaTeX Font Info:    Trying to load font information for U+msa on input line 21.
+
+ (c:/texlive/2023/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 21.
+
+
+(c:/texlive/2023/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+LaTeX Font Info:    Trying to load font information for U+rsfs on input line 21
+.
+
+(c:/texlive/2023/texmf-dist/tex/latex/jknapltx/ursfs.fd
+File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
+)
+LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 2
+1.
+
+(c:/texlive/2023/texmf-dist/tex/latex/base/t1cmtt.fd
+File: t1cmtt.fd 2023/04/13 v2.5m Standard LaTeX font definitions
+)
+Underfull \hbox (badness 6428) in paragraph at lines 21--21
+[][]\T1/cmr/m/n/9 Monninger: De-part-ment of Eco-nomics, Texas A&M Uni-ver-sity
+, [][]$\T1/cmtt/m/n/9 https : / / sites . google . com / view /
+ []
+
+
+Package natbib Warning: Citation `Carroll2017-hk' on page 1 undefined on input 
+line 36.
+
+) [1
+
+{c:/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{c:/texlive/2023/
+texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}{c:/texlive/2023/texmf-dist
+/fonts/enc/dvips/cm-super/cm-super-ts1.enc}] (./Introduction.tex)
+(./RetirementModel.tex [2
+
+] [3]
+<timeline_RetirementModel.pdf, id=169, 420.06938pt x 141.52875pt>
+File: timeline_RetirementModel.pdf Graphic file (type pdf)
+<use timeline_RetirementModel.pdf>
+Package pdftex.def Info: timeline_RetirementModel.pdf  used on input line 75.
+(pdftex.def)             Requested size: 469.75502pt x 158.26924pt.
+
+Overfull \hbox (48.79555pt too wide) in paragraph at lines 80--87
+[]\T1/cmr/m/n/10.95 Let the set of pos-si-ble choice sets for the worker's dis-
+crete choice be given by $\OMS/cmsy/m/n/10.95 D[] 2 ff[]\OML/cmm/m/it/10.95 ; [
+]\OMS/cmsy/m/n/10.95 g\OML/cmm/m/it/10.95 ; \OMS/cmsy/m/n/10.95 f[]gg$
+ []
+
+[4 <./timeline_RetirementModel.pdf>] [5]
+LaTeX Font Info:    Trying to load font information for U+bbm on input line 224
+.
+
+(c:/texlive/2023/texmf-dist/tex/latex/bbm-macros/ubbm.fd
+File: ubbm.fd 1999/03/15 V 1.2 Font definition for bbm font - TH
+)
+Overfull \hbox (14.94363pt too wide) detected at line 243
+[][][][][]
+ []
+
+[6]
+Overfull \hbox (18.9034pt too wide) detected at line 257
+[][][][][]
+ []
+
+<../Figures/Figures_v3/p1_xi0_eta0.pdf, id=210, 462.52798pt x 346.89601pt>
+File: ../Figures/Figures_v3/p1_xi0_eta0.pdf Graphic file (type pdf)
+<use ../Figures/Figures_v3/p1_xi0_eta0.pdf>
+Package pdftex.def Info: ../Figures/Figures_v3/p1_xi0_eta0.pdf  used on input l
+ine 278.
+(pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
+<../Figures/Figures_v3/p0_xi0_eta0.pdf, id=211, 462.52798pt x 346.89601pt>
+File: ../Figures/Figures_v3/p0_xi0_eta0.pdf Graphic file (type pdf)
+<use ../Figures/Figures_v3/p0_xi0_eta0.pdf>
+Package pdftex.def Info: ../Figures/Figures_v3/p0_xi0_eta0.pdf  used on input l
+ine 283.
+(pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
+[7]
+<../Figures/Figures_v3/p0_xi0p005_eta0.pdf, id=225, 462.52798pt x 346.89601pt>
+File: ../Figures/Figures_v3/p0_xi0p005_eta0.pdf Graphic file (type pdf)
+<use ../Figures/Figures_v3/p0_xi0p005_eta0.pdf>
+Package pdftex.def Info: ../Figures/Figures_v3/p0_xi0p005_eta0.pdf  used on inp
+ut line 327.
+(pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
+<../Figures/Figures_v3/p0_xi0p02_eta0.pdf, id=226, 462.52798pt x 346.89601pt>
+File: ../Figures/Figures_v3/p0_xi0p02_eta0.pdf Graphic file (type pdf)
+<use ../Figures/Figures_v3/p0_xi0p02_eta0.pdf>
+Package pdftex.def Info: ../Figures/Figures_v3/p0_xi0p02_eta0.pdf  used on inpu
+t line 332.
+(pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
+<../Figures/Figures_v3/p0_xi0p005_etaSqrt0p005.pdf, id=229, 462.52798pt x 346.8
+9601pt>
+File: ../Figures/Figures_v3/p0_xi0p005_etaSqrt0p005.pdf Graphic file (type pdf)
+
+<use ../Figures/Figures_v3/p0_xi0p005_etaSqrt0p005.pdf>
+Package pdftex.def Info: ../Figures/Figures_v3/p0_xi0p005_etaSqrt0p005.pdf  use
+d on input line 356.
+(pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
+<../Figures/Figures_v3/p0_xi0p02_etaSqrt0p005.pdf, id=230, 462.52798pt x 346.89
+601pt>
+File: ../Figures/Figures_v3/p0_xi0p02_etaSqrt0p005.pdf Graphic file (type pdf)
+<use ../Figures/Figures_v3/p0_xi0p02_etaSqrt0p005.pdf>
+Package pdftex.def Info: ../Figures/Figures_v3/p0_xi0p02_etaSqrt0p005.pdf  used
+ on input line 361.
+(pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
+ [8 <../Figures/Figures_v3/p1_xi0_eta0.pdf> <../Figures/Figures_v3/p0_xi0_eta0.
+pdf>] [9 <../Figures/Figures_v3/p0_xi0p005_eta0.pdf> <../Figures/Figures_v3/p0_
+xi0p02_eta0.pdf> <../Figures/Figures_v3/p0_xi0p005_etaSqrt0p005.pdf> <../Figure
+s/Figures_v3/p0_xi0p02_etaSqrt0p005.pdf>]
+<../Figures/Figures_v3/VaryP.pdf, id=532, 462.52798pt x 346.89601pt>
+File: ../Figures/Figures_v3/VaryP.pdf Graphic file (type pdf)
+<use ../Figures/Figures_v3/VaryP.pdf>
+Package pdftex.def Info: ../Figures/Figures_v3/VaryP.pdf  used on input line 40
+8.
+(pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
+<../Figures/Figures_v3/VaryS.pdf, id=533, 462.52798pt x 346.89601pt>
+File: ../Figures/Figures_v3/VaryS.pdf Graphic file (type pdf)
+<use ../Figures/Figures_v3/VaryS.pdf>
+Package pdftex.def Info: ../Figures/Figures_v3/VaryS.pdf  used on input line 41
+3.
+(pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
+<../Figures/Figures_v3/VaryXi.pdf, id=534, 462.52798pt x 346.89601pt>
+File: ../Figures/Figures_v3/VaryXi.pdf Graphic file (type pdf)
+<use ../Figures/Figures_v3/VaryXi.pdf>
+Package pdftex.def Info: ../Figures/Figures_v3/VaryXi.pdf  used on input line 4
+25.
+(pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
+<../Figures/Figures_v3/VaryEta.pdf, id=535, 462.52798pt x 346.89601pt>
+File: ../Figures/Figures_v3/VaryEta.pdf Graphic file (type pdf)
+<use ../Figures/Figures_v3/VaryEta.pdf>
+Package pdftex.def Info: ../Figures/Figures_v3/VaryEta.pdf  used on input line 
+430.
+(pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
+ [10 <../Figures/Figures_v3/VaryP.pdf> <../Figures/Figures_v3/VaryS.pdf>]
+<../Figures/Figures_v3/IncomeDiscMethod_Convergence.pdf, id=654, 462.52798pt x 
+346.89601pt>
+File: ../Figures/Figures_v3/IncomeDiscMethod_Convergence.pdf Graphic file (type
+ pdf)
+<use ../Figures/Figures_v3/IncomeDiscMethod_Convergence.pdf>
+Package pdftex.def Info: ../Figures/Figures_v3/IncomeDiscMethod_Convergence.pdf
+  used on input line 469.
+(pdftex.def)             Requested size: 281.85587pt x 211.39981pt.
+ [11 <../Figures/Figures_v3/VaryXi.pdf> <../Figures/Figures_v3/VaryEta.pdf>] [1
+2 <../Figures/Figures_v3/IncomeDiscMethod_Convergence.pdf>]) (./DurableModel.te
+x [13] [14]
+<timeline_DurableModel.pdf, id=903, 813.34265pt x 106.60829pt>
+File: timeline_DurableModel.pdf Graphic file (type pdf)
+<use timeline_DurableModel.pdf>
+Package pdftex.def Info: timeline_DurableModel.pdf  used on input line 10.
+(pdftex.def)             Requested size: 469.75502pt x 61.57419pt.
+ [15 <./timeline_DurableModel.pdf>] [16]
+LaTeX Font Info:    Trying to load font information for U+euf on input line 77.
+
+ (c:/texlive/2023/texmf-dist/tex/latex/amsfonts/ueuf.fd
+File: ueuf.fd 2013/01/14 v3.01 Euler Fraktur
+)
+
+LaTeX Warning: Float too large for page by 78.68704pt on input line 134.
+
+<../Figures/DurableModel/Baseline_Ss_T.pdf, id=991, 423.82477pt x 353.95424pt>
+File: ../Figures/DurableModel/Baseline_Ss_T.pdf Graphic file (type pdf)
+<use ../Figures/DurableModel/Baseline_Ss_T.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/Baseline_Ss_T.pdf  used on inp
+ut line 143.
+(pdftex.def)             Requested size: 225.4804pt x 188.31317pt.
+<../Figures/DurableModel/Baseline_d_T.pdf, id=992, 469.755pt x 325.215pt>
+File: ../Figures/DurableModel/Baseline_d_T.pdf Graphic file (type pdf)
+<use ../Figures/DurableModel/Baseline_d_T.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/Baseline_d_T.pdf  used on inpu
+t line 149.
+(pdftex.def)             Requested size: 225.4804pt x 156.10143pt.
+<../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf, id=993, 469.755pt x 325.2
+15pt>
+File: ../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf Graphic file (type pd
+f)
+<use ../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf  u
+sed on input line 155.
+(pdftex.def)             Requested size: 225.4804pt x 156.10143pt.
+<../Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf, id=994, 469.755pt x 325.2
+15pt>
+File: ../Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf Graphic file (type pd
+f)
+<use ../Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf  u
+sed on input line 161.
+(pdftex.def)             Requested size: 225.4804pt x 156.10143pt.
+<../Figures/DurableModel/Baseline_c_periodt_MPC_decomp.pdf, id=996, 469.755pt x
+ 325.215pt>
+File: ../Figures/DurableModel/Baseline_c_periodt_MPC_decomp.pdf Graphic file (t
+ype pdf)
+<use ../Figures/DurableModel/Baseline_c_periodt_MPC_decomp.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/Baseline_c_periodt_MPC_decomp.
+pdf  used on input line 175.
+(pdftex.def)             Requested size: 225.4804pt x 156.10143pt.
+<../Figures/DurableModel/Baseline_d_periodt_MPC_decomp.pdf, id=997, 469.755pt x
+ 325.215pt>
+File: ../Figures/DurableModel/Baseline_d_periodt_MPC_decomp.pdf Graphic file (t
+ype pdf)
+<use ../Figures/DurableModel/Baseline_d_periodt_MPC_decomp.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/Baseline_d_periodt_MPC_decomp.
+pdf  used on input line 181.
+(pdftex.def)             Requested size: 225.4804pt x 156.10143pt.
+[17] [18] [19 <../Figures/DurableModel/Baseline_Ss_T.pdf> <../Figures/DurableMo
+del/Baseline_d_T.pdf> <../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf> <..
+/Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf>] [20 <../Figures/DurableMode
+l/Baseline_c_periodt_MPC_decomp.pdf> <../Figures/DurableModel/Baseline_d_period
+t_MPC_decomp.pdf>]
+<../Figures/DurableModel/TasteShock_Ss_T.pdf, id=1412, 712.9048pt x 591.72256pt
+>
+File: ../Figures/DurableModel/TasteShock_Ss_T.pdf Graphic file (type pdf)
+<use ../Figures/DurableModel/TasteShock_Ss_T.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/TasteShock_Ss_T.pdf  used on i
+nput line 230.
+(pdftex.def)             Requested size: 469.75502pt x 389.9151pt.
+<../Figures/DurableModel/TasteShock_c_periodt_MPC_decomp.pdf, id=1414, 722.7pt 
+x 578.16pt>
+File: ../Figures/DurableModel/TasteShock_c_periodt_MPC_decomp.pdf Graphic file 
+(type pdf)
+<use ../Figures/DurableModel/TasteShock_c_periodt_MPC_decomp.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/TasteShock_c_periodt_MPC_decom
+p.pdf  used on input line 242.
+(pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
+<../Figures/DurableModel/TasteShock_d_periodt_MPC_decomp.pdf, id=1415, 722.7pt 
+x 578.16pt>
+File: ../Figures/DurableModel/TasteShock_d_periodt_MPC_decomp.pdf Graphic file 
+(type pdf)
+<use ../Figures/DurableModel/TasteShock_d_periodt_MPC_decomp.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/TasteShock_d_periodt_MPC_decom
+p.pdf  used on input line 248.
+(pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
+ [21 <../Figures/DurableModel/TasteShock_Ss_T.pdf>]
+<../Figures/DurableModel/Search_Ss_T.pdf, id=1492, 712.9048pt x 591.72256pt>
+File: ../Figures/DurableModel/Search_Ss_T.pdf Graphic file (type pdf)
+<use ../Figures/DurableModel/Search_Ss_T.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/Search_Ss_T.pdf  used on input
+ line 274.
+(pdftex.def)             Requested size: 469.75502pt x 389.9151pt.
+<../Figures/DurableModel/Search_c_periodt_MPC_decomp.pdf, id=1494, 722.7pt x 57
+8.16pt>
+File: ../Figures/DurableModel/Search_c_periodt_MPC_decomp.pdf Graphic file (typ
+e pdf)
+<use ../Figures/DurableModel/Search_c_periodt_MPC_decomp.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/Search_c_periodt_MPC_decomp.pd
+f  used on input line 284.
+(pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
+<../Figures/DurableModel/Search_d_periodt_MPC_decomp.pdf, id=1495, 722.7pt x 57
+8.16pt>
+File: ../Figures/DurableModel/Search_d_periodt_MPC_decomp.pdf Graphic file (typ
+e pdf)
+<use ../Figures/DurableModel/Search_d_periodt_MPC_decomp.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/Search_d_periodt_MPC_decomp.pd
+f  used on input line 290.
+(pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
+ [22 <../Figures/DurableModel/TasteShock_c_periodt_MPC_decomp.pdf> <../Figures/
+DurableModel/TasteShock_d_periodt_MPC_decomp.pdf>] [23 <../Figures/DurableModel
+/Search_Ss_T.pdf>] [24 <../Figures/DurableModel/Search_c_periodt_MPC_decomp.pdf
+> <../Figures/DurableModel/Search_d_periodt_MPC_decomp.pdf>] [25]
+<../Figures/DurableModel/PriceStd_Ss_T.pdf, id=1849, 712.9048pt x 591.72256pt>
+File: ../Figures/DurableModel/PriceStd_Ss_T.pdf Graphic file (type pdf)
+<use ../Figures/DurableModel/PriceStd_Ss_T.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/PriceStd_Ss_T.pdf  used on inp
+ut line 359.
+(pdftex.def)             Requested size: 399.29463pt x 331.42557pt.
+<../Figures/DurableModel/PriceStd_c_periodt_MPC_decomp.pdf, id=1852, 722.7pt x 
+578.16pt>
+File: ../Figures/DurableModel/PriceStd_c_periodt_MPC_decomp.pdf Graphic file (t
+ype pdf)
+<use ../Figures/DurableModel/PriceStd_c_periodt_MPC_decomp.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/PriceStd_c_periodt_MPC_decomp.
+pdf  used on input line 369.
+(pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
+<../Figures/DurableModel/PriceStd_d_periodt_MPC_decomp.pdf, id=1853, 722.7pt x 
+578.16pt>
+File: ../Figures/DurableModel/PriceStd_d_periodt_MPC_decomp.pdf Graphic file (t
+ype pdf)
+<use ../Figures/DurableModel/PriceStd_d_periodt_MPC_decomp.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/PriceStd_d_periodt_MPC_decomp.
+pdf  used on input line 375.
+(pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
+<../Figures/DurableModel/PriceCount_c_periodt_MPC_decomp.pdf, id=1854, 722.7pt 
+x 578.16pt>
+File: ../Figures/DurableModel/PriceCount_c_periodt_MPC_decomp.pdf Graphic file 
+(type pdf)
+<use ../Figures/DurableModel/PriceCount_c_periodt_MPC_decomp.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/PriceCount_c_periodt_MPC_decom
+p.pdf  used on input line 387.
+(pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
+<../Figures/DurableModel/PriceCount_d_periodt_MPC_decomp.pdf, id=1855, 722.7pt 
+x 578.16pt>
+File: ../Figures/DurableModel/PriceCount_d_periodt_MPC_decomp.pdf Graphic file 
+(type pdf)
+<use ../Figures/DurableModel/PriceCount_d_periodt_MPC_decomp.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/PriceCount_d_periodt_MPC_decom
+p.pdf  used on input line 393.
+(pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
+ [26 <../Figures/DurableModel/PriceStd_Ss_T.pdf>] [27 <../Figures/DurableModel/
+PriceStd_c_periodt_MPC_decomp.pdf> <../Figures/DurableModel/PriceStd_d_periodt_
+MPC_decomp.pdf> <../Figures/DurableModel/PriceCount_c_periodt_MPC_decomp.pdf> <
+../Figures/DurableModel/PriceCount_d_periodt_MPC_decomp.pdf>]
+<../Figures/DurableModel/PriceStd_Search_Ss_T.pdf, id=2175, 712.9048pt x 591.72
+256pt>
+File: ../Figures/DurableModel/PriceStd_Search_Ss_T.pdf Graphic file (type pdf)
+<use ../Figures/DurableModel/PriceStd_Search_Ss_T.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/PriceStd_Search_Ss_T.pdf  used
+ on input line 434.
+(pdftex.def)             Requested size: 399.29463pt x 331.42557pt.
+<../Figures/DurableModel/PriceStd_Search_c_periodt_MPC_decomp.pdf, id=2176, 722
+.7pt x 578.16pt>
+File: ../Figures/DurableModel/PriceStd_Search_c_periodt_MPC_decomp.pdf Graphic 
+file (type pdf)
+<use ../Figures/DurableModel/PriceStd_Search_c_periodt_MPC_decomp.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/PriceStd_Search_c_periodt_MPC_
+decomp.pdf  used on input line 443.
+(pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
+<../Figures/DurableModel/PriceStd_Search_d_periodt_MPC_decomp.pdf, id=2177, 722
+.7pt x 578.16pt>
+File: ../Figures/DurableModel/PriceStd_Search_d_periodt_MPC_decomp.pdf Graphic 
+file (type pdf)
+<use ../Figures/DurableModel/PriceStd_Search_d_periodt_MPC_decomp.pdf>
+Package pdftex.def Info: ../Figures/DurableModel/PriceStd_Search_d_periodt_MPC_
+decomp.pdf  used on input line 449.
+(pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
+) (./Conclusion.tex) (./dcegmSearch.bbl
+[28] [29 <../Figures/DurableModel/PriceStd_Search_Ss_T.pdf> <../Figures/Durable
+Model/PriceStd_Search_c_periodt_MPC_decomp.pdf> <../Figures/DurableModel/PriceS
+td_Search_d_periodt_MPC_decomp.pdf>]) [30] (./Appendix.tex
+(./ApndxDurableModelBasic.tex [31
+
+] [32] [33] [34]
+Underfull \hbox (badness 10000) in paragraph at lines 249--250
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 267--268
+
+ []
+
+[35]
+Overfull \hbox (8.76169pt too wide) in paragraph at lines 297--299
+\T1/cmr/m/n/10.95 and the com-bined (marginal) value func-tions fol-low equa-ti
+ons []--[]. When com-put-ing (marginal)
+ []
+
+[36] [37]
+Overfull \hbox (40.03902pt too wide) in paragraph at lines 362--364
+\T1/cmr/m/n/10.95 mer-i-cally sta-ble form $[]\OMS/cmsy/m/n/10.95 f\OML/cmm/m/i
+t/10.95 v[]; v[]\OMS/cmsy/m/n/10.95 g \OT1/cmr/m/n/10.95 + \OML/cmm/m/it/10.95 
+^^[[] [] [] [][] []\OT1/cmr/m/n/10.95 ((\OML/cmm/m/it/10.95 v[] \OMS/cmsy/m/n/1
+0.95 ^^@ []\OT1/cmr/m/n/10.95 )\OML/cmm/m/it/10.95 =^^[[]\OT1/cmr/m/n/10.95 )[]
+$ \T1/cmr/m/n/10.95 (as in \T1/cmtt/m/n/10.95 calcLogSumChoiceProbs
+ []
+
+
+Overfull \hbox (28.48837pt too wide) detected at line 382
+[]
+ []
+
+[38]
+Overfull \hbox (55.55864pt too wide) detected at line 404
+[]
+ []
+
+[39]
+Overfull \hbox (30.68985pt too wide) in paragraph at lines 440--442
+\T1/cmr/m/n/10.95 Define the state- and price-contingent in-di-ca-tors $\U/msb/
+m/n/10.95 1[]\OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 m[]; n[]; p[]\OT1/cmr/m/n/
+10.95 )$ \T1/cmr/m/n/10.95 and $\U/msb/m/n/10.95 1[]\OT1/cmr/m/n/10.95 (\OML/cm
+m/m/it/10.95 m[]; n[]; p[]\OT1/cmr/m/n/10.95 ) = 1 \OMS/cmsy/m/n/10.95 ^^@ \U/m
+sb/m/n/10.95 1[]\OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 m[]; n[]; p[]\OT1/cmr/m
+/n/10.95 )$
+ []
+
+[40]
+Overfull \hbox (11.2661pt too wide) detected at line 457
+[]
+ []
+
+[41] [42] [43]
+Overfull \hbox (12.89024pt too wide) detected at line 583
+[]
+ []
+
+[44])) [45]
+
+Package natbib Warning: There were undefined citations.
+
+[46] (./dcegmSearch.aux)
+ ***********
+LaTeX2e <2023-11-01>
+L3 programming layer <2023-11-09>
+ ***********
+Package rerunfilecheck Info: File `dcegmSearch.out' has not changed.
+(rerunfilecheck)             Checksum: FC367206B578E1421E9C01987E1651D4;5054.
+ ) 
+Here is how much of TeX's memory you used:
+ 25909 strings out of 474267
+ 481632 string characters out of 5751464
+ 1957558 words of memory out of 5000000
+ 47201 multiletter control sequences out of 15000+600000
+ 591864 words of font info for 140 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 84i,21n,93p,1136b,685s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ <c:/Users/adria/.texlive2023/texmf-var/fonts/pk/ljfour/public/bbm/bbm10.657p
+k><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/tex
+live/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb><c:/texlive/2023/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2023/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/texlive/2023/texmf-dist/fonts/t
+ype1/public/amsfonts/cm/cmmi6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/publi
+c/amsfonts/cm/cmmi7.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmmi8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib1
+0.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib8.pf
+b><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texl
+ive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/texlive/2023/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb><c:/texlive/2023/texmf-dist/f
+onts/type1/public/amsfonts/cm/cmr8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmsy10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/am
+sfonts/cm/cmsy6.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmsy8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/euler/eufm10.
+pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+<c:/texlive/2023/texmf-dist/fonts/type1/public/rsfs/rsfs10.pfb><c:/texlive/2023
+/texmf-dist/fonts/type1/public/cm-super/sfbx0800.pfb><c:/texlive/2023/texmf-dis
+t/fonts/type1/public/cm-super/sfbx0900.pfb><c:/texlive/2023/texmf-dist/fonts/ty
+pe1/public/cm-super/sfbx1000.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public
+/cm-super/sfbx1095.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/cm-super/
+sfbx1200.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/cm-super/sfbx1440.p
+fb><c:/texlive/2023/texmf-dist/fonts/type1/public/cm-super/sfrm0600.pfb><c:/tex
+live/2023/texmf-dist/fonts/type1/public/cm-super/sfrm0800.pfb><c:/texlive/2023/
+texmf-dist/fonts/type1/public/cm-super/sfrm0900.pfb><c:/texlive/2023/texmf-dist
+/fonts/type1/public/cm-super/sfrm1000.pfb><c:/texlive/2023/texmf-dist/fonts/typ
+e1/public/cm-super/sfrm1095.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/
+cm-super/sfrm1200.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/cm-super/s
+frm1728.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/cm-super/sfti1095.pf
+b><c:/texlive/2023/texmf-dist/fonts/type1/public/cm-super/sftt0900.pfb><c:/texl
+ive/2023/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb><c:/texlive/2023/t
+exmf-dist/fonts/type1/public/cm-super/sftt1095.pfb>
+Output written on dcegmSearch.pdf (46 pages, 3946360 bytes).
+PDF statistics:
+ 3021 PDF objects out of 3580 (max. 8388607)
+ 1437 compressed objects within 15 object streams
+ 433 named destinations out of 1000 (max. 500000)
+ 370 words of extra memory for PDF output out of 10000 (max. 10000000)
+

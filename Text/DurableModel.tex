@@ -140,25 +140,25 @@ Fig.~\ref{fig:baseline_T} illustrates the terminal solution. Taking the hard-max
 \begin{figure}[htbp]
 	\centering
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/Baseline_Ss_T.pdf}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/Baseline_Ss_T.pdf}
 		\caption{Adjustment region (S,s bands).}
 		\label{fig:baseline_ss_T}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/Baseline_d_T.pdf}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/Baseline_d_T.pdf}
 		\caption{Durable policy $d_t(n_t,m_t)$.}
 		\label{fig:baseline_d_T}
 	\end{subfigure}
 	\vspace{0.5em}
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/Baseline_c_T_MPC_decomp.pdf}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf}
 		\caption{MPC decomposition of nondurable consumption $c_t(n_t,m_t)$.}
 		\label{fig:baseline_c_T_MPC_decomp}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/Baseline_d_T_MPC_decomp.pdf}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf}
 		\caption{MPC decomposition of durable consumption $d_t(n_t,m_t)$.}
 		\label{fig:baseline_d_T_MPC_decomp}
 	\end{subfigure}
@@ -172,14 +172,15 @@ In earlier period, the agent incorporates the switchpoints in the next period in
 \begin{figure}[htbp]
 	\centering
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/Baseline_c_periodt_MPC_decomp.pdf}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/Baseline_c_periodt_MPC_decomp.pdf}
 		\caption{MPC decomposition of nondurable consumption $c_t(n_t,m_t)$.}
-		\label{fig:baseline_c_T_MPC_decomp}
+		\label{fig:baseline_c_periodt_MPC_decomp}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/Baseline_d_periodt_MPC_decomp.pdf}
-		\caption{MPC decomposition of durable consumption $c_t(n_t,m_t)$.}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/Baseline_d_periodt_MPC_decomp.pdf}
+		\caption{MPC decomposition of durable consumption $d_t(n_t,m_t)$.}
+		\label{fig:baseline_d_periodt_MPC_decomp}
 	\end{subfigure}
 	\caption{MPC and policy functions of non-durable and durable consumption.}
 	\label{fig:baseline_t_MPC_decomp}
@@ -222,31 +223,30 @@ The expected (ex-ante) policy functions are the probability-weighted averages of
 \end{align}
 As $\sigma_\varepsilon \to 0$, the logit probabilities collapse to the hard indicators of the baseline model and~\eqref{eq:taste_logsum} collapses to the hard maximum. Larger $\sigma_\varepsilon$ spreads probability mass onto the inferior branch near indifference, so $c_t$ and $d_t$ (and the marginal-value functions derived from the inclusive value~\eqref{eq:taste_logsum}) are smooth in $(m_t,n_t)$. No quadrature over taste nodes is required: the EV Type I assumption delivers the inclusive value and choice probabilities in closed form. The taste shocks do not alter the household's budget set, so the no-borrowing constraint $a_t \ge 0$ is unaffected. I derive the envelope conditions, the Euler equations, and the EGM algorithm with EV Type I taste shocks in appendix~\ref{subsec:appdx_taste_basic}.
 
-As a result, the S,s curve in the terminal period is smoothened and adjuster values between zero and one are optimal. In the aggregate, the policy functions are a convex combination of adjuster and keeper policy functions around the S,s thresholds. Fig~\ref{tasteshock_T} illustrates the point clearly.
+As a result, the S,s curve in the terminal period is smoothened and adjuster values between zero and one are optimal. In the aggregate, the policy functions are a convex combination of adjuster and keeper policy functions around the S,s thresholds. Fig~\ref{fig:tasteshock_T} illustrates the point clearly.
 
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=\linewidth]{../Figures/DurableModel/TasteShock_Ss_T.pdf}
-	\caption{Adjustment region (S,s bands).}
-	\label{fig:tasteshock_ss_T}
 	\caption{Terminal-period keep--adjust regions in $(m_t,n_t)$ space under EV Type I taste shocks for $\sigma_\varepsilon \in \{0, 0.05, 0.1, 0.2\}$.}
+	\label{fig:tasteshock_ss_T}
 	\label{fig:tasteshock_T}
 \end{figure}
 
-As a result, the discontinuities in period t disapear with a small EV shock parameter. Fig~\ref{fig:taste_adj} show the now continuous consumption functions and marginal propensities to consume and expend.
+As a result, the discontinuities in period t disapear with a small EV shock parameter. Fig~\ref{fig:tasteshock_periodt_MPC_decomp} show the now continuous consumption functions and marginal propensities to consume and expend.
 
 
 \begin{figure}[htbp]
 	\centering
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/TasteShock_c_t_MPC_decomp.pdf}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/TasteShock_c_periodt_MPC_decomp.pdf}
 		\caption{MPC decomposition of nondurable consumption $c_t(n_t,m_t)$.}
 		\label{fig:tasteshock_c_periodt_MPC_decomp}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/TasteShock_d_t_MPC_decomp.pdf}
-		\caption{MPC decomposition of durable consumption $c_t(n_t,m_t)$.}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/TasteShock_d_periodt_MPC_decomp.pdf}
+		\caption{MPC decomposition of durable consumption $d_t(n_t,m_t)$.}
 		\label{fig:tasteshock_d_periodt_MPC_decomp}
 	\end{subfigure}
 	\caption{MPC and policy functions of non-durable and durable consumption using EV taste shocks.}
@@ -271,10 +271,9 @@ Endogeneous search achieves a similar smoothing compared to the EV shocks. Fig~\
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=\linewidth]{../Figures/Durable/Search_Ss_T.pdf}
-	\caption{Adjustment region (S,s bands).}
-	\label{fig:search_ss_T}
+	\includegraphics[width=\linewidth]{../Figures/DurableModel/Search_Ss_T.pdf}
 	\caption{Terminal-period keep--adjust regions in $(m_t,n_t)$ space under endogeneous search for search-cost scales $S \in \{0, 0.05, 0.1, 0.2\}$.}
+	\label{fig:search_ss_T}
 \end{figure}
 
 As a result, optimal consumption functions in period t are smooth as well (see fig~\ref{fig:search_periodt_MPC_decomp}).
@@ -282,14 +281,14 @@ As a result, optimal consumption functions in period t are smooth as well (see f
 \begin{figure}[htbp]
 	\centering
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/Search_c_t_MPC_decomp.pdf}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/Search_c_periodt_MPC_decomp.pdf}
 		\caption{MPC decomposition of nondurable consumption $c_t(n_t,m_t)$.}
 		\label{fig:search_c_periodt_MPC_decomp}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/Search_d_t_MPC_decomp.pdf}
-		\caption{MPC decomposition of durable consumption $c_t(n_t,m_t)$.}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/Search_d_periodt_MPC_decomp.pdf}
+		\caption{MPC decomposition of durable consumption $d_t(n_t,m_t)$.}
 		\label{fig:search_d_periodt_MPC_decomp}
 	\end{subfigure}
 	\caption{MPC and policy functions of non-durable and durable consumption using endogeneous search.}
@@ -357,7 +356,7 @@ fig~\ref{fig:pricestd_Ss_T}. However, since sharp thresholds still exist, the co
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=0.85\linewidth]{PriceStd_Ss_T.pdf}
+	\includegraphics[width=0.85\linewidth]{../Figures/DurableModel/PriceStd_Ss_T.pdf}
 	\caption{Adjustment regions in period $T$ under stochastic durable prices for $\sigma_p \in \{0, 0.05, 0.1, 0.2\}$ (fixed number of price nodes). Greater price dispersion softens the hard keep--adjust threshold.}
 	\label{fig:pricestd_Ss_T}
 \end{figure}
@@ -367,14 +366,14 @@ Figure~\ref{fig:PriceStd_periodt_MPC_decomp} shows the policy functions for vari
 \begin{figure}[htbp]
 	\centering
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/PriceStd_c_t_MPC_decomp.pdf}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/PriceStd_c_periodt_MPC_decomp.pdf}
 		\caption{MPC decomposition of nondurable consumption $c_t(n_t,m_t)$.}
 		\label{fig:PriceStd_c_periodt_MPC_decomp}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/PriceStd_d_t_MPC_decomp.pdf}
-		\caption{MPC decomposition of durable consumption $c_t(n_t,m_t)$.}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/PriceStd_d_periodt_MPC_decomp.pdf}
+		\caption{MPC decomposition of durable consumption $d_t(n_t,m_t)$.}
 		\label{fig:PriceStd_d_periodt_MPC_decomp}
 	\end{subfigure}
 	\caption{MPC and policy functions of non-durable and durable consumption using stochastic prices.}
@@ -385,14 +384,14 @@ Figure~\ref{fig:PriceStd_periodt_MPC_decomp} shows the policy functions for vari
 \begin{figure}[htbp]
 	\centering
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/PriceCount_c_t_MPC_decomp.pdf}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/PriceCount_c_periodt_MPC_decomp.pdf}
 		\caption{MPC decomposition of nondurable consumption $c_t(n_t,m_t)$.}
 		\label{fig:PriceCount_c_periodt_MPC_decomp}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/PriceCount_d_t_MPC_decomp.pdf}
-		\caption{MPC decomposition of durable consumption $c_t(n_t,m_t)$.}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/PriceCount_d_periodt_MPC_decomp.pdf}
+		\caption{MPC decomposition of durable consumption $d_t(n_t,m_t)$.}
 		\label{fig:PriceCount_d_periodt_MPC_decomp}
 	\end{subfigure}
 	\caption{MPC and policy functions of non-durable and durable consumption varying the number of price points.}
@@ -432,7 +431,7 @@ Using a combination of endogeneous search and stochastic prices can smooth polic
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=0.85\linewidth]{PriceStd_Search_Ss_T.pdf}
+	\includegraphics[width=0.85\linewidth]{../Figures/DurableModel/PriceStd_Search_Ss_T.pdf}
 	\caption{Adjustment regions in period $T$ under stochastic durable prices and endogeneous search.}
 	\label{fig:pricestd_search_Ss_T}
 \end{figure}
@@ -441,14 +440,14 @@ Using a combination of endogeneous search and stochastic prices can smooth polic
 \begin{figure}[htbp]
 	\centering
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/PriceStd_Search_c_t_MPC_decomp.pdf}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/PriceStd_Search_c_periodt_MPC_decomp.pdf}
 		\caption{MPC decomposition of nondurable consumption $c_t(n_t,m_t)$.}
 		\label{fig:PriceStd_Search_c_periodt_MPC_decomp}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}{0.48\textwidth}
-		\includegraphics[width=\linewidth]{../Figures/Durable/PriceStd_Search_d_t_MPC_decomp.pdf}
-		\caption{MPC decomposition of durable consumption $c_t(n_t,m_t)$.}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/PriceStd_Search_d_periodt_MPC_decomp.pdf}
+		\caption{MPC decomposition of durable consumption $d_t(n_t,m_t)$.}
 		\label{fig:PriceStd_Search_d_periodt_MPC_decomp}
 	\end{subfigure}
 	\caption{MPC and policy functions of non-durable and durable consumption using stochastic prices and search.}
