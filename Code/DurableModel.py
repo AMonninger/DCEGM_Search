@@ -294,6 +294,13 @@ class DurableConsumerSolution(MetricObject):
         dAdj_post=None,
         aAdj_post=None,
         vAdj_post=None,
+        # DCEGM / FUES diagnostics (None for terminal)
+        keep_decreasing_segments=None,
+        keep_segments_total=None,
+        keep_share_decreasing=None,
+        adj_kinks_removed=None,
+        adj_points_total=None,
+        adj_share_removed=None,
     ):
         self.cFunc = cFunc
         self.dFunc = dFunc
@@ -343,36 +350,35 @@ class DurableConsumerSolution(MetricObject):
         self.dAdj_post = dAdj_post
         self.aAdj_post = aAdj_post
         self.vAdj_post = vAdj_post
+        # Keeper (DCEGM decreasing segments) and adjuster (FUES) kink counts
+        self.keep_decreasing_segments = keep_decreasing_segments
+        self.keep_segments_total = keep_segments_total
+        self.keep_share_decreasing = keep_share_decreasing
+        self.adj_kinks_removed = adj_kinks_removed
+        self.adj_points_total = adj_points_total
+        self.adj_share_removed = adj_share_removed
 
 
 # Default parameters (Combined notebook)
 durable_defaults = dict(
     CRRA=2.0,
-    DiscFac=0.96,
+    DiscFac=0.975,
     LivPrb=1.0,
-    alpha=0.9,
+    alpha=0.75,
     d_ubar=1e-4,
-    dDepr=0.15,
-    adjC=0.15,
+    dDepr=0.05,
+    adjC=0.3,
     MaintCost=0.0,
     OpCost=0.0,
-    Rfree=1.04,
+    Rfree=1.04 ** (0.25),
     RSpread=0.0,
     PermGroFac=1.0,
     LTV=0.0,
     BoroCnstArt=0.0,
-    # Channels
-    # EV Type I taste (alternative to search; mutually exclusive with SearchCost > 0)
-    sigma_eps=0.0,
-    SearchCost=0.1,
-    ScaleBool=False,
-    e_grid_count=101,
-    PriceShkCount=5,
-    PriceShkStd=0.1,
     # Income
     PermShkStd=0.0,
     PermShkCount=1,
-    TranShkStd=0.1,
+    TranShkStd=0.2,
     TranShkCount=7,
     UnempPrb=0.0,
     IncUnemp=0.0,
@@ -381,19 +387,26 @@ durable_defaults = dict(
     taxrate=0.0,
     labor=1.0,
     wage=1.0,
+    # Channels (EV taste sigma_eps vs search are mutually exclusive)
+    sigma_eps=0.0,
+    SearchCost=0.1,
+    ScaleBool=False,
+    e_grid_count=101,
+    PriceShkCount=5,
+    PriceShkStd=0.1,
     # EoP method
-    use_expected=False,
-    use_TransitionMatrix=True,
+    use_expected=True,
+    use_TransitionMatrix=False,
     # Grids
     nNrmMax=5.0,
-    nNrmCount=40,
+    nNrmCount=100,
     mNrmMax=8.0,
-    mNrmCount=50,
-    xNrmMax=12.0,
-    xNrmCount=80,
+    mNrmCount=100,
+    xNrmMax=13.0,
+    xNrmCount=200,
     aNrmMax=8.0,
-    aNrmCount=50,
-    NestFac=2,
+    aNrmCount=100,
+    NestFac=1,
     grid_type="exp_mult",
     TranMatrix_mCount=1010,
     TranMatrix_bCount=1000,
@@ -978,6 +991,8 @@ class DurableConsumer:
         vTransf = lambda x: np.exp(np.clip(x, -700, 700))
 
         cFuncKeepList = []
+        decreasing_segments_counter = 0
+        segments_total_counter = 0
         for i_n, n0 in enumerate(dNrmGrid):
             n_aux = np.full(len(aNrmGrid), n0)
             EndOfPrdvPNow = EndOfPrdvPOne[i_n]
@@ -988,6 +1003,13 @@ class DurableConsumer:
 
             vKeept = vTransf(vKeep_egm)
             start, end = calc_nondecreasing_segments(mKeep_egm, vKeept)
+
+            # Decreasing segments = breaks between nondecreasing pieces (= kinks)
+            n_nondec = len(start)
+            n_dec = max(n_nondec - 1, 0)
+            decreasing_segments_counter += n_dec
+            segments_total_counter += n_nondec + n_dec
+
             segments, m_segments, c_segments = [], [], []
             for j in range(len(start)):
                 idx = range(start[j], end[j] + 1)
@@ -1073,6 +1095,11 @@ class DurableConsumer:
             cFuncKeep, dFuncKeep, alpha, d_ubar, CRRA
         )
 
+        keep_share_decreasing = (
+            decreasing_segments_counter / segments_total_counter
+            if segments_total_counter
+            else float("nan")
+        )
         return dict(
             cFuncKeep=cFuncKeep,
             dFuncKeep=dFuncKeep,
@@ -1088,6 +1115,9 @@ class DurableConsumer:
             vPDFuncKeep=vPDFuncKeep,
             vPDFuncKeep_arr=vPDFuncKeep_arr,
             keep_shape=keep_shape,
+            keep_decreasing_segments=int(decreasing_segments_counter),
+            keep_segments_total=int(segments_total_counter),
+            keep_share_decreasing=float(keep_share_decreasing),
         )
 
     # ----------------------------------------------------------- adjuster
@@ -1125,6 +1155,8 @@ class DurableConsumer:
         aAdj_pre_list, vAdj_pre_list = [], []
         xAdj_post_list, cAdj_post_list, dAdj_post_list = [], [], []
         aAdj_post_list, vAdj_post_list = [], []
+        adj_removedpoints_counter = 0
+        adj_totalpoints_counter = 0
 
         for i_p, p0 in enumerate(PriceShkVals):
             aAdj_list, cAdj_list, xAdj_list, dAdj_list, vAdj_list = [], [], [], [], []
@@ -1189,6 +1221,9 @@ class DurableConsumer:
                     xAdj_array, vAdj_array, cAdj_array, dAdj_array, aAdj_array, b=BoroCnstNat1D
                 )
                 use_fallback = len(xAdj_upper) == 0
+                if not use_fallback:
+                    adj_removedpoints_counter += len(xAdj_array) - len(xAdj_upper)
+                    adj_totalpoints_counter += len(xAdj_array)
 
             if use_fallback:
                 self._log(f"  fallback static adjuster for p={p0:.4f}")
@@ -1278,6 +1313,11 @@ class DurableConsumer:
         cFuncAdj_NM = LinearFast(cFuncAdj_NM_arr[i_p0], [nNrmGrid, mNrmGrid])
         dFuncAdj_NM = LinearFast(dFuncAdj_NM_arr[i_p0], [nNrmGrid, mNrmGrid])
 
+        adj_share_removed = (
+            adj_removedpoints_counter / adj_totalpoints_counter
+            if adj_totalpoints_counter
+            else float("nan")
+        )
         return dict(
             cFuncAdj_NM_arr=cFuncAdj_NM_arr,
             dFuncAdj_NM_arr=dFuncAdj_NM_arr,
@@ -1300,6 +1340,9 @@ class DurableConsumer:
             aAdj_post_list=aAdj_post_list,
             vAdj_post_list=vAdj_post_list,
             i_p0=i_p0,
+            adj_kinks_removed=int(adj_removedpoints_counter),
+            adj_points_total=int(adj_totalpoints_counter),
+            adj_share_removed=float(adj_share_removed),
         )
 
     # -------------------------------------------------------- one period
@@ -1380,6 +1423,12 @@ class DurableConsumer:
             dAdj_post=adj["dAdj_post_list"][i_p0],
             aAdj_post=adj["aAdj_post_list"][i_p0],
             vAdj_post=adj["vAdj_post_list"][i_p0],
+            keep_decreasing_segments=keep["keep_decreasing_segments"],
+            keep_segments_total=keep["keep_segments_total"],
+            keep_share_decreasing=keep["keep_share_decreasing"],
+            adj_kinks_removed=adj["adj_kinks_removed"],
+            adj_points_total=adj["adj_points_total"],
+            adj_share_removed=adj["adj_share_removed"],
         )
 
     # ---------------------------------------------------------------- solve
@@ -1398,6 +1447,35 @@ class DurableConsumer:
             sols.insert(0, self.solve_one_period(sols[0]))
         self.solution = sols
         return self.solution
+
+    def print_kink_stats(self, label=None):
+        """
+        Print keeper (DCEGM decreasing segments) and adjuster (FUES) stats
+        for each period.
+
+        Terminal period has no EGM/FUES envelope step, so those rows are marked n/a.
+        """
+        if label:
+            print(f"=== {label}: kink / segment stats by period ===")
+        else:
+            print("=== Kink / segment stats by period ===")
+        sols = getattr(self, "solution", None)
+        if not sols:
+            print("  (no solution)")
+            return
+        for t, sol in enumerate(sols):
+            if sol.keep_decreasing_segments is None and sol.adj_kinks_removed is None:
+                print(f"Period {t} (terminal): n/a")
+                continue
+            print(f"Period {t}:")
+            print(
+                f"  Keeper — number of decreasing segments: {sol.keep_decreasing_segments}, "
+                f"share of decreasing segments: {sol.keep_share_decreasing}"
+            )
+            print(
+                f"  Adjuster — number of kinks removed: {sol.adj_kinks_removed}, "
+                f"share of removed points: {sol.adj_share_removed}"
+            )
 
 
 __all__ = [
