@@ -453,3 +453,68 @@ Using a combination of endogeneous search and stochastic prices can smooth polic
 	\caption{MPC and policy functions of non-durable and durable consumption using stochastic prices and search.}
 	\label{fig:PriceStd_Search_periodt_MPC_decomp}
 \end{figure}
+
+
+\subsection{Comparing smoothness mechanisms}\label{subsec:ModelBasicSmoothingCompare}
+
+As in the retirement application of Section~\ref{sec:RetirementModel}, each of the mechanisms above---EV Type~I taste shocks $\sigma_\varepsilon$, search frictions $S$, durable-price dispersion $\sigma_p$, and transitory income risk $\sigma_\eta$---can smooth the discontinuities that arise from the hard keep-versus-adjust margin. It is therefore natural to ask whether they also shift the combined decision rules in economically distinct directions, as taste shocks and search frictions do for the worker's consumption function.
+
+To make the comparison transparent, I fix beginning-of-period durables at a representative stock $n_t=n_0$ and plot the \emph{combined} policies $c_t(n_0,m_t)$ and $d_t(n_0,m_t)$ in an earlier period, together with the corresponding marginal propensities $\partial c_t/\partial m_t$ and $\partial d_t/\partial m_t$. Starting from a lightly smoothed reference in each channel, I then increase one smoothness parameter at a time (holding the others at their inactive values, except that the income experiment retains a small EV scale so that the discrete margin remains smooth). Figures~\ref{fig:smoothing_shifts_levels} and~\ref{fig:smoothing_shifts_mpcs} summarize the results.
+
+In contrast to the retirement model, all four mechanisms move the durable policies in the \emph{same} direction. Raising $\sigma_\varepsilon$, $S$, $\sigma_p$, or $\sigma_\eta$ increases combined nondurable consumption, decreases combined durable holdings, and dampens the sharp MPC spikes that appear around the S,s band under a hard maximum. The common pattern reflects the nature of the discrete choice. Keep-versus-adjust reallocates a stock subject to a transaction cost $\tau$; it does not permanently alter the household's labor-income stream. Larger search costs, a more diffuse logit mix of keep and adjust, or greater ex-ante averaging over purchase prices all reduce the weight (or the extremity) of the full adjuster branch relative to keeping $d_t=n_t$. The combined rule therefore shifts toward the keeper---higher liquid consumption out of $m_t$ and a durable stock closer to the inherited $n_0$---and the discontinuous jump in MPCs at the S,s threshold is attenuated. Larger income shocks reinforce the same qualitative shift through standard precautionary saving into liquid resources.
+
+These visual improvements are matched by the numerical kink diagnostics stored with each period's solution. For the keeper, I count decreasing segments of the EGM locus (the breaks between nondecreasing pieces that necessitate an upper envelope); for the adjuster, I count the FOC candidates removed by FUES. Table~\ref{tab:smoothing_kinks} reports both counts and shares in the same earlier period as Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs}, for the hard-max baseline and one representative magnitude of each discrete-choice smoother. Relative to the hard maximum, taste shocks, search frictions, and price dispersion all drive the keeper's decreasing-segment count to zero. Taste shocks and search frictions also eliminate FUES removals in that period; price dispersion leaves a small residual share of removed adjuster points (the absolute count is not comparable to the single-price baseline because FUES is applied separately at each price node), but the keeper side is fully cleaned and the combined MPC spikes are still damped.
+
+\begin{table}[htbp]
+\centering
+\caption{Period-$t$ kink diagnostics under the hard-max baseline and one smoothed magnitude of each discrete-choice channel. Keeper: number and share of decreasing EGM segments. Adjuster: number and share of FOC points removed by FUES. The $\sigma_p$ adjuster count sums over price nodes.}
+\label{tab:smoothing_kinks}
+\begin{tabular}{lcccc}
+\hline
+ & \multicolumn{2}{c}{Keeper} & \multicolumn{2}{c}{Adjuster} \\
+\cline{2-3}\cline{4-5}
+Specification & Decr.\ seg. & Share & Kinks rem. & Share \\
+\hline
+Hard max & 5 & 0.045 & 4 & 0.040 \\
+$\sigma_\varepsilon = 0.05$ & 0 & 0 & 0 & 0 \\
+$S = 0.1$ & 0 & 0 & 0 & 0 \\
+$\sigma_p = 0.1$ & 0 & 0 & 17 & 0.035 \\
+\hline
+\end{tabular}
+\end{table}
+
+The retirement contrast is immediate. There, lowering the probability of a successful switch or raising search frictions reduces the likelihood of leaving work, so agents expect more years of labor income and consume more today; larger taste shocks instead raise the risk of retiring ``too early'' and induce precautionary saving, so consumption falls. Taste and search therefore shift the worker's rule in opposite directions even though both smooth the discrete margin. In the durable environment, both channels primarily reweight the same keep-versus-adjust comparison toward less aggressive adjustment, so their effects on combined $c_t$ and $d_t$ line up---as do price dispersion and income risk.
+
+\begin{figure}[htbp]
+	\centering
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/SmoothingShifts_c_periodt.pdf}
+		\caption{Combined nondurable consumption $c_t(n_0,m_t)$.}
+		\label{fig:smoothing_shifts_c}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/SmoothingShifts_d_periodt.pdf}
+		\caption{Combined durable stock $d_t(n_0,m_t)$.}
+		\label{fig:smoothing_shifts_d}
+	\end{subfigure}
+	\caption{Combined policies at fixed $n_0$ when each smoothness channel is strengthened. Panels vary (a)~$\sigma_\varepsilon$, (b)~$S$, (c)~$\sigma_p$, and (d)~$\sigma_\eta$. All four raise $c_t$ and lower $d_t$ relative to the lightly smoothed reference in that panel.}
+	\label{fig:smoothing_shifts_levels}
+\end{figure}
+
+\begin{figure}[htbp]
+	\centering
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/SmoothingShifts_c_MPC_periodt.pdf}
+		\caption{MPC of nondurable consumption $\partial c_t/\partial m_t$.}
+		\label{fig:smoothing_shifts_c_MPC}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{../Figures/DurableModel/SmoothingShifts_d_MPC_periodt.pdf}
+		\caption{MPC of durable stock $\partial d_t/\partial m_t$.}
+		\label{fig:smoothing_shifts_d_MPC}
+	\end{subfigure}
+	\caption{Combined MPCs at fixed $n_0$ under the same four experiments as Figure~\ref{fig:smoothing_shifts_levels}. Strengthening any channel dampens the spikes around the S,s band.}
+	\label{fig:smoothing_shifts_mpcs}
+\end{figure}
