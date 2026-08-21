@@ -3387,16 +3387,6 @@ class UnempRisk_Durable_Latest(IndShockConsumerType):
         ### Sparse Version
         ergodic_distr = compute_erg_dstn_sparse(transition_matrix[0])
 
-        # # ergodic_distr = compute_erg_dstn(transition_matrix[0], method)
-        # if method == 'Pontus':
-        #     ergodic_distr = compute_erg_dstn(transition_matrix[0])
-        # else:
-        #     eigen, ergodic_distr = sp.sparse.linalg.eigs(transition_matrix[0], v0=np.ones(len(transition_matrix[0])), k=1,
-        #                                       which='LM')  # Solve for ergodic distribution
-        #     ergodic_distr = ergodic_distr.real / np.sum(ergodic_distr.real)
-
-
-
         self.vec_erg_dstn = ergodic_distr  # distribution as a vector
         self.erg_dstn = ergodic_distr.reshape(
             (len(self.dist_nGrid), len(self.dist_mGrid)))  # distribution reshaped into len(ngrid) by len(mgrid) array
@@ -3408,24 +3398,6 @@ class UnempRisk_Durable_Latest(IndShockConsumerType):
             self.cycles = 0
             self.update()
             self.solve()
-        # Add Limit
-        # if self.dDepr <1:
-        #     self.add_limit()
-
-        # else:
-        #     solution_shape = (len(self.nNrmGrid) , len(self.mNrmGrid))
-        #     cFunc_array = np.zeros(solution_shape)
-        #     dFunc_array = np.zeros(solution_shape)
-        #     exFunc_array = np.zeros(solution_shape)
-        #     for i_n in range(len(self.nNrmGrid)):
-        #         n_aux = np.ones_like(self.mNrmGrid) * self.nNrmGrid[i_n]
-        #         cFunc_array[i_n] = self.solution[0].cFunc(n_aux, self.mNrmGrid)
-        #         dFunc_array[i_n] = self.solution[0].dFunc(n_aux, self.mNrmGrid)
-        #         exFunc_array[i_n] = self.solution[0].exFunc(n_aux, self.mNrmGrid)
-        #     self.solution[0].cFunc = LinearFast(cFunc_array, [self.nNrmGrid, self.mNrmGrid])
-        #     self.solution[0].dFunc = LinearFast(dFunc_array, [self.nNrmGrid, self.mNrmGrid])
-        #     self.solution[0].exFunc = LinearFast(exFunc_array, [self.nNrmGrid, self.mNrmGrid])
-        #     self.add_limit()
 
         # Use Harmenberg Measure
         self.neutral_measure = True

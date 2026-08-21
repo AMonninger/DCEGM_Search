@@ -22,7 +22,10 @@ Requires LTV=0, ScaleBool=False, MaintCost=OpCost=0 (simplified).
 """
 from __future__ import annotations
 
+from copy import deepcopy
+
 import numpy as np
+import scipy.sparse as sps
 
 from HARK.econforgeinterp import LinearFast
 from HARK.interpolation import ValueFuncCRRA, LowerEnvelope2D, MargValueFuncCRRA
@@ -45,6 +48,10 @@ from utility import (
     compute_cost_matrix,
     directed_search_function_scaled_matrix,
     FUES_allPol,
+    jump_to_grid_dur,
+    gen_tran_matrix_dur_sparse,
+    compute_erg_dstn_sparse,
+    J_from_F,
 )
 
 
@@ -246,7 +253,7 @@ def combine_search_price(
 class DurableConsumerSolution(MetricObject):
     """One-period solution objects for plotting and continuation."""
 
-    distance_criteria = ["cFunc", "dFunc"]
+    distance_criteria = ["inv_vPFunc", "inv_vPDFunc"]
 
     def __init__(
         self,
@@ -411,8 +418,29 @@ durable_defaults = dict(
     TranMatrix_mCount=1010,
     TranMatrix_bCount=1000,
     N_scan=800,
-    # Horizon: cycles = number of periods before terminal (1 => T and T-1)
+    # Steady-state histogram / transition-matrix grids (distribution over (n, m))
+    TranMatrixmMin=1e-4,
+    TranMatrixmMax=8.0,
+    TranMatrixmCount=1000,
+    TranMatrixnMin=0.0,
+    TranMatrixnMax=5.0,
+    TranMatrixnCount=100,
+    nNrmInitMean=0.0,   # newborn durable stock seed (used only when LivPrb < 1)
+    mNrmInitMean=1.0,   # newborn market-resource seed (used only when LivPrb < 1)
+    neutral_measure=False,
+    # Horizon (background convention): cycles is the MODE selector, T_cycle the
+    # number of periods.
+    #   cycles = 1 => finite horizon with T_cycle periods before the terminal
+    #                 (solution has T_cycle + 1 entries; solution[-1] is terminal)
+    #   cycles = 0 => infinite horizon (iterate the one-period operator to convergence)
     cycles=1,
+    T_cycle=1,       # number of periods before terminal when cycles >= 1
+    tol=1e-6,        # infinite-horizon convergence tolerance (matches background)
+    max_cycles=500,  # iteration cap for cycles=0 (matches background max_cycles)
+    # When False, solve() uses a pre-set self.solution_terminal as the terminal
+    # instead of computing the analytic terminal (used by the Jacobian solver).
+    analytic_terminal=True,
+    jac_dx=1e-4,     # perturbation size for sequence-space Jacobians
     verbose=False,
 )
 
@@ -431,7 +459,20 @@ class DurableConsumer:
     Parameters
     ----------
     cycles : int
-        Number of periods before the terminal period (cycles=1 solves T-1 and T).
+        Horizon mode selector (background convention).
+        ``cycles = 1`` solves a finite horizon with ``T_cycle`` periods before
+        the terminal (solution has ``T_cycle + 1`` entries; ``solution[-1]`` is
+        terminal). ``cycles = 0`` solves the infinite horizon: the one-period
+        operator is iterated from the terminal seed until the solution
+        ``distance`` falls below ``tol`` (or ``max_cycles`` iterations are
+        reached).
+    T_cycle : int
+        Number of periods before the terminal when ``cycles >= 1``
+        (T_cycle=1 solves T-1 and T).
+    tol : float
+        Convergence tolerance for the infinite-horizon iteration (cycles=0).
+    max_cycles : int
+        Maximum number of iterations for the infinite-horizon iteration.
     **kwds
         Override any entry in durable_defaults.
     """
@@ -1434,19 +1475,452 @@ class DurableConsumer:
     # ---------------------------------------------------------------- solve
     def solve(self):
         """
-        Solve the finite-horizon problem.
+        Solve the model.
 
-        Sets ``self.solution`` to a list of length ``cycles + 1``, where
-        ``solution[t]`` is period t (0 = first) and ``solution[-1]`` is terminal.
+        Finite horizon (``cycles >= 1``): sets ``self.solution`` to a list of
+        length ``T_cycle + 1``, where ``solution[t]`` is period t (0 = first) and
+        ``solution[-1]`` is terminal.
+
+        Infinite horizon (``cycles == 0``): iterates the one-period operator
+        from the terminal seed until ``sol.distance(prev) < self.tol`` (using the
+        solution ``distance_criteria``) or ``self.max_cycles`` is reached. Sets
+        ``self.solution`` to a single-element list holding the converged (limit)
+        solution.
         """
         self.update()
-        terminal = self.solve_terminal()
-        self.solution_terminal = terminal
+        if not self.analytic_terminal and self.solution_terminal is not None:
+            terminal = self.solution_terminal
+        else:
+            terminal = self.solve_terminal()
+            self.solution_terminal = terminal
+
+        if int(self.cycles) == 0:
+            prev = terminal
+            for it in range(int(self.max_cycles)):
+                sol = self.solve_one_period(prev)
+                dist = sol.distance(prev)
+                self._log(f"Infinite-horizon iter {it}: distance = {dist:.3e}")
+                if dist < self.tol:
+                    self._log(f"Converged after {it + 1} iterations (distance {dist:.3e}).")
+                    self.solution = [sol]
+                    return self.solution
+                prev = sol
+            self._log(
+                f"Warning: reached max_cycles={self.max_cycles} without converging "
+                f"(last distance {dist:.3e})."
+            )
+            self.solution = [prev]
+            return self.solution
+
         sols = [terminal]
-        for _ in range(int(self.cycles)):
+        for _ in range(int(self.T_cycle)):
             sols.insert(0, self.solve_one_period(sols[0]))
         self.solution = sols
         return self.solution
+
+    def _solve_perturbed_finite(self, param_path):
+        """
+        Finite-horizon backward induction seeded by ``self.solution_terminal``
+        (which must be pre-set to the steady-state solution), with per-period
+        parameter values.
+
+        ``param_path`` maps a parameter name to a list of length ``T_cycle``
+        giving that parameter's value in each period (index 0 = earliest period,
+        index T_cycle-1 = the period just before the terminal). Only the
+        "direct" parameters consumed in ``_end_of_period`` are supported.
+
+        Produces ``self.solution`` of length ``T_cycle + 1`` where
+        ``solution[k]`` is period k and ``solution[-1]`` is the terminal seed.
+        """
+        self.update()
+        if self.solution_terminal is None:
+            raise ValueError(
+                "_solve_perturbed_finite requires self.solution_terminal to be set."
+            )
+        T = int(self.T_cycle)
+        saved = {k: getattr(self, k) for k in param_path}
+        sols = [self.solution_terminal]
+        try:
+            # Backward step j produces period index (T-1-j): j=0 -> period T-1.
+            for j in range(T):
+                period = T - 1 - j
+                for k, path in param_path.items():
+                    setattr(self, k, path[period])
+                sols.insert(0, self.solve_one_period(sols[0]))
+        finally:
+            for k, v in saved.items():
+                setattr(self, k, v)
+        self.solution = sols
+        return self.solution
+
+    # ------------------------------------------------- transition matrix / SS
+    def define_distribution_grid_dur(self, dist_mGrid=None, dist_nGrid=None, timestonest=None):
+        """
+        Build the histogram grids over which the stationary distribution lives.
+
+        Simplified vs. background: LTV=0 is enforced, so ``mNrmMin = 0`` and the
+        negative-``m`` branch is dropped. Grids are the same for the infinite
+        (``cycles=0``) and finite (``T_cycle``) cases.
+        """
+        if timestonest is None:
+            timestonest = self.NestFac
+
+        if not hasattr(dist_mGrid, "__len__"):
+            self.dist_mGrid = np.asarray(
+                make_grid_exp_mult(
+                    ming=self.TranMatrixmMin,
+                    maxg=self.TranMatrixmMax,
+                    ng=int(self.TranMatrixmCount),
+                    timestonest=timestonest,
+                )
+            ).flatten()
+        else:
+            self.dist_mGrid = dist_mGrid
+
+        if not hasattr(dist_nGrid, "__len__"):
+            self.dist_nGrid = construct_grid(
+                self.TranMatrixnMin,
+                self.TranMatrixnMax,
+                int(self.TranMatrixnCount),
+                self.grid_type,
+                self.NestFac,
+            )
+        else:
+            self.dist_nGrid = dist_nGrid
+
+    def _tran_matrix_one_period(self, sol, shk):
+        """Policy grids + sparse transition matrix for a single solved period."""
+        dist_nGrid = self.dist_nGrid
+        dist_mGrid = self.dist_mGrid
+        shape = (len(dist_nGrid), len(dist_mGrid))
+
+        cPol = np.zeros(shape)
+        dPol = np.zeros(shape)
+        aPol = np.zeros(shape)
+        adjPol = np.zeros(shape)
+        dexPol = np.zeros(shape)
+        for i_n in range(len(dist_nGrid)):
+            n_aux = np.ones(len(dist_mGrid)) * dist_nGrid[i_n]
+            cPol[i_n] = sol.cFunc(n_aux, dist_mGrid)
+            dPol[i_n] = sol.dFunc(n_aux, dist_mGrid)
+            dexPol[i_n] = dPol[i_n] - n_aux
+            adjPol[i_n] = np.clip(sol.adjusting(n_aux, dist_mGrid), 0.0, 1.0)
+            aPol[i_n] = sol.aFunc(n_aux, dist_mGrid)
+        texPol = cPol + dexPol
+
+        if np.any(np.isnan(cPol)):
+            print("cPol_Grid has NaNs")
+
+        # Scalar Rfree/RSpread/LivPrb in the simplified model (no time variation).
+        R_vec = np.where(aPol < 0, self.Rfree + self.RSpread, self.Rfree)
+        bNext = (R_vec * aPol) - dPol * (self.OpCost + self.dDepr * self.MaintCost)
+        nNext_unshocked = (1.0 - self.dDepr * (1.0 - self.MaintCost)) * dPol
+
+        shk_prbs = shk.pmv
+        perm_shks = shk.atoms[0]
+        tran_shks = shk.atoms[1]
+        LivPrb = self.LivPrb
+
+        NewBornDist = jump_to_grid_dur(
+            np.ones_like(tran_shks) * self.nNrmInitMean,
+            np.ones_like(tran_shks) * self.mNrmInitMean,
+            shk_prbs,
+            dist_nGrid,
+            dist_mGrid,
+        )
+
+        rows, cols, data, nStates = gen_tran_matrix_dur_sparse(
+            dist_nGrid, dist_mGrid, bNext, nNext_unshocked,
+            shk_prbs, perm_shks, tran_shks, LivPrb, NewBornDist,
+        )
+        rows = np.array(rows, dtype=np.int32)
+        cols = np.array(cols, dtype=np.int32)
+        data = np.array(data, dtype=np.float64)
+        TranMatrix = sps.csr_matrix((data, (rows, cols)), shape=(nStates, nStates))
+
+        return dict(
+            cPol=cPol, dPol=dPol, aPol=aPol, adjPol=adjPol,
+            dexPol=dexPol, texPol=texPol, TranMatrix=TranMatrix,
+        )
+
+    def calc_transition_matrix_dur(self, shk_dstn=None):
+        """
+        Evaluate solved policies on the histogram grid and build the transition
+        matrix. For ``cycles=0`` a single matrix is stored; for the finite case a
+        list over ``T_cycle`` periods is stored.
+
+        No CarCrash channel and no Harmenberg neutral measure in the simplified
+        port (default has degenerate permanent shocks).
+        """
+        if shk_dstn is None:
+            shk_dstn = self.IncShkDstn
+
+        if int(self.cycles) == 0:
+            out = self._tran_matrix_one_period(self.solution[0], shk_dstn)
+            self.cPol_Grid = out["cPol"]
+            self.dPol_Grid = out["dPol"]
+            self.aPol_Grid = out["aPol"]
+            self.adjPol_Grid = out["adjPol"]
+            self.dexPol_Grid = out["dexPol"]
+            self.texPol_Grid = out["texPol"]
+            self.tran_matrix = out["TranMatrix"]
+        else:
+            self.cPol_Grid = []
+            self.dPol_Grid = []
+            self.aPol_Grid = []
+            self.adjPol_Grid = []
+            self.dexPol_Grid = []
+            self.texPol_Grid = []
+            self.tran_matrix = []
+            for k in range(int(self.T_cycle)):
+                out = self._tran_matrix_one_period(self.solution[k], shk_dstn)
+                self.cPol_Grid.append(out["cPol"])
+                self.dPol_Grid.append(out["dPol"])
+                self.aPol_Grid.append(out["aPol"])
+                self.adjPol_Grid.append(out["adjPol"])
+                self.dexPol_Grid.append(out["dexPol"])
+                self.texPol_Grid.append(out["texPol"])
+                self.tran_matrix.append(out["TranMatrix"])
+
+    def calc_ergodic_dist(self, transition_matrix=None):
+        """Stationary distribution (eigenvector for eigenvalue 1) of the matrix."""
+        if transition_matrix is None:
+            transition_matrix = self.tran_matrix
+        if isinstance(transition_matrix, list):
+            transition_matrix = transition_matrix[0]
+
+        ergodic_distr = compute_erg_dstn_sparse(transition_matrix)
+        self.vec_erg_dstn = ergodic_distr
+        self.erg_dstn = ergodic_distr.reshape(
+            (len(self.dist_nGrid), len(self.dist_mGrid))
+        )
+
+    def compute_steady_state(self):
+        """
+        Solve the infinite-horizon problem, build the transition matrix and its
+        ergodic distribution, and return steady-state aggregates.
+        """
+        if self.solution is None or int(self.cycles) != 0:
+            self.cycles = 0
+            self.update()
+            self.solve()
+
+        self.define_distribution_grid_dur()
+        self.calc_transition_matrix_dur()
+
+        self.c_ss = self.cPol_Grid
+        self.d_ss = self.dPol_Grid
+        self.dex_ss = self.dexPol_Grid
+        self.a_ss = self.aPol_Grid
+        self.adj_ss = self.adjPol_Grid
+
+        self.calc_ergodic_dist()
+        ss_dstn = self.vec_erg_dstn
+
+        self.A_ss = self.a_ss.flatten() @ ss_dstn
+        self.C_ss = self.c_ss.flatten() @ ss_dstn
+        self.D_ss = self.d_ss.flatten() @ ss_dstn
+        self.DEX_ss = self.dex_ss.flatten() @ ss_dstn
+        self.TEX_ss = self.C_ss + self.DEX_ss
+        self.ADJ_ss = self.adj_ss.flatten() @ ss_dstn
+
+        return self.A_ss, self.C_ss, self.D_ss, self.DEX_ss, self.TEX_ss, self.ADJ_ss
+
+    # --------------------------------------------------- sequence-space Jacobian
+    # Parameters whose Jacobian is currently supported (consumed directly in
+    # _end_of_period, so time variation is handled by set-and-restore).
+    _JAC_SUPPORTED = ("Rfree", "RSpread", "DiscFac", "PermGroFac")
+    # Not implemented yet (need a per-period income process rebuild, or the
+    # newborn/survival distribution which is trivial at LivPrb=1).
+    _JAC_NOT_IMPLEMENTED = (
+        "LivPrb", "PermShkStd", "TranShkStd", "UnempPrb", "IncUnemp",
+    )
+
+    def _params_dict(self):
+        """Reconstruct a kwargs dict of current parameter values (fresh-instance)."""
+        return {k: getattr(self, k) for k in durable_defaults}
+
+    def _make_finite_agent(self, T):
+        """Fresh finite-horizon agent seeded by this model's steady state."""
+        params = self._params_dict()
+        params["cycles"] = 1
+        params["T_cycle"] = int(T)
+        params["analytic_terminal"] = False  # terminal = steady state
+        agent = DurableConsumer(**params)
+        agent.solution_terminal = deepcopy(self.solution[0])
+        return agent
+
+    def calc_jacobian(self, shk_param, T):
+        """
+        Sequence-space (fake-news) Jacobians of aggregate ``C, DEX, TEX, D, A,
+        ADJ`` with respect to ``shk_param`` over a horizon ``T``.
+
+        Requires ``compute_steady_state()`` to have been run on ``self`` first
+        (uses the stored SS policy grids, transition matrix, and ergodic
+        distribution). Returns ``(J_C, J_DEX, J_TEX, J_D, J_A, J_ADJ)``.
+
+        Only the "direct" parameters in ``_JAC_SUPPORTED`` are implemented; other
+        shocks print a not-implemented message and return ``None``.
+        """
+        if shk_param in self._JAC_NOT_IMPLEMENTED:
+            print(
+                f"calc_jacobian: shock parameter '{shk_param}' is not implemented "
+                "yet (needs a per-period income process rebuild / non-trivial "
+                "survival distribution). Supported: "
+                f"{', '.join(self._JAC_SUPPORTED)}."
+            )
+            return None
+        if shk_param not in self._JAC_SUPPORTED:
+            print(
+                f"calc_jacobian: unknown shock parameter '{shk_param}'. "
+                f"Supported: {', '.join(self._JAC_SUPPORTED)}."
+            )
+            return None
+        if getattr(self, "vec_erg_dstn", None) is None:
+            raise RuntimeError(
+                "calc_jacobian requires a steady state: call compute_steady_state() first."
+            )
+
+        T = int(T)
+        dx = self.jac_dx
+        ss_val = getattr(self, shk_param)
+
+        # Steady-state objects (single arrays / matrix for cycles=0).
+        a_ss = self.aPol_Grid
+        c_ss = self.cPol_Grid
+        d_ss = self.dPol_Grid
+        dex_ss = self.dexPol_Grid
+        adj_ss = self.adjPol_Grid
+        tranmat_ss = self.tran_matrix
+        Dist_ss = self.vec_erg_dstn.T
+
+        # -- Finite-horizon agent: shock at period i = T-1 (second to last) -----
+        FinHorizonAgent = self._make_finite_agent(T)
+        i = T - 1
+        path = [ss_val] * T
+        path[i] = ss_val + dx
+        FinHorizonAgent._solve_perturbed_finite({shk_param: path})
+        FinHorizonAgent.define_distribution_grid_dur()
+        FinHorizonAgent.calc_transition_matrix_dur()
+
+        a_t = FinHorizonAgent.aPol_Grid
+        c_t = FinHorizonAgent.cPol_Grid
+        d_t = FinHorizonAgent.dPol_Grid
+        dex_t = FinHorizonAgent.dexPol_Grid
+        adj_t = FinHorizonAgent.adjPol_Grid
+        # Append steady-state grids (index T) — not added by calc_transition_matrix.
+        a_t.append(self.a_ss)
+        c_t.append(self.c_ss)
+        d_t.append(self.d_ss)
+        dex_t.append(self.dex_ss)
+        adj_t.append(self.adj_ss)
+
+        # STEP 1: policy deviations and their aggregates (curly Y).
+        A_curl_s = np.zeros(T)
+        C_curl_s = np.zeros(T)
+        D_curl_s = np.zeros(T)
+        DEX_curl_s = np.zeros(T)
+        ADJ_curl_s = np.zeros(T)
+        for k in range(T):
+            A_curl_s[k] = ((a_t[T - k] - a_ss).flatten() @ Dist_ss) / dx
+            C_curl_s[k] = ((c_t[T - k] - c_ss).flatten() @ Dist_ss) / dx
+            D_curl_s[k] = ((d_t[T - k] - d_ss).flatten() @ Dist_ss) / dx
+            DEX_curl_s[k] = ((dex_t[T - k] - dex_ss).flatten() @ Dist_ss) / dx
+            ADJ_curl_s[k] = ((adj_t[T - k] - adj_ss).flatten() @ Dist_ss) / dx
+
+        # STEP 1 (curly D): distribution deviations.
+        tranmat_t = FinHorizonAgent.tran_matrix
+        tranmat_t.append(tranmat_ss)
+        nStates = len(self.dist_nGrid) * len(self.dist_mGrid)
+        Dist_curl_s = np.zeros((T, nStates))
+        for k in range(T):
+            dlambda = tranmat_t[T - k] - tranmat_ss
+            Dist_curl_s[k] = (dlambda @ Dist_ss) / dx
+
+        # STEP 2: expectation vectors propagated by the SS transition matrix.
+        exp_vecs_a = np.zeros((T, nStates))
+        exp_vecs_c = np.zeros((T, nStates))
+        exp_vecs_d = np.zeros((T, nStates))
+        exp_vecs_dex = np.zeros((T, nStates))
+        exp_vecs_adj = np.zeros((T, nStates))
+        ev_a = a_ss.flatten()
+        ev_c = c_ss.flatten()
+        ev_d = d_ss.flatten()
+        ev_dex = dex_ss.flatten()
+        ev_adj = adj_ss.flatten()
+        for k in range(T):
+            exp_vecs_a[k] = ev_a
+            exp_vecs_c[k] = ev_c
+            exp_vecs_d[k] = ev_d
+            exp_vecs_dex[k] = ev_dex
+            exp_vecs_adj[k] = ev_adj
+            ev_a = ev_a @ tranmat_ss
+            ev_c = ev_c @ tranmat_ss
+            ev_d = ev_d @ tranmat_ss
+            ev_dex = ev_dex @ tranmat_ss
+            ev_adj = ev_adj @ tranmat_ss
+
+        # STEP 3: fake-news matrices.
+        Curl_F_A = np.zeros((T, T))
+        Curl_F_C = np.zeros((T, T))
+        Curl_F_D = np.zeros((T, T))
+        Curl_F_DEX = np.zeros((T, T))
+        Curl_F_ADJ = np.zeros((T, T))
+        Curl_F_A[0] = A_curl_s
+        Curl_F_C[0] = C_curl_s
+        Curl_F_D[0] = D_curl_s
+        Curl_F_DEX[0] = DEX_curl_s
+        Curl_F_ADJ[0] = ADJ_curl_s
+        for r in range(T - 1):
+            for s in range(T):
+                Curl_F_A[r + 1][s] = np.dot(exp_vecs_a[r], Dist_curl_s[s])
+                Curl_F_C[r + 1][s] = np.dot(exp_vecs_c[r], Dist_curl_s[s])
+                Curl_F_D[r + 1][s] = np.dot(exp_vecs_d[r], Dist_curl_s[s])
+                Curl_F_DEX[r + 1][s] = np.dot(exp_vecs_dex[r], Dist_curl_s[s])
+                Curl_F_ADJ[r + 1][s] = np.dot(exp_vecs_adj[r], Dist_curl_s[s])
+
+        # STEP 4: Jacobians from fake-news matrices.
+        J_A = J_from_F(Curl_F_A)
+        J_C = J_from_F(Curl_F_C)
+        J_D = J_from_F(Curl_F_D)
+        J_DEX = J_from_F(Curl_F_DEX)
+        J_TEX = J_C + J_DEX
+        J_ADJ = J_from_F(Curl_F_ADJ)
+
+        # -- Zeroth column via a 2-period agent shocked at period 0 -------------
+        ZerothColAgent = self._make_finite_agent(2)
+        path0 = [ss_val + dx, ss_val]
+        ZerothColAgent._solve_perturbed_finite({shk_param: path0})
+        ZerothColAgent.define_distribution_grid_dur()
+        ZerothColAgent.calc_transition_matrix_dur()
+
+        tranmat_zeroth = ZerothColAgent.tran_matrix[0]
+        dstn = self.vec_erg_dstn.T
+
+        A_t_no_sim = np.zeros(T)
+        C_t_no_sim = np.zeros(T)
+        D_t_no_sim = np.zeros(T)
+        DEX_t_no_sim = np.zeros(T)
+        ADJ_t_no_sim = np.zeros(T)
+        for k in range(T):
+            if k == 0:
+                dstn = tranmat_zeroth @ dstn
+            else:
+                dstn = tranmat_ss @ dstn
+            A_t_no_sim[k] = self.aPol_Grid.flatten() @ dstn
+            C_t_no_sim[k] = self.cPol_Grid.flatten() @ dstn
+            D_t_no_sim[k] = self.dPol_Grid.flatten() @ dstn
+            DEX_t_no_sim[k] = self.dexPol_Grid.flatten() @ dstn
+            ADJ_t_no_sim[k] = self.adjPol_Grid.flatten() @ dstn
+
+        J_A.T[0] = (A_t_no_sim - self.A_ss) / dx
+        J_C.T[0] = (C_t_no_sim - self.C_ss) / dx
+        J_D.T[0] = (D_t_no_sim - self.D_ss) / dx
+        J_DEX.T[0] = (DEX_t_no_sim - self.DEX_ss) / dx
+        J_TEX.T[0] = J_C.T[0] + J_DEX.T[0]
+        J_ADJ.T[0] = (ADJ_t_no_sim - self.ADJ_ss) / dx
+
+        return J_C, J_DEX, J_TEX, J_D, J_A, J_ADJ
 
     def print_kink_stats(self, label=None):
         """

@@ -515,6 +515,17 @@ def compute_erg_dstn_sparse(transition_matrix: sp.csr_matrix):
     return ergodic_distr
 
 
+def J_from_F(F):
+    """
+    Build a sequence-space Jacobian column-recursively from a fake-news matrix F
+    (Auclert et al. 2021, eq. 26): J[t, s] = F[t, s] + J[t-1, s-1].
+    """
+    J = F.copy()
+    for t in range(1, F.shape[0]):
+        J[1:, t] += J[:-1, t - 1]
+    return J
+
+
 ##########################################################################################################
 ### Integration / Taking Expectations
 ##########################################################################################################
