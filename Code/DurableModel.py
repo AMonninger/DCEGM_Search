@@ -26,6 +26,7 @@ from copy import deepcopy
 
 import numpy as np
 import scipy.sparse as sps
+import matplotlib.pyplot as plt
 
 from HARK.econforgeinterp import LinearFast
 from HARK.interpolation import ValueFuncCRRA, LowerEnvelope2D, MargValueFuncCRRA
@@ -254,6 +255,7 @@ class DurableConsumerSolution(MetricObject):
     """One-period solution objects for plotting and continuation."""
 
     distance_criteria = ["inv_vPFunc", "inv_vPDFunc"]
+    # distance_criteria = ["vPFunc", "vPDFunc"]
 
     def __init__(
         self,
@@ -437,6 +439,14 @@ durable_defaults = dict(
     T_cycle=1,       # number of periods before terminal when cycles >= 1
     tol=1e-6,        # infinite-horizon convergence tolerance (matches background)
     max_cycles=500,  # iteration cap for cycles=0 (matches background max_cycles)
+    # Aggregation used for the infinite-horizon convergence distance:
+    #   "max"  -> max absolute difference (matches HARK's default behavior)
+    #   "mse"  -> mean squared error
+    #   "rmse" -> root mean squared error
+    distance_metric="mse",
+    # When True, solve steps emit diagnostic figures (e.g. the 1-D adjuster
+    # consumption/durable policies plotted once per period/iteration).
+    diagnostics=False,
     # When False, solve() uses a pre-set self.solution_terminal as the terminal
     # instead of computing the analytic terminal (used by the Jacobian solver).
     analytic_terminal=True,
@@ -473,6 +483,16 @@ class DurableConsumer:
         Convergence tolerance for the infinite-horizon iteration (cycles=0).
     max_cycles : int
         Maximum number of iterations for the infinite-horizon iteration.
+    distance_metric : str
+        How to aggregate the per-point differences of the solution
+        ``distance_criteria`` into the scalar convergence distance used in the
+        infinite-horizon iteration (``cycles=0``). One of:
+        ``"max"`` (maximum absolute difference; matches HARK's default),
+        ``"mse"`` (mean squared error), or ``"rmse"`` (root mean squared error).
+    diagnostics : bool
+        When True, the solver emits diagnostic figures while solving. Currently
+        this plots the 1-D (representative price ~= 1) adjuster consumption
+        ``cFuncAdj`` and durable ``dFuncAdj`` policies once per period/iteration.
     **kwds
         Override any entry in durable_defaults.
     """
@@ -1359,6 +1379,14 @@ class DurableConsumer:
             if adj_totalpoints_counter
             else float("nan")
         )
+
+        # Diagnostic plot of the 1-D adjuster policies (price ~= 1), one per period.
+        if getattr(self, "diagnostics", False):
+            self._plot_adjuster_1d(cFuncAdj_list, dFuncAdj_list, i_p0)
+            print("length of adjuster: ", len(x_upper))
+            print("min and max c: ", np.min(c_upper), np.max(c_upper))
+            print("min and max d: ", np.min(d_upper), np.max(d_upper))
+
         return dict(
             cFuncAdj_NM_arr=cFuncAdj_NM_arr,
             dFuncAdj_NM_arr=dFuncAdj_NM_arr,
@@ -1385,6 +1413,34 @@ class DurableConsumer:
             adj_points_total=int(adj_totalpoints_counter),
             adj_share_removed=float(adj_share_removed),
         )
+
+    # ------------------------------------------------------ diagnostics
+    def _plot_adjuster_1d(self, cFuncAdj_list, dFuncAdj_list, i_p0):
+        """
+        Diagnostic plot of the 1-D adjuster policies at the representative price
+        (``p ~= 1``, index ``i_p0``): consumption ``cFuncAdj`` and durable
+        ``dFuncAdj`` as functions of adjuster liquidity ``x`` (``self.xNrmGrid``).
+
+        Called once per period/iteration when ``self.diagnostics`` is True.
+        """
+        x = self.xNrmGrid
+        cAdj = np.maximum(cFuncAdj_list[i_p0](x), 0.0)
+        dAdj = np.maximum(dFuncAdj_list[i_p0](x), 0.0)
+
+        self._diag_period = getattr(self, "_diag_period", 0) + 1
+
+        fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+        axes[0].plot(x, cAdj)
+        axes[0].set_title("cFuncAdj (1D)")
+        axes[0].set_xlabel("x (adjuster liquidity)")
+        axes[0].set_ylabel("c")
+        axes[1].plot(x, dAdj)
+        axes[1].set_title("dFuncAdj (1D)")
+        axes[1].set_xlabel("x (adjuster liquidity)")
+        axes[1].set_ylabel("d")
+        fig.suptitle(f"Adjuster 1D policies - period/iter {self._diag_period}")
+        fig.tight_layout()
+        plt.show()
 
     # -------------------------------------------------------- one period
     def solve_one_period(self, solution_next):
@@ -1418,6 +1474,11 @@ class DurableConsumer:
         )
         adjusting = LinearFast(adjusting_arr, [self.nNrmGrid, self.mNrmGrid])
 
+        # Diagnostic
+        if getattr(self, "diagnostics", False):
+            print("min and max inv_vPFunc: ", np.min(vPFunc_arr), np.max(vPFunc_arr))
+            print("min and max inv_vPDFunc: ", np.min(vPDFunc_arr), np.max(vPDFunc_arr))
+            print("Average adjuster probability: ", float(adjusting_arr.mean()))
         self._log("Period combined. Mean E[eps*]:", float(adjusting_arr.mean()))
         i_p0 = int(np.argmin(np.abs(self.PriceShkVals - 1.0)))
         return DurableConsumerSolution(
@@ -1472,6 +1533,58 @@ class DurableConsumer:
             adj_share_removed=adj["adj_share_removed"],
         )
 
+    # ----------------------------------------------------- distance metric
+    def _criterion_diffs(self, sol_a, sol_b):
+        """
+        Return the element-wise differences of the two solutions' value grids
+        for every entry in ``distance_criteria``, as a single flat array.
+
+        Each criterion (``inv_vPFunc``, ``inv_vPDFunc``, ...) is a ``LinearFast``
+        interpolant; its underlying value grid lives in ``.f_val``. Plain arrays
+        are compared directly. The grids themselves are fixed across iterations
+        and are intentionally not pooled into the metric.
+
+        The criterion arrays are ``utilityP_inv(vP, CRRA) = vP ** (-1/CRRA)``,
+        which is ``+inf`` wherever marginal value is exactly zero. To avoid
+        ``inf - inf = nan`` (which would poison the mean/max), only points where
+        both arrays are finite are kept.
+        """
+        diffs = []
+        for name in sol_a.distance_criteria:
+            obj_a = getattr(sol_a, name)
+            obj_b = getattr(sol_b, name)
+            arr_a = np.asarray(getattr(obj_a, "f_val", obj_a), dtype=float)
+            arr_b = np.asarray(getattr(obj_b, "f_val", obj_b), dtype=float)
+            if arr_a.shape != arr_b.shape:
+                return None  # shapes disagree -> treat as "very far apart"
+            finite = np.isfinite(arr_a) & np.isfinite(arr_b)
+            diffs.append((arr_a[finite] - arr_b[finite]).ravel())
+        diffs = [d for d in diffs if d.size > 0]
+        if not diffs:
+            return np.array([0.0])
+        return np.concatenate(diffs)
+
+    def _solution_distance(self, sol, prev):
+        """
+        Scalar convergence distance between consecutive solutions, aggregated
+        according to ``self.distance_metric`` ("max", "mse", or "rmse").
+
+        The "max" option reproduces HARK's default ``sol.distance(prev)``.
+        """
+        metric = str(getattr(self, "distance_metric", "max")).lower()
+        diffs = self._criterion_diffs(sol, prev)
+        if diffs is None:
+            return 1000.0  # mirrors HARK's failsafe for shape mismatches
+        if metric == "max":
+            return float(np.max(np.abs(diffs)))
+        elif metric == "mse":
+            return float(np.mean(diffs ** 2))
+        elif metric == "rmse":
+            return float(np.sqrt(np.mean(diffs ** 2)))
+        raise ValueError(
+            f"Unknown distance_metric {metric!r}; choose 'max', 'mse', or 'rmse'."
+        )
+
     # ---------------------------------------------------------------- solve
     def solve(self):
         """
@@ -1482,8 +1595,10 @@ class DurableConsumer:
         ``solution[-1]`` is terminal.
 
         Infinite horizon (``cycles == 0``): iterates the one-period operator
-        from the terminal seed until ``sol.distance(prev) < self.tol`` (using the
-        solution ``distance_criteria``) or ``self.max_cycles`` is reached. Sets
+        from the terminal seed until the convergence distance falls below
+        ``self.tol`` or ``self.max_cycles`` is reached. The distance aggregates
+        the differences of the solution ``distance_criteria`` according to
+        ``self.distance_metric`` ("max", "mse", or "rmse"). Sets
         ``self.solution`` to a single-element list holding the converged (limit)
         solution.
         """
@@ -1498,8 +1613,14 @@ class DurableConsumer:
             prev = terminal
             for it in range(int(self.max_cycles)):
                 sol = self.solve_one_period(prev)
-                dist = sol.distance(prev)
-                self._log(f"Infinite-horizon iter {it}: distance = {dist:.3e}")
+                dist = self._solution_distance(sol, prev)
+                ###
+                print(dist)
+                ###
+                self._log(
+                    f"Infinite-horizon iter {it}: {self.distance_metric} "
+                    f"distance = {dist:.3e}"
+                )
                 if dist < self.tol:
                     self._log(f"Converged after {it + 1} iterations (distance {dist:.3e}).")
                     self.solution = [sol]
