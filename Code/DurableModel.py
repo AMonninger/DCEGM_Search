@@ -13,7 +13,8 @@ Port of the one-period notebook suite into a self-contained class API:
     sol.cFunc(n, m), sol.dFunc(n, m), sol.adjusting(n, m)
 
 Channels (turn off with zeros):
-  - Directed search: SearchCost (mutually exclusive with EV taste)
+  - Directed search: SearchCost (mutually exclusive with EV taste);
+    search_method="closed" (default, conjugate ε*) or "grid" (101-point argmax)
   - EV Type I taste shocks: sigma_eps (closed-form logit / log-sum; no xi grid)
   - Stochastic prices: PriceShkStd
 
@@ -48,6 +49,7 @@ from utility import (
     update_prob_grid_list_with_trunc,
     compute_cost_matrix,
     directed_search_function_scaled_matrix,
+    directed_search_function_closed_form,
     FUES_allPol,
     jump_to_grid_dur,
     gen_tran_matrix_dur_sparse,
@@ -156,15 +158,22 @@ def combine_search_price(
     cAdj, dAdj, aAdj, inv_vAdj, vPAdj, vPDAdj,
     cKeep, dKeep, aKeep, inv_vKeep, vPKeep, vPDKeep,
     nGrid, mGrid, SearchCost_func_, e_grid_, CRRA_,
+    search_method="closed",
 ):
     """
     Nested combine over price nodes with directed search (Combined notebook):
       v = max_eps[(1-eps) vKeep + eps * vAdj(p) - sigma(eps)],
     then integrate with mu_p.
 
+    ``search_method`` is ``"closed"`` (conjugate ε* = max{0, 1-exp(-Δ/S)}) or
+    ``"grid"`` (argmax over ``e_grid_``, the original 101-point kernel).
+
     Shutoffs: PriceShkStd=0, SearchCost=0 (hard max via zero costs).
     Adjuster arrays: (n_price, n_n, n_m). Keeper: (n_n, n_m).
     """
+    if search_method not in ("grid", "closed"):
+        raise ValueError("search_method must be 'grid' or 'closed'.")
+
     n_price = cAdj.shape[0]
     keep_shape = cKeep.shape
 
@@ -175,7 +184,11 @@ def combine_search_price(
     for i_n, n0 in enumerate(nGrid):
         n_aux = np.full(len(mGrid), n0)
         search_cost_matrix[i_n, :] = SearchCost_func_(n_aux + mGrid)
-    Costs_matrix = compute_cost_matrix(search_cost_matrix, e_grid_)
+    Costs_matrix = (
+        compute_cost_matrix(search_cost_matrix, e_grid_)
+        if search_method == "grid"
+        else None
+    )
     mNrmGridMin = np.zeros(1)
 
     barC = np.zeros(keep_shape)
@@ -199,18 +212,32 @@ def combine_search_price(
         vPKeep_aux = np.where(vPKeep == np.inf, 1e12, vPKeep)
         vPDKeep_aux = np.where(vPDKeep == np.inf, 1e12, vPDKeep)
 
-        (
-            eps_ij, _cost_ij, v_ij,
-            c_ij, d_ij, a_ij, vP_ij, vPD_ij,
-        ) = directed_search_function_scaled_matrix(
-            nGrid, mGrid, mNrmGridMin, e_grid_, Costs_matrix,
-            vAdj_aux, vKeep_aux,
-            cAdj[i_p], cKeep,
-            dAdj[i_p], dKeep,
-            aAdj[i_p], aKeep,
-            vPAdj_aux, vPKeep_aux,
-            vPDAdj_aux, vPDKeep_aux,
-        )
+        if search_method == "grid":
+            (
+                eps_ij, _cost_ij, v_ij,
+                c_ij, d_ij, a_ij, vP_ij, vPD_ij,
+            ) = directed_search_function_scaled_matrix(
+                nGrid, mGrid, mNrmGridMin, e_grid_, Costs_matrix,
+                vAdj_aux, vKeep_aux,
+                cAdj[i_p], cKeep,
+                dAdj[i_p], dKeep,
+                aAdj[i_p], aKeep,
+                vPAdj_aux, vPKeep_aux,
+                vPDAdj_aux, vPDKeep_aux,
+            )
+        else:
+            (
+                eps_ij, _cost_ij, v_ij,
+                c_ij, d_ij, a_ij, vP_ij, vPD_ij,
+            ) = directed_search_function_closed_form(
+                nGrid, mGrid, mNrmGridMin, search_cost_matrix,
+                vAdj_aux, vKeep_aux,
+                cAdj[i_p], cKeep,
+                dAdj[i_p], dKeep,
+                aAdj[i_p], aKeep,
+                vPAdj_aux, vPKeep_aux,
+                vPDAdj_aux, vPDKeep_aux,
+            )
 
         v_ij = np.array(v_ij, copy=True)
         vP_ij = np.array(vP_ij, copy=True)
@@ -401,6 +428,7 @@ durable_defaults = dict(
     SearchCost=0.1,
     ScaleBool=False,
     e_grid_count=101,
+    search_method="closed",  # "closed" conjugate ε*; "grid" 101-point argmax
     PriceShkCount=5,
     PriceShkStd=0.1,
     # EoP method
@@ -460,7 +488,9 @@ class DurableConsumer:
     Simplified durable consumer with optional EV taste, search, and price channels.
 
     Discrete-choice smoothers (mutually exclusive):
-      - Directed search when ``SearchCost > 0`` (Combined / Search notebooks)
+      - Directed search when ``SearchCost > 0`` (Combined / Search notebooks).
+        ``search_method="closed"`` uses the conjugate ε*; ``"grid"`` keeps the
+        original 101-point argmax over ``e_grid``.
       - EV Type I taste shocks when ``sigma_eps > 0`` and ``SearchCost == 0``
       - Hard max when both are zero
 
@@ -521,6 +551,8 @@ class DurableConsumer:
                 "Search and EV Type I taste shocks are alternative discrete smoothers; "
                 "set either SearchCost=0 or sigma_eps=0."
             )
+        if self.search_method not in ("grid", "closed"):
+            raise ValueError("search_method must be 'grid' or 'closed'.")
 
         self.solution = None
         self.solution_terminal = None
@@ -561,6 +593,14 @@ class DurableConsumer:
                 * (D + self.d_ubar) ** ((1.0 - self.alpha) * (1.0 - self.CRRA))
             )
         ) ** power
+
+    def CRRAutilityPD_inv(self, Dmarg, D):
+        """Invert u_d(c, d) = Dmarg for c, holding d fixed."""
+        expo = self.alpha * (1.0 - self.CRRA)
+        denom = (1.0 - self.alpha) * (D + self.d_ubar) ** (
+            (1.0 - self.alpha) * (1.0 - self.CRRA) - 1.0
+        )
+        return (Dmarg / denom) ** (1.0 / expo)
 
     def tau_func(self, x):
         return np.ones_like(np.asarray(x, dtype=float)) * self.tau
@@ -674,7 +714,11 @@ class DurableConsumer:
         self._log(
             f"Updated. Discrete: {discrete}"
             + (f" (sigma_eps={self.sigma_eps})" if self.sigma_eps > 0 and self.SearchCost == 0 else "")
-            + (f" (S={self.SearchCost})" if self.SearchCost > 0 else "")
+            + (
+                f" (S={self.SearchCost}, search_method={self.search_method})"
+                if self.SearchCost > 0
+                else ""
+            )
             + f"; price: {'ON' if self.PriceShkStd > 0 else 'OFF'} (nPrice={self.nPrice})"
         )
 
@@ -696,6 +740,7 @@ class DurableConsumer:
                 cAdj, dAdj, aAdj, inv_vAdj, vPAdj, vPDAdj,
                 cKeep, dKeep, aKeep, inv_vKeep, vPKeep, vPDKeep,
                 nGrid, mGrid, self.SearchCost_func, self.e_grid, self.CRRA,
+                search_method=self.search_method,
             )
         return combine_ev_taste_price(
             self.PriceShkVals, self.PriceShkWeights,
@@ -1615,7 +1660,8 @@ class DurableConsumer:
                 sol = self.solve_one_period(prev)
                 dist = self._solution_distance(sol, prev)
                 ###
-                print(dist)
+                if getattr(self, "diagnostics", False):
+                    print(dist)
                 ###
                 self._log(
                     f"Infinite-horizon iter {it}: {self.distance_metric} "
@@ -2043,6 +2089,270 @@ class DurableConsumer:
 
         return J_C, J_DEX, J_TEX, J_D, J_A, J_ADJ
 
+    # ---------------------------------------------------------- Euler errors
+    @staticmethod
+    def _interior_nodes(grid, densify=1, trim=0.0):
+        """``densify`` interior points in each grid cell, then trim a fraction of the span."""
+        grid = np.asarray(grid, dtype=float)
+        densify = int(densify)
+        if densify < 1 or grid.size < 2:
+            return np.array([], dtype=float)
+        pieces = [
+            np.linspace(lo, hi, densify + 2)[1:-1]
+            for lo, hi in zip(grid[:-1], grid[1:])
+        ]
+        nodes = np.concatenate(pieces)
+        span = float(grid[-1] - grid[0])
+        lo = float(grid[0]) + float(trim) * span
+        hi = float(grid[-1]) - float(trim) * span
+        return nodes[(nodes > lo) & (nodes < hi)]
+
+    @staticmethod
+    def _judd_ee(c, c_impl):
+        """Judd (1992) consumption-unit residual: log10(|c - c_impl| / c + 1e-16)."""
+        c = np.asarray(c, dtype=float)
+        c_impl = np.asarray(c_impl, dtype=float)
+        rel = np.abs(c - c_impl) / np.maximum(np.abs(c), 1e-16)
+        return np.log10(rel + 1e-16)
+
+    @staticmethod
+    def _ee_summary(ee):
+        ee = np.asarray(ee, dtype=float)
+        ee = ee[np.isfinite(ee)]
+        n = int(ee.size)
+        if n == 0:
+            return dict(
+                mean=float("nan"),
+                p95=float("nan"),
+                n=0,
+                share_gt_neg3=float("nan"),
+                share_gt_neg4=float("nan"),
+            )
+        return dict(
+            mean=float(np.mean(ee)),
+            p95=float(np.percentile(ee, 95)),
+            n=n,
+            share_gt_neg3=float(np.mean(ee > -3.0)),
+            share_gt_neg4=float(np.mean(ee > -4.0)),
+        )
+
+    @staticmethod
+    def _assign_ee(sol, prefix, summary):
+        setattr(sol, f"{prefix}_mean", summary["mean"])
+        setattr(sol, f"{prefix}_p95", summary["p95"])
+        setattr(sol, f"{prefix}_n", summary["n"])
+        setattr(sol, f"{prefix}_share_gt_neg3", summary["share_gt_neg3"])
+        setattr(sol, f"{prefix}_share_gt_neg4", summary["share_gt_neg4"])
+
+    def _gothic_from_next(self, sol_next, d, a):
+        """
+        End-of-period marginal values at (d, a) from next period's stored
+        ``inv_vPFunc`` / ``inv_vPDFunc``, using the same income quadrature as EGM.
+
+        Returns ``(eop1, eopd, ok)`` where ``ok`` is False if any shock node
+        would extrapolate the continuation interpolants.
+        """
+        d = np.asarray(d, dtype=float).ravel()
+        a = np.asarray(a, dtype=float).ravel()
+        n_pts = d.size
+        eop1 = np.full(n_pts, np.nan)
+        eopd = np.full(n_pts, np.nan)
+        ok = np.zeros(n_pts, dtype=bool)
+        if n_pts == 0:
+            return eop1, eopd, ok
+
+        psi = np.asarray(self.PermShkValsNext, dtype=float)
+        theta = np.asarray(self.TranShkValsNext, dtype=float)
+        omega = np.asarray(self.ShkPrbsNext, dtype=float)
+        n_next = ((1.0 - self.dDepr) * d[:, None]) / psi[None, :]
+        m_next = (
+            self.Rfree / (self.PermGroFac * psi[None, :]) * a[:, None]
+            + theta[None, :]
+        )
+        n_grid = np.asarray(sol_next.nNrmGrid, dtype=float)
+        m_grid = np.asarray(sol_next.mNrmGrid, dtype=float)
+        ok = np.all(
+            (n_next >= n_grid[0])
+            & (n_next <= n_grid[-1])
+            & (m_next >= m_grid[0])
+            & (m_next <= m_grid[-1]),
+            axis=1,
+        )
+        if not np.any(ok):
+            return eop1, eopd, ok
+
+        n_flat = n_next[ok].ravel()
+        m_flat = m_next[ok].ravel()
+        crra = self.CRRA
+        vp = np.clip(sol_next.inv_vPFunc(n_flat, m_flat), 0.0, None) ** (-crra)
+        vpd = np.clip(sol_next.inv_vPDFunc(n_flat, m_flat), 0.0, None) ** (-crra)
+        vp = np.where(np.isfinite(vp), vp, 1e16)
+        vpd = np.where(np.isfinite(vpd), vpd, 1e16)
+        n_ok = int(np.sum(ok))
+        vp = vp.reshape(n_ok, psi.size)
+        vpd = vpd.reshape(n_ok, psi.size)
+
+        wgt = omega[None, :] * (psi[None, :] ** (-crra))
+        e_vp = np.sum(wgt * vp, axis=1)
+        e_vpd = np.sum(wgt * vpd, axis=1)
+        fac = self.DiscFac * self.LivPrb * self.PermGroFac ** (-crra)
+        eop1[ok] = fac * self.Rfree * e_vp
+        eopd[ok] = fac * (1.0 - self.dDepr * (1.0 - self.MaintCost)) * e_vpd
+        return eop1, eopd, ok
+
+    def _euler_consumption(self, sol_next, c, d, a, a_guard, c_guard):
+        """Branch-conditional consumption Euler: Judd residual vs u_c^{-1}(gothic_m)."""
+        c = np.asarray(c, dtype=float).ravel()
+        d = np.asarray(d, dtype=float).ravel()
+        a = np.asarray(a, dtype=float).ravel()
+        base_ok = (
+            np.isfinite(c)
+            & np.isfinite(d)
+            & np.isfinite(a)
+            & (a > a_guard)
+            & (c > c_guard)
+            & (d >= -1e-12)
+        )
+        eop1, eopd, ok_next = self._gothic_from_next(sol_next, d, a)
+        ok = base_ok & ok_next & np.isfinite(eop1) & (eop1 > 0.0)
+        c_impl = np.full_like(c, np.nan)
+        if np.any(ok):
+            with np.errstate(divide="ignore", invalid="ignore"):
+                c_impl[ok] = self.CRRAutilityP_inv(eop1[ok], d[ok])
+        ok &= np.isfinite(c_impl) & (c_impl > c_guard)
+        ee = np.full_like(c, np.nan)
+        ee[ok] = self._judd_ee(c[ok], c_impl[ok])
+        return ee, eop1, eopd, ok
+
+    def compute_euler_errors(
+        self,
+        densify=2,
+        trim_m=0.05,
+        trim_n=0.02,
+        a_guard=1e-6,
+        c_guard=None,
+    ):
+        """
+        Off-grid, branch-conditional Euler residuals (Judd 1992 consumption units).
+
+        Evaluates keeper ``c(n,m)`` and adjuster ``(c,d)(ℓ)`` on a staggered
+        ``(n,m)`` mesh that is not a subset of the solution grid. Continuation
+        comes from *next* period's stored ``inv_vPFunc`` / ``inv_vPDFunc`` with
+        the same income quadrature as EGM — not from the current period's
+        end-of-period interpolants, and never from the mixed policy ``c̄``.
+
+        Constrained points (``a`` below ``a_guard``), tiny consumption, and
+        states that would extrapolate the continuation interpolants are dropped.
+
+        Stores on each non-terminal ``solution[t]``:
+
+        * ``ee_c_keep_{mean,p95,n,share_gt_neg3,share_gt_neg4}``
+        * ``ee_c_adj_{...}``
+        * ``ee_d_adj_{...}``  (durable FOC converted to consumption units)
+
+        Infinite horizon (``cycles=0``): the unique solution is its own
+        continuation. Finite horizon: ``solution[t]`` uses ``solution[t+1]``;
+        the terminal period is skipped.
+
+        Returns a list of per-period summary dicts.
+        """
+        sols = getattr(self, "solution", None)
+        if not sols:
+            raise ValueError("compute_euler_errors requires a solved model (call solve first).")
+        if c_guard is None:
+            c_guard = max(float(self.d_ubar), 1e-8)
+        a_guard = float(a_guard)
+
+        n_test = self._interior_nodes(self.nNrmGrid, densify=densify, trim=trim_n)
+        m_test = self._interior_nodes(self.mNrmGrid, densify=densify, trim=trim_m)
+        if n_test.size == 0 or m_test.size == 0:
+            raise ValueError("Euler test mesh is empty; relax trim_n / trim_m or densify.")
+        nn, mm = np.meshgrid(n_test, m_test, indexing="ij")
+        n_flat = nn.ravel()
+        m_flat = mm.ravel()
+
+        i_p0 = int(np.argmin(np.abs(self.PriceShkVals - 1.0)))
+        p0 = float(self.PriceShkVals[i_p0])
+        tau = float(self.tau)
+        ell = m_flat + (1.0 - tau) * n_flat
+
+        n_period = len(sols)
+        # Infinite horizon: one solution, continuation is itself.
+        # Finite horizon: skip the terminal (last) entry.
+        if n_period == 1:
+            pairs = [(0, sols[0], sols[0])]
+        else:
+            pairs = [(t, sols[t], sols[t + 1]) for t in range(n_period - 1)]
+
+        empty = self._ee_summary(np.array([]))
+        reports = []
+        for t, sol, sol_next in pairs:
+            if sol.cFuncKeep is None or sol_next.inv_vPFunc is None:
+                self._assign_ee(sol, "ee_c_keep", empty)
+                self._assign_ee(sol, "ee_c_adj", empty)
+                self._assign_ee(sol, "ee_d_adj", empty)
+                reports.append(
+                    dict(period=t, c_keep=empty, c_adj=empty, d_adj=empty)
+                )
+                continue
+
+            # ----- keeper: d = n, a = m - c -----
+            c_keep = np.clip(np.asarray(sol.cFuncKeep(n_flat, m_flat), dtype=float).ravel(), 0.0, None)
+            d_keep = n_flat
+            a_keep = m_flat - c_keep
+            ee_c_keep, _, _, _ = self._euler_consumption(
+                sol_next, c_keep, d_keep, a_keep, a_guard, c_guard
+            )
+            sum_c_keep = self._ee_summary(ee_c_keep)
+
+            # ----- adjuster at representative p ≈ 1, policies in liquidity ℓ -----
+            c_adj_fn = sol.cFuncAdj_1d
+            d_adj_fn = sol.dFuncAdj_1d
+            if c_adj_fn is None or d_adj_fn is None:
+                sum_c_adj = empty
+                sum_d_adj = empty
+            else:
+                x_grid = getattr(c_adj_fn, "grid_list", [self.xNrmGrid])[0]
+                x_lo, x_hi = float(np.asarray(x_grid)[0]), float(np.asarray(x_grid)[-1])
+                in_x = (ell >= x_lo) & (ell <= x_hi)
+                c_adj = np.full_like(ell, np.nan)
+                d_adj = np.full_like(ell, np.nan)
+                if np.any(in_x):
+                    c_adj[in_x] = np.clip(np.asarray(c_adj_fn(ell[in_x]), dtype=float).ravel(), 0.0, None)
+                    d_adj[in_x] = np.clip(np.asarray(d_adj_fn(ell[in_x]), dtype=float).ravel(), 0.0, None)
+                a_adj = ell - c_adj - p0 * d_adj
+                ee_c_adj, eop1, eopd, ok_c = self._euler_consumption(
+                    sol_next, c_adj, d_adj, a_adj, a_guard, c_guard
+                )
+                ee_c_adj = np.where(in_x, ee_c_adj, np.nan)
+                sum_c_adj = self._ee_summary(ee_c_adj)
+
+                # Durable FOC in consumption units: hold d fixed, invert u_d.
+                target = p0 * eop1 - eopd
+                ok_d = (
+                    ok_c
+                    & in_x
+                    & np.isfinite(target)
+                    & (target > 0.0)
+                    & (d_adj > 0.0)
+                )
+                c_d_impl = np.full_like(c_adj, np.nan)
+                if np.any(ok_d):
+                    with np.errstate(divide="ignore", invalid="ignore"):
+                        c_d_impl[ok_d] = self.CRRAutilityPD_inv(target[ok_d], d_adj[ok_d])
+                ok_d &= np.isfinite(c_d_impl) & (c_d_impl > c_guard)
+                ee_d_adj = np.full_like(c_adj, np.nan)
+                ee_d_adj[ok_d] = self._judd_ee(c_adj[ok_d], c_d_impl[ok_d])
+                sum_d_adj = self._ee_summary(ee_d_adj)
+
+            self._assign_ee(sol, "ee_c_keep", sum_c_keep)
+            self._assign_ee(sol, "ee_c_adj", sum_c_adj)
+            self._assign_ee(sol, "ee_d_adj", sum_d_adj)
+            reports.append(
+                dict(period=t, c_keep=sum_c_keep, c_adj=sum_c_adj, d_adj=sum_d_adj)
+            )
+        return reports
+
     def print_kink_stats(self, label=None):
         """
         Print keeper (DCEGM decreasing segments) and adjuster (FUES) stats
@@ -2071,6 +2381,23 @@ class DurableConsumer:
                 f"  Adjuster — number of kinks removed: {sol.adj_kinks_removed}, "
                 f"share of removed points: {sol.adj_share_removed}"
             )
+            if getattr(sol, "ee_c_keep_mean", None) is not None:
+                def _ee_line(name, prefix):
+                    mean = getattr(sol, f"{prefix}_mean")
+                    p95 = getattr(sol, f"{prefix}_p95")
+                    n = getattr(sol, f"{prefix}_n")
+                    share = getattr(sol, f"{prefix}_share_gt_neg3")
+                    if n == 0 or (isinstance(mean, float) and np.isnan(mean)):
+                        print(f"  Euler {name}: n/a")
+                        return
+                    print(
+                        f"  Euler {name}: mean={mean:.3f}, p95={p95:.3f}, n={n}"
+                        f", share>1e-3={share:.3f}"
+                    )
+
+                _ee_line("EE_c keep", "ee_c_keep")
+                _ee_line("EE_c adj", "ee_c_adj")
+                _ee_line("EE_d adj", "ee_d_adj")
 
 
 __all__ = [

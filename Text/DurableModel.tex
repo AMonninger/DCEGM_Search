@@ -463,7 +463,7 @@ To make the comparison transparent, I fix beginning-of-period durables at a repr
 
 In contrast to the retirement model, all four mechanisms move the durable policies in the \emph{same} direction. Raising $\sigma_\varepsilon$, $S$, $\sigma_p$, or $\sigma_\eta$ increases combined nondurable consumption, decreases combined durable holdings, and dampens the sharp MPC spikes that appear around the S,s band under a hard maximum. The common pattern reflects the nature of the discrete choice. Keep-versus-adjust reallocates a stock subject to a transaction cost $\tau$; it does not permanently alter the household's labor-income stream. Larger search costs, a more diffuse logit mix of keep and adjust, or greater ex-ante averaging over purchase prices all reduce the weight (or the extremity) of the full adjuster branch relative to keeping $d_t=n_t$. The combined rule therefore shifts toward the keeper---higher liquid consumption out of $m_t$ and a durable stock closer to the inherited $n_0$---and the discontinuous jump in MPCs at the S,s threshold is attenuated. Larger income shocks reinforce the same qualitative shift through standard precautionary saving into liquid resources.
 
-These visual improvements are matched by the numerical kink diagnostics stored with each period's solution. For the keeper, I count decreasing segments of the EGM locus (the breaks between nondecreasing pieces that necessitate an upper envelope); for the adjuster, I count the FOC candidates removed by FUES. Table~\ref{tab:smoothing_kinks} reports both counts and shares in the same earlier period as Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs}, for the hard-max baseline and one representative magnitude of each discrete-choice smoother. Relative to the hard maximum, taste shocks, search frictions, and price dispersion all drive the keeper's decreasing-segment count to zero. Taste shocks and search frictions also eliminate FUES removals in that period; price dispersion leaves a small residual share of removed adjuster points (the absolute count is not comparable to the single-price baseline because FUES is applied separately at each price node), but the keeper side is fully cleaned and the combined MPC spikes are still damped.
+These visual improvements are matched by the numerical kink diagnostics stored with each period's solution. For the keeper, I count decreasing segments of the EGM locus (the breaks between nondecreasing pieces that necessitate an upper envelope); for the adjuster, I count the FOC candidates removed by FUES. Table~\ref{tab:smoothing_kinks} reports both counts and shares in the same earlier period as Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs}, for the hard-max baseline and one representative magnitude of each discrete-choice smoother. Relative to the hard maximum, taste shocks, search frictions, and price dispersion all drive the keeper's decreasing-segment count to zero. Taste shocks and search frictions also eliminate FUES removals in that period; price dispersion leaves a small residual share of removed adjuster points (the absolute count is not comparable to the single-price baseline because FUES is applied separately at each price node), but the keeper side is fully cleaned and the combined MPC spikes are still damped. A zero deletion count is not the same as an accurate interpolant; Section~\ref{subsec:ModelBasicEuler} pairs the counts with off-grid Euler residuals.
 
 \begin{table}[htbp]
 \centering
@@ -518,3 +518,41 @@ The retirement contrast is immediate. There, lowering the probability of a succe
 	\caption{Combined MPCs at fixed $n_0$ under the same four experiments as Figure~\ref{fig:smoothing_shifts_levels}. Strengthening any channel dampens the spikes around the S,s band.}
 	\label{fig:smoothing_shifts_mpcs}
 \end{figure}
+
+\subsection{Kinks and Euler residuals}
+\label{subsec:ModelBasicEuler}
+
+Table~\ref{tab:smoothing_kinks} records cleanliness of the raw EGM cloud. The object that is stored and plotted is an interpolant of the refined cloud, so a zero deletion count does not by itself establish that the computed rule solves the problem that was posed. A policy mixed over dominated Euler roots can look as smooth as one whose envelope has nothing left to delete. I therefore pair the kink counts with off-grid Euler residuals in the sense of \citet{Judd1992-sp}. For an unconstrained continuous choice $c$ with implied Euler consumption $c^{\mathrm{impl}}$,
+\begin{align}
+	\mathrm{EE}(c)
+	\;=\;
+	\log_{10}\!\left(
+		\left\lvert \frac{c - c^{\mathrm{impl}}}{c} \right\rvert
+		+ 10^{-16}
+	\right).
+	\label{eq:judd_ee}
+\end{align}
+More negative is more accurate: $-4$ is a $0.01\%$ consumption error, $-3$ a $0.1\%$ error. Residuals are branch-conditional---keepers on $c_t^{\mathrm{keep}}$, adjusters on the durable first-order condition converted to the same consumption units ($\mathrm{EE}_d^{\mathrm{adj}}$)---and are never evaluated at the mixed policy $\bar c_t$, which does not satisfy the Euler equation even when both branches do. The test mesh is off the solution grid; constrained points are dropped. I report the mean and the 95th percentile, because the mean can look acceptable while a thin set of points near the S,s band is not.
+
+Table~\ref{tab:smoothing_euler} places both diagnostics in the same period as Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs}. For the keeper the computational claim holds. Taste shocks and search frictions drive decreasing segments to zero, and $\mathrm{EE}_c^{\mathrm{keep}}$ improves: the hard-max mean and 95th percentile are $-4.19$ and $-2.50$; at $S=0.1$ they are $-4.23$ and $-3.13$, and they continue to improve as $S$ or $\sigma_\varepsilon$ is raised. The smoother combined consumption rule is not an average over dominated keeper roots. Price dispersion likewise zeros the keeper count, with only a small change in the mean.
+
+For the adjuster the deletion count is not enough. Taste and search eliminate FUES removals in this period, but the 95th percentile of $\mathrm{EE}_d^{\mathrm{adj}}$ deteriorates (from $-2.42$ under the hard maximum to $+0.27$ at $S=0.1$), while the mean stays around $-3$. Cleanliness of the raw FOC cloud is not the same as accuracy of the stored $(c,d)$ interpolant, so FUES is not shown to be redundant by the deletion count alone. Price dispersion, whose $d$-FOC is applied at each price node, continues to remove points and has a similar tail. The four channels are different economies and are not ranked by residual size; the residuals certify internal accuracy of each specification, not proximity to the frictionless target.
+
+\begin{table}[htbp]
+\centering
+\caption{Period-$t$ kink counts and Euler residuals under the hard-max baseline and one smoothed magnitude of each discrete-choice channel. Residuals are mean and 95th percentile of~\eqref{eq:judd_ee} on an off-grid test mesh; constrained points excluded. The $\sigma_p$ adjuster kink count sums over price nodes.}
+\label{tab:smoothing_euler}
+\small
+\begin{tabular}{lcccccc}
+\hline
+ & \multicolumn{2}{c}{Kinks} & \multicolumn{2}{c}{$\mathrm{EE}_c^{\mathrm{keep}}$} & \multicolumn{2}{c}{$\mathrm{EE}_d^{\mathrm{adj}}$} \\
+\cline{2-3}\cline{4-5}\cline{6-7}
+Specification & Decr.\ seg. & FUES rem. & Mean & P95 & Mean & P95 \\
+\hline
+Hard max & 5 & 4 & $-4.19$ & $-2.50$ & $-3.49$ & $-2.42$ \\
+$\sigma_\varepsilon = 0.05$ & 0 & 0 & $-4.22$ & $-3.23$ & $-3.04$ & $0.45$ \\
+$S = 0.1$ & 0 & 0 & $-4.23$ & $-3.13$ & $-3.06$ & $0.27$ \\
+$\sigma_p = 0.1$ & 0 & 17 & $-4.04$ & $-2.93$ & $-2.97$ & $0.52$ \\
+\hline
+\end{tabular}
+\end{table}

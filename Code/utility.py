@@ -854,6 +854,87 @@ def directed_search_function_scaled_matrix(nNrmGridNow, mNrmGridTotal, mNrmGridM
     return e_matrix, DirectedSearchCost_array, vFunc_array, cFunc_array, dFunc_array, aFunc_array, vPFunc_array, vPDFunc_array
 
 
+# Overflow cap: exp(-700) underflows to 0, so ε* → 1, which is the correct limit.
+_SEARCH_Z_MAX = 700.0
+
+
+def directed_search_function_closed_form(
+    nNrmGridNow, mNrmGridTotal, mNrmGridMin, search_cost_2d,
+    vFuncAdj_SOL_array, vFuncKeep_SOL_array,
+    cFuncAdj_SOL_array, cFuncKeep_SOL_array,
+    dFuncAdj_SOL_array, dFuncKeep_SOL_array,
+    aFuncAdj_SOL_array, aFuncKeep_SOL_array,
+    vPFuncAdj_SOL_array, vPFuncKeep_SOL_array,
+    vPDFuncAdj_SOL_array, vPDFuncKeep_SOL_array,
+):
+    """
+    Vectorized closed-form search mix, same special cases as the 101-point grid
+    kernel ``directed_search_function_scaled_matrix``.
+
+    With σ(ε) = S[ε + (1-ε) log(1-ε)] the conjugate is
+        ε* = max{0, 1 - exp(-Δ/S)},  Δ = v_adj - v_keep,
+        v  = v_keep + Φ(Δ),  Φ(Δ) = Δ - S(1 - e^{-Δ/S}) for Δ>0 and 0 otherwise.
+    """
+    nNrmGridNow = np.asarray(nNrmGridNow, dtype=float)
+    mNrmGridTotal = np.asarray(mNrmGridTotal, dtype=float)
+    v_adj = np.asarray(vFuncAdj_SOL_array, dtype=float)
+    v_keep = np.asarray(vFuncKeep_SOL_array, dtype=float)
+    S = np.asarray(search_cost_2d, dtype=float)
+    if S.ndim == 0:
+        S = np.full(v_adj.shape, float(S))
+    elif S.shape != v_adj.shape:
+        S = np.broadcast_to(S, v_adj.shape).copy()
+
+    n_size = nNrmGridNow.size
+    m_size = mNrmGridTotal.size
+    n_min = len(mNrmGridMin) if mNrmGridMin is not None else 0
+    start_idx = np.maximum(n_min - np.arange(n_size), 0)
+    below_min = np.arange(m_size)[None, :] < start_idx[:, None]
+    n_is_zero = nNrmGridNow[:, None] == 0.0
+
+    vFunc_min = v_adj[0, 0]
+    delta = v_adj - v_keep
+    s_pos = S > 0.0
+    delta_pos = delta > 0.0
+    z = np.where(s_pos, np.clip(delta / np.maximum(S, 1e-300), 0.0, _SEARCH_Z_MAX), 0.0)
+    em1 = 1.0 - np.exp(-z)
+
+    # Interior closed form; S=0 → hard max. NaN Δ (infeasible pair) → ε=0, as grid argmax of all -inf.
+    finite_delta = np.isfinite(delta)
+    eps = np.where(finite_delta & delta_pos & s_pos, em1, 0.0)
+    eps = np.where(finite_delta & delta_pos & ~s_pos, 1.0, eps)
+    vFunc_array = np.where(finite_delta & delta_pos & s_pos, v_keep + delta - S * em1, v_keep)
+    vFunc_array = np.where(finite_delta & delta_pos & ~s_pos, v_adj, vFunc_array)
+    cost = np.where(finite_delta & delta_pos & s_pos, S * em1 - delta * np.exp(-z), 0.0)
+
+    both_min = (v_keep == vFunc_min) & (v_adj == vFunc_min)
+    keep_better = v_keep > v_adj
+
+    # Overlay in reverse of the grid kernel's if/elif so the first match wins.
+    eps = np.where(both_min, 1.0, eps)
+    vFunc_array = np.where(both_min, v_adj - S, vFunc_array)
+    cost = np.where(both_min, S, cost)
+
+    eps = np.where(keep_better, 0.0, eps)
+    vFunc_array = np.where(keep_better, v_keep, vFunc_array)
+    cost = np.where(keep_better, 0.0, cost)
+
+    eps = np.where(n_is_zero, 1.0, eps)
+    vFunc_array = np.where(n_is_zero, v_adj - S, vFunc_array)
+    cost = np.where(n_is_zero, S, cost)
+
+    eps = np.where(below_min, 1.0, eps)
+    vFunc_array = np.where(below_min, -np.inf, vFunc_array)
+
+    cFunc_array = eps * cFuncAdj_SOL_array + (1.0 - eps) * cFuncKeep_SOL_array
+    dFunc_array = eps * dFuncAdj_SOL_array + (1.0 - eps) * dFuncKeep_SOL_array
+    aFunc_array = eps * aFuncAdj_SOL_array + (1.0 - eps) * aFuncKeep_SOL_array
+    vPFunc_array = eps * vPFuncAdj_SOL_array + (1.0 - eps) * vPFuncKeep_SOL_array
+    vPDFunc_array = eps * vPDFuncAdj_SOL_array + (1.0 - eps) * vPDFuncKeep_SOL_array
+
+    return eps, cost, vFunc_array, cFunc_array, dFunc_array, aFunc_array, vPFunc_array, vPDFunc_array
+
+
 @njit(parallel=True, fastmath=True)
 def directed_search_function_scaled_matrix_limit(nNrmGridNow, mNrmGridTotal, mNrmGridMin,
                                                   idx_nlimit, idx_mlimit, e_grid,

@@ -1,0 +1,18 @@
+\begin{table}[htbp]
+\centering
+\caption{Period-$t$ kink counts and Euler residuals under the hard-max baseline and one smoothed magnitude of each discrete-choice channel. Residuals are mean and 95th percentile of~\eqref{eq:judd_ee} on an off-grid test mesh; constrained points excluded. The $\sigma_p$ adjuster kink count sums over price nodes.}
+\label{tab:smoothing_euler}
+\small
+\begin{tabular}{lcccccc}
+\hline
+ & \multicolumn{2}{c}{Kinks} & \multicolumn{2}{c}{$\mathrm{EE}_c^{\mathrm{keep}}$} & \multicolumn{2}{c}{$\mathrm{EE}_d^{\mathrm{adj}}$} \\
+\cline{2-3}\cline{4-5}\cline{6-7}
+Specification & Decr.\ seg. & FUES rem. & Mean & P95 & Mean & P95 \\
+\hline
+Hard max & 5 & 4 & -4.19 & -2.50 & -3.49 & -2.42 \\
+$\sigma_{\varepsilon} = 0.05$ & 0 & 0 & -4.22 & -3.23 & -3.04 & 0.45 \\
+$S = 0.1$ & 0 & 0 & -4.23 & -3.13 & -3.06 & 0.27 \\
+$\sigma_{p} = 0.1$ & 0 & 17 & -4.04 & -2.93 & -2.97 & 0.52 \\
+\hline
+\end{tabular}
+\end{table}

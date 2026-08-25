@@ -1,0 +1,148 @@
+%============================================================
+% Working note (not \input into the paper).
+% The published discussion is the short subsection
+% subsec:ModelBasicEuler in DurableModel.tex.
+% Numbers from Code/Figures_Durable.ipynb, period t.
+%============================================================
+
+\subsection{Euler residuals and the cleanliness of the EGM step}
+\label{subsec:ModelBasicEuler}
+
+Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs} and Table~\ref{tab:smoothing_kinks} show that taste shocks, search frictions, and price dispersion flatten the combined policies, dampen MPC spikes around the S,s band, and (for the first two channels) drive the count of suboptimal EGM points to zero. Those objects do not, by themselves, establish that the smoother solution is accurate. A policy that has been averaged over dominated Euler roots can look smooth while remaining a poor approximation of the problem that was posed. This subsection adds the missing residual diagnostic and re-runs it on the same four-channel experiment as Figure~\ref{fig:smoothing_shifts_levels}.
+
+\subsubsection{Why a residual diagnostic is required}
+
+The paper's computational claim is that a smoother discrete margin can make the Euler equation locally sufficient, so that the endogenous-grid step of \citet{Carroll2006-mv} stops producing the suboptimal candidates that DC-EGM \citep{Iskhakov2017-jb} and FUES \citep{Dobrescu2022-ii} are designed to discard. Two logically distinct statements are bundled in that claim, and the figures currently speak only to the first.
+
+\begin{enumerate}
+	\item \emph{Cleanliness of the EGM correspondence.} As the continuation value becomes less kinked, the map from end-of-period assets to beginning-of-period resources becomes monotone, and the upper-envelope scan has nothing left to delete. Table~\ref{tab:smoothing_kinks} already measures this: decreasing segments of the keeper locus, and FOC candidates removed by FUES on the adjuster.
+	\item \emph{Accuracy of the interpolated policy.} Cleanliness is a property of the raw EGM cloud. The object that is stored and plotted is an interpolant of the \emph{refined} cloud. Envelope mistakes, interpolation across a remaining discontinuity, and (under search) a discrete mixing weight that is itself approximated, can all produce a smooth-looking rule that does not satisfy the first-order conditions of the model that was solved. \citet{Judd1992-sp} introduced Euler-equation residuals precisely as a check that the computed decision rule is consistent with optimality off the nodes at which it was constructed; \citet{Santos2000-ec} showed that, in concave problems, those residuals bound the policy error.
+\end{enumerate}
+
+The second statement is the one the figures cannot address. Visual smoothness of $c_t(n_0,m_t)$ is compatible with two very different mechanisms: the envelope deleted the dominated roots, or the smoother mixed over them. A smooth wrong answer is strictly worse than a jagged right one, because it conceals the error. Euler residuals distinguish those mechanisms only when they are paired with the kink counts. Residuals that remain small as the kink counts fall to zero mean that the EGM step became clean \emph{and} the stored policy still solves the Euler equation of the model that was solved. Residuals that deteriorate as the plots become smoother would mean that smoothness was purchased by averaging over points that should have been discarded.
+
+A caveat, which is why both diagnostics are needed, is that Euler residuals cannot rank the four channels against a common ``true'' hard-max solution. Taste shocks, search, prices, and income risk each change the economy: they are not alternative algorithms for the same Bellman equation. \citet{Santos2000-ec}'s bound from residuals to policy error also requires concavity of the continuation value, which neither the log-sum nor the search aggregator restores (Appendix~\ref{sec:appdx_smoothness}). The residuals therefore certify \emph{internal} accuracy of each specification, not proximity to the frictionless target. Distance to that target is a separate object---a policy or welfare deviation as $S\to 0$ or $\sigma_\varepsilon\to 0$---and is not computed here. The analogous split in \citet{Dobrescu2022-ii} is between Euler errors (identical across envelope methods that recover the same upper envelope) and a ``true deviation'' against a high-resolution benchmark.
+
+\subsubsection{Construction}
+
+I follow \citet{Judd1992-sp} and the durables application of \citet{Dobrescu2022-ii} and report consumption-unit relative residuals in $\log_{10}$ scale. For an unconstrained continuous choice $c$ with implied Euler consumption $c^{\mathrm{impl}}$,
+\begin{align}
+	\mathrm{EE}(c)
+	\;=\;
+	\log_{10}\!\left(
+		\left\lvert \frac{c - c^{\mathrm{impl}}}{c} \right\rvert
+		+ 10^{-16}
+	\right).
+	\label{eq:judd_ee}
+\end{align}
+More negative values are more accurate: $-3$ is a 0.1\% consumption error, $-4$ a 0.01\% error. The unit is invariant to affine transformations of felicity, which a raw utility residual is not.
+
+The Euler equations are the within-branch first-order conditions~\eqref{eq:FOC_c_basic}--\eqref{eq:FOC_d_basic}, with next period's \emph{combined} marginal values $v_{t+1}^{m}$ and $v_{t+1}^{n}$ (hard maximum, logit inclusive value~\eqref{eq:taste_vm}, or search-weighted envelope~\eqref{eq:search_vm}, according to the specification). Equality holds only off the borrowing constraint, so every residual below is computed on $\{a_t>\underline{a}\}$.
+
+\paragraph{Consumption Euler, both branches.}
+Given a test state and a conditional policy $(c_t^{j},d_t^{j})$ for $j\in\{\mathrm{keep},\mathrm{adj}\}$,
+\begin{align}
+	c_t^{j,\mathrm{impl}}
+	\;=\;
+	u_c^{-1}\!\left(
+		\beta\mathcal{R}\,\mathbb{E}_t\bigl[v_{t+1}^{m}(n_{t+1},m_{t+1})\bigr]
+		;\,
+		d_t^{j}
+	\right),
+	\qquad
+	\mathrm{EE}_c^{j}
+	\;=\;
+	\mathrm{EE}\bigl(c_t^{j}\bigr)
+	\text{ using }c^{j,\mathrm{impl}}.
+	\label{eq:ee_c}
+\end{align}
+The keeper has $d_t^{\mathrm{keep}}=n_t$. The expectation uses the same income quadrature (or transition matrix) as the solver. This is the residual that diagnoses the keeper EGM-plus-envelope step.
+
+\paragraph{Durable Euler, adjuster only.}
+The adjuster's second first-order condition~\eqref{eq:FOC_d_basic} (or its price-contingent form~\eqref{eq:price_foc_d}) is independent of the consumption Euler and is the residual that diagnoses FUES. I convert it to the same consumption units by holding $d_t^{\mathrm{adj}}$ fixed and asking what nondurable consumption would restore the FOC, then applying~\eqref{eq:judd_ee}. Denote the resulting residual $\mathrm{EE}_d^{\mathrm{adj}}$. In the FUES durables application this is the statistic that moves with the envelope method; the consumption Euler does not \citep{Dobrescu2022-ii}.
+
+\paragraph{What is not a residual.}
+The combined (probability-weighted) policy
+\begin{align}
+	\bar c_t
+	\;=\;
+	(1-\varepsilon_t^{\ast})\,c_t^{\mathrm{keep}}
+	+ \varepsilon_t^{\ast}\,c_t^{\mathrm{adj}}
+\end{align}
+does not satisfy~\eqref{eq:FOC_c_basic} even when both branches do. Evaluating~\eqref{eq:judd_ee} at $\bar c_t$---or at the logit analogue---produces a large residual for an exact solution. Residuals are therefore always branch-conditional, as in \citet{Dobrescu2022-ii}: keepers are evaluated on $c_t^{\mathrm{keep}}$, adjusters on $(c_t^{\mathrm{adj}},d_t^{\mathrm{adj}})$. Under search or taste shocks, a point in the mixing band contributes to both branch-conditional distributions; it is not assigned a residual for $\bar c_t$.
+
+EGM nodes satisfy the Euler equation by construction, up to root-finding tolerance. The test is therefore off the solution grid: a staggered mesh of $(n,m)$ in a compact interior wealth region (so that CRRA $\lvert u''\rvert\to 0$ at high $m$ does not dominate the mean), using next period's stored $v^{m}$ and $v^{n}$ rather than the current period's end-of-period objects. Constrained points, extrapolated states, and $c_t$ below the durable utility floor are dropped.
+
+I report the mean and the 95th percentile of each residual. The mean can look acceptable while a thin set of points near the S,s boundary is not, which is exactly the ``averaged over suboptimal points'' failure mode. \citet{Dobrescu2022-ii} report the same pair, together with the share of residuals worse than $10^{-3}$ and $10^{-4}$.
+
+\subsubsection{The four-channel experiment}
+
+The experiment is the same as Figure~\ref{fig:smoothing_shifts_levels}. Starting from a lightly smoothed reference in each channel, I increase one smoothness parameter at a time, holding the others at their inactive values (except that the income experiment retains a small EV scale so the discrete margin remains defined). The four panels vary $\sigma_\varepsilon$, $S$, $\sigma_p$, and $\sigma_\eta$. All objects are evaluated in the same earlier period and at the same representative $n_0$ as Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs}.
+
+Two companion figures replace the single-magnitude snapshot in Table~\ref{tab:smoothing_kinks} with the full sweep.
+
+\begin{figure}[htbp]
+	\centering
+	% \includegraphics[width=0.98\linewidth]{../Figures/DurableModel/SmoothingDiag_kinks_periodt.pdf}
+	\fbox{\parbox{0.95\linewidth}{\centering\vspace{2.2cm}
+	\emph{Placeholder.} Four panels, same layout as Figure~\ref{fig:smoothing_shifts_levels}:
+	(a)~$\sigma_\varepsilon$, (b)~$S$, (c)~$\sigma_p$, (d)~$\sigma_\eta$.
+	Each panel: keeper decreasing-segment count (solid) and adjuster FUES removals (dashed)
+	against the smoothness parameter. Mark the first value at which the keeper count hits zero.
+	\vspace{2.2cm}}}
+	\caption{Kink diagnostics along the same four-channel sweep as Figure~\ref{fig:smoothing_shifts_levels}. Keeper: number of decreasing EGM segments. Adjuster: number of FOC candidates removed by FUES. The $\sigma_p$ adjuster count sums over price nodes and is not comparable in level to the single-price panels.}
+	\label{fig:smoothing_diagnostics_kinks}
+\end{figure}
+
+\begin{figure}[htbp]
+	\centering
+	% \includegraphics[width=0.98\linewidth]{../Figures/DurableModel/SmoothingDiag_euler_periodt.pdf}
+	\fbox{\parbox{0.95\linewidth}{\centering\vspace{2.2cm}
+	\emph{Placeholder.} Four panels, same layout as Figure~\ref{fig:smoothing_shifts_levels}:
+	(a)~$\sigma_\varepsilon$, (b)~$S$, (c)~$\sigma_p$, (d)~$\sigma_\eta$.
+	Each panel: mean (solid) and 95th percentile (dashed) of $\mathrm{EE}_c^{\mathrm{keep}}$
+	and $\mathrm{EE}_d^{\mathrm{adj}}$ against the smoothness parameter, $\log_{10}$ scale.
+	A horizontal line at $-3$ is a 0.1\% consumption error.
+	\vspace{2.2cm}}}
+	\caption{Off-grid Euler residuals along the same four-channel sweep as Figure~\ref{fig:smoothing_shifts_levels}. $\mathrm{EE}_c^{\mathrm{keep}}$ diagnoses the keeper envelope; $\mathrm{EE}_d^{\mathrm{adj}}$ diagnoses FUES. Mean and 95th percentile of~\eqref{eq:judd_ee}; more negative is more accurate. Constrained points excluded.}
+	\label{fig:smoothing_diagnostics_euler}
+\end{figure}
+
+Table~\ref{tab:smoothing_euler} reports the same four specifications as Table~\ref{tab:smoothing_kinks}, now with residuals alongside the kink counts. The table is a snapshot; Figures~\ref{fig:smoothing_diagnostics_kinks}--\ref{fig:smoothing_diagnostics_euler} are the argument.
+
+\begin{table}[htbp]
+\centering
+\caption{Period-$t$ kink counts and Euler residuals under the hard-max baseline and one smoothed magnitude of each discrete-choice channel. Residuals are mean and 95th percentile of~\eqref{eq:judd_ee} on an off-grid test mesh; constrained points excluded. The $\sigma_p$ adjuster kink count sums over price nodes.}
+\label{tab:smoothing_euler}
+\small
+\begin{tabular}{lcccccc}
+\hline
+ & \multicolumn{2}{c}{Kinks} & \multicolumn{2}{c}{$\mathrm{EE}_c^{\mathrm{keep}}$} & \multicolumn{2}{c}{$\mathrm{EE}_d^{\mathrm{adj}}$} \\
+\cline{2-3}\cline{4-5}\cline{6-7}
+Specification & Decr.\ seg. & FUES rem. & Mean & P95 & Mean & P95 \\
+\hline
+Hard max & 5 & 4 & $-4.19$ & $-2.50$ & $-3.49$ & $-2.42$ \\
+$\sigma_\varepsilon = 0.05$ & 0 & 0 & $-4.22$ & $-3.23$ & $-3.04$ & $0.45$ \\
+$S = 0.1$ & 0 & 0 & $-4.23$ & $-3.13$ & $-3.06$ & $0.27$ \\
+$\sigma_p = 0.1$ & 0 & 17 & $-4.04$ & $-2.93$ & $-2.97$ & $0.52$ \\
+\hline
+\end{tabular}
+\end{table}
+
+\input{smoothing_euler_table_full}
+
+The prediction from Appendix~\ref{sec:appdx_smoothness} is sharp enough to be wrong, and the snapshot in Table~\ref{tab:smoothing_euler} splits by branch. For the keeper it holds. Decreasing segments hit zero once $S$ (respectively $\sigma_\varepsilon$) is in the range of Figure~\ref{fig:smoothing_shifts_levels}, and $\mathrm{EE}_c^{\mathrm{keep}}$ does \emph{not} deteriorate: the hard-max mean and 95th percentile are $-4.19$ and $-2.50$; at $S=0.1$ they are $-4.23$ and $-3.13$, and both continue to improve as $S$ or $\sigma_\varepsilon$ is raised (full sweep in Table~\ref{tab:smoothing_euler_full}). The smoother combined consumption rule is not an average over dominated keeper roots. For the adjuster the deletion count is not enough. FUES removals fall to zero under taste and search, but the 95th percentile of $\mathrm{EE}_d^{\mathrm{adj}}$ deteriorates (from $-2.42$ under the hard maximum to $+0.27$ at $S=0.1$), while the mean stays around $-3$. Cleanliness of the raw FOC cloud is not the same as accuracy of the stored $(c,d)$ interpolant; FUES is not shown to be redundant by the deletion count alone. Price dispersion continues to remove adjuster points (the count sums over nodes) and has a similar tail, consistent with the $d$-FOC nonconvexity being independent of the keep--adjust aggregator. The 95th percentile is the relevant check near the S,s band: the mean can be dominated by the large keep and adjust regions where the Euler equation is well behaved even under a hard maximum.
+
+Two further restrictions on interpretation follow from the same theory and from the experiment in Figure~\ref{fig:smoothing_shifts_levels}.
+
+First, the four channels are not ranked by who attains the smallest residual. They are different models. They can be ranked by the kink counts at a common adjustment hazard---the apple-to-apple comparison of Section~\ref{subsec:ModelBasicSmoothingCompare}---with Euler residuals serving only as a certificate that each column is a well-solved instance of its own model. That is the same division of labour as in \citet{Dobrescu2022-ii}: envelope methods that recover the same upper envelope have essentially identical Euler errors, and the comparison is then over speed (and, here, over the economic content of the smoother).
+
+Second, residuals that remain small as $S\to\infty$ or $\sigma_\varepsilon\to\infty$ are uninformative about the paper's claim. In those limits the discrete choice is smoothed away by being removed, the keeper problem is a standard concave consumption-saving problem, and the Euler equation is necessary and sufficient for reasons that have nothing to do with search. The informative region is the smallest $S$ (or $\sigma_\varepsilon$) at which Figure~\ref{fig:smoothing_diagnostics_kinks} first reports a clean keeper step, read against Figure~\ref{fig:smoothing_diagnostics_euler} at that same value. That pair is the quantitative version of the abstract's statement that with ample search frictions the suboptimal points can be eliminated entirely.
+
+\subsubsection{Implementation notes}
+
+The residuals use the closed-form search intensity~\eqref{eq:eps_star_basic} rather than a grid search over $\varepsilon_t$. A piecewise-constant $\varepsilon_t$ puts kinks of order the grid spacing into $v_t^{m}$, which appear as Euler noise and recreate, inside the smoother, the numerical-versus-economic confound documented for income discretisation in Section~\ref{sec:incdisc}.
+
+The test mesh is denser than the solution grid and is not a subset of it. Evaluating~\eqref{eq:judd_ee} at EGM nodes is close to tautological and will not detect interpolation error across a remaining discontinuity.
+
+For the $\sigma_p$ panel, $\mathrm{EE}_d^{\mathrm{adj}}$ is computed at the representative price $p_t\approx 1$ used in the policy figures, so that the residual is comparable to the single-price panels; the FUES count continues to sum over nodes, with that caveat restated in the caption.
