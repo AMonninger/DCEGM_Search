@@ -1,4 +1,4 @@
-\begin{thebibliography}{19}
+\begin{thebibliography}{20}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -79,6 +79,12 @@ Fedor Iskhakov, Thomas~H Jørgensen, John Rust, and Bertel Schjerning.
   models with (or without) taste shocks: {DC-{EGM}} method for dynamic choice
   models.
 \newblock \emph{Quant. Econom.}, 8\penalty0 (2):\penalty0 317--365, July 2017.
+
+\bibitem[Judd(1992)]{Judd1992-sp}
+K~L Judd.
+\newblock Projection methods for solving aggregate growth models.
+\newblock \emph{Journal of Economic theory}, 58\penalty0 (2):\penalty0
+  410--452, 1992.
 
 \bibitem[Khan(2019)]{Khan2019-ew}
 Shujaat~A Khan.
