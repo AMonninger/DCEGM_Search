@@ -108,30 +108,17 @@ Two companion figures replace the single-magnitude snapshot in Table~\ref{tab:sm
 	\label{fig:smoothing_diagnostics_euler}
 \end{figure}
 
-Table~\ref{tab:smoothing_euler} reports the same four specifications as Table~\ref{tab:smoothing_kinks}, now with residuals alongside the kink counts. The table is a snapshot; Figures~\ref{fig:smoothing_diagnostics_kinks}--\ref{fig:smoothing_diagnostics_euler} are the argument.
+Table~\ref{tab:smoothing_euler} reports the same $\sigma_\varepsilon$, $S$, and $\sigma_p$ magnitudes as Figure~\ref{fig:smoothing_shifts_levels}, with residuals alongside the kink counts.
 
 \begin{table}[htbp]
 \centering
-\caption{Period-$t$ kink counts and Euler residuals under the hard-max baseline and one smoothed magnitude of each discrete-choice channel. Residuals are mean and 95th percentile of~\eqref{eq:judd_ee} on an off-grid test mesh; constrained points excluded. The $\sigma_p$ adjuster kink count sums over price nodes.}
+\caption{Period-$t$ kink counts and Euler residuals under the hard-max baseline and the same $\sigma_\varepsilon$, $S$, and $\sigma_p$ sweep as Figure~\ref{fig:smoothing_shifts_levels}. Residuals are mean and 95th percentile of~\eqref{eq:judd_ee} on an off-grid test mesh; constrained points excluded. The $\sigma_p$ adjuster kink count sums over price nodes.}
 \label{tab:smoothing_euler}
 \small
-\begin{tabular}{lcccccc}
-\hline
- & \multicolumn{2}{c}{Kinks} & \multicolumn{2}{c}{$\mathrm{EE}_c^{\mathrm{keep}}$} & \multicolumn{2}{c}{$\mathrm{EE}_d^{\mathrm{adj}}$} \\
-\cline{2-3}\cline{4-5}\cline{6-7}
-Specification & Decr.\ seg. & FUES rem. & Mean & P95 & Mean & P95 \\
-\hline
-Hard max & 5 & 4 & $-4.19$ & $-2.50$ & $-3.49$ & $-2.42$ \\
-$\sigma_\varepsilon = 0.05$ & 0 & 0 & $-4.22$ & $-3.23$ & $-3.04$ & $0.45$ \\
-$S = 0.1$ & 0 & 0 & $-4.23$ & $-3.13$ & $-3.06$ & $0.27$ \\
-$\sigma_p = 0.1$ & 0 & 17 & $-4.04$ & $-2.93$ & $-2.97$ & $0.52$ \\
-\hline
-\end{tabular}
+\input{../Tables/smoothing_euler}
 \end{table}
 
-\input{smoothing_euler_table_full}
-
-The prediction from Appendix~\ref{sec:appdx_smoothness} is sharp enough to be wrong, and the snapshot in Table~\ref{tab:smoothing_euler} splits by branch. For the keeper it holds. Decreasing segments hit zero once $S$ (respectively $\sigma_\varepsilon$) is in the range of Figure~\ref{fig:smoothing_shifts_levels}, and $\mathrm{EE}_c^{\mathrm{keep}}$ does \emph{not} deteriorate: the hard-max mean and 95th percentile are $-4.19$ and $-2.50$; at $S=0.1$ they are $-4.23$ and $-3.13$, and both continue to improve as $S$ or $\sigma_\varepsilon$ is raised (full sweep in Table~\ref{tab:smoothing_euler_full}). The smoother combined consumption rule is not an average over dominated keeper roots. For the adjuster the deletion count is not enough. FUES removals fall to zero under taste and search, but the 95th percentile of $\mathrm{EE}_d^{\mathrm{adj}}$ deteriorates (from $-2.42$ under the hard maximum to $+0.27$ at $S=0.1$), while the mean stays around $-3$. Cleanliness of the raw FOC cloud is not the same as accuracy of the stored $(c,d)$ interpolant; FUES is not shown to be redundant by the deletion count alone. Price dispersion continues to remove adjuster points (the count sums over nodes) and has a similar tail, consistent with the $d$-FOC nonconvexity being independent of the keep--adjust aggregator. The 95th percentile is the relevant check near the S,s band: the mean can be dominated by the large keep and adjust regions where the Euler equation is well behaved even under a hard maximum.
+The prediction from Appendix~\ref{sec:appdx_smoothness} is sharp enough to be wrong, and Table~\ref{tab:smoothing_euler} splits by branch. For the keeper it holds. Decreasing segments are zero at every listed $S$ and $\sigma_\varepsilon$, and $\mathrm{EE}_c^{\mathrm{keep}}$ does \emph{not} deteriorate: the hard-max mean and 95th percentile are $-4.19$ and $-2.50$; they improve to $-4.52$ and $-3.39$ at $\sigma_\varepsilon=0.2$ and to $-4.42$ and $-3.24$ at $S=0.3$. The smoother combined consumption rule is not an average over dominated keeper roots. For the adjuster the deletion count is not enough. FUES removals are zero under taste and search at every listed magnitude, but the 95th percentile of $\mathrm{EE}_d^{\mathrm{adj}}$ remains positive ($0.45$--$0.69$ as $\sigma_\varepsilon$ rises; $0.27$--$0.22$ as $S$ rises), while the mean stays around $-3$. Raising the smoother does not repair the tail. Cleanliness of the raw FOC cloud is not the same as accuracy of the stored $(c,d)$ interpolant; FUES is not shown to be redundant by the deletion count alone. Price dispersion continues to remove adjuster points ($20$, $17$, $34$ as $\sigma_p$ increases; the count sums over nodes) and has a similar tail, consistent with the $d$-FOC nonconvexity being independent of the keep--adjust aggregator. The 95th percentile is the relevant check near the S,s band: the mean can be dominated by the large keep and adjust regions where the Euler equation is well behaved even under a hard maximum.
 
 Two further restrictions on interpretation follow from the same theory and from the experiment in Figure~\ref{fig:smoothing_shifts_levels}.
 

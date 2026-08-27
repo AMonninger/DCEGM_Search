@@ -519,6 +519,24 @@ The retirement contrast is immediate. There, lowering the probability of a succe
 	\label{fig:smoothing_shifts_mpcs}
 \end{figure}
 
+\subsection{Infinite horizon}
+\label{subsec:ModelBasicInf}
+
+The comparisons above are period-$t$ objects on a fixed beginning-of-period durable stock. I next ask how the same three discrete-choice smoothers---EV taste shocks $\sigma_\varepsilon$, search frictions $S$, and durable-price dispersion $\sigma_p$---shape the \emph{stationary} economy. For each channel I solve the infinite-horizon problem with that smoother active and the other two shut off, using the same magnitudes as in Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs}. Given the converged policies, I build the transition matrix over the joint $(n,m)$ histogram grid, compute the ergodic distribution, and report aggregate steady-state nondurable consumption $C$, durable stock $D$, durable expenditure $\mathrm{DEX}$, total expenditure $\mathrm{TEX}$, liquid assets $A$, and the adjustment probability $\mathrm{ADJ}$.
+
+I also compute sequence-space Jacobians of these aggregates with respect to the risk-free return $R$ and to a labor (mean-income) shock, using the fake-news algorithm for sequence-space Jacobians. Table~\ref{tab:inf_ss} reports the steady-state aggregates together with the impact labor responses: MPC Non is $J_C^{\mathrm{labor}}[0,0]$, MPC Dur is $J_{\mathrm{DEX}}^{\mathrm{labor}}[0,0]$, and MPX is $J_{\mathrm{TEX}}^{\mathrm{labor}}[0,0]$.
+
+\begin{table}[htbp]
+\centering
+\caption{Infinite-horizon steady-state aggregates and impact labor MPCs under the same $\sigma_\varepsilon$, $S$, and $\sigma_p$ sweep as Figure~\ref{fig:smoothing_shifts_levels}. Each channel is varied with the other two shut off. Labor MPCs are the $(0,0)$ entries of the sequence-space Jacobians of $C$, $\mathrm{DEX}$, and $\mathrm{TEX}$ with respect to labor.}
+\label{tab:inf_ss}
+\footnotesize
+\input{../Output/DurableModel_Inf_SS}
+\end{table}
+
+\paragraph{Results.}
+\emph{[Placeholder: discuss how steady-state aggregates and labor MPCs vary across $\sigma_\varepsilon$, $S$, and $\sigma_p$.]}
+
 \subsection{Kinks and Euler residuals}
 \label{subsec:ModelBasicEuler}
 
@@ -534,25 +552,14 @@ Table~\ref{tab:smoothing_kinks} records cleanliness of the raw EGM cloud. The ob
 \end{align}
 More negative is more accurate: $-4$ is a $0.01\%$ consumption error, $-3$ a $0.1\%$ error. Residuals are branch-conditional---keepers on $c_t^{\mathrm{keep}}$, adjusters on the durable first-order condition converted to the same consumption units ($\mathrm{EE}_d^{\mathrm{adj}}$)---and are never evaluated at the mixed policy $\bar c_t$, which does not satisfy the Euler equation even when both branches do. The test mesh is off the solution grid; constrained points are dropped. I report the mean and the 95th percentile, because the mean can look acceptable while a thin set of points near the S,s band is not.
 
-Table~\ref{tab:smoothing_euler} places both diagnostics in the same period as Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs}. For the keeper the computational claim holds. Taste shocks and search frictions drive decreasing segments to zero, and $\mathrm{EE}_c^{\mathrm{keep}}$ improves: the hard-max mean and 95th percentile are $-4.19$ and $-2.50$; at $S=0.1$ they are $-4.23$ and $-3.13$, and they continue to improve as $S$ or $\sigma_\varepsilon$ is raised. The smoother combined consumption rule is not an average over dominated keeper roots. Price dispersion likewise zeros the keeper count, with only a small change in the mean.
+Table~\ref{tab:smoothing_euler} places both diagnostics in the same period as Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs}, now for every listed magnitude of $\sigma_\varepsilon$, $S$, and $\sigma_p$. For the keeper the computational claim holds. Decreasing segments are zero at all three taste and search values, and $\mathrm{EE}_c^{\mathrm{keep}}$ improves with the smoother: the hard-max mean and 95th percentile are $-4.19$ and $-2.50$; at $\sigma_\varepsilon=0.2$ they are $-4.52$ and $-3.39$, and at $S=0.3$ they are $-4.42$ and $-3.24$. The smoother combined consumption rule is not an average over dominated keeper roots. Price dispersion likewise zeros the keeper count at all three $\sigma_p$, with only a small deterioration in the mean (from $-4.11$ at $\sigma_p=0.05$ to $-4.00$ at $0.2$).
 
-For the adjuster the deletion count is not enough. Taste and search eliminate FUES removals in this period, but the 95th percentile of $\mathrm{EE}_d^{\mathrm{adj}}$ deteriorates (from $-2.42$ under the hard maximum to $+0.27$ at $S=0.1$), while the mean stays around $-3$. Cleanliness of the raw FOC cloud is not the same as accuracy of the stored $(c,d)$ interpolant, so FUES is not shown to be redundant by the deletion count alone. Price dispersion, whose $d$-FOC is applied at each price node, continues to remove points and has a similar tail. The four channels are different economies and are not ranked by residual size; the residuals certify internal accuracy of each specification, not proximity to the frictionless target.
+For the adjuster the deletion count is not enough. Taste and search eliminate FUES removals at every listed magnitude, but the 95th percentile of $\mathrm{EE}_d^{\mathrm{adj}}$ remains positive---$0.45$ to $0.69$ as $\sigma_\varepsilon$ rises, $0.27$ to $0.22$ as $S$ rises---while the mean stays around $-3$. Raising the smoother does not repair the tail. Price dispersion continues to remove points ($20$, $17$, $34$ as $\sigma_p$ increases) and has a similar tail. Cleanliness of the raw FOC cloud is not the same as accuracy of the stored $(c,d)$ interpolant, so FUES is not shown to be redundant by the deletion count alone. Taste, search, and prices are different economies and are not ranked by residual size; the residuals certify internal accuracy of each specification, not proximity to the frictionless target.
 
 \begin{table}[htbp]
 \centering
-\caption{Period-$t$ kink counts and Euler residuals under the hard-max baseline and one smoothed magnitude of each discrete-choice channel. Residuals are mean and 95th percentile of~\eqref{eq:judd_ee} on an off-grid test mesh; constrained points excluded. The $\sigma_p$ adjuster kink count sums over price nodes.}
+\caption{Period-$t$ kink counts and Euler residuals under the hard-max baseline and the same $\sigma_\varepsilon$, $S$, and $\sigma_p$ sweep as Figure~\ref{fig:smoothing_shifts_levels}. Residuals are mean and 95th percentile of~\eqref{eq:judd_ee} on an off-grid test mesh; constrained points excluded. The $\sigma_p$ adjuster kink count sums over price nodes.}
 \label{tab:smoothing_euler}
 \small
-\begin{tabular}{lcccccc}
-\hline
- & \multicolumn{2}{c}{Kinks} & \multicolumn{2}{c}{$\mathrm{EE}_c^{\mathrm{keep}}$} & \multicolumn{2}{c}{$\mathrm{EE}_d^{\mathrm{adj}}$} \\
-\cline{2-3}\cline{4-5}\cline{6-7}
-Specification & Decr.\ seg. & FUES rem. & Mean & P95 & Mean & P95 \\
-\hline
-Hard max & 5 & 4 & $-4.19$ & $-2.50$ & $-3.49$ & $-2.42$ \\
-$\sigma_\varepsilon = 0.05$ & 0 & 0 & $-4.22$ & $-3.23$ & $-3.04$ & $0.45$ \\
-$S = 0.1$ & 0 & 0 & $-4.23$ & $-3.13$ & $-3.06$ & $0.27$ \\
-$\sigma_p = 0.1$ & 0 & 17 & $-4.04$ & $-2.93$ & $-2.97$ & $0.52$ \\
-\hline
-\end{tabular}
+\input{../Tables/smoothing_euler}
 \end{table}

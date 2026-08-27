@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.18)  25 AUG 2026 15:51
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.18)  27 AUG 2026 17:03
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -267,6 +267,14 @@ Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
 \@lastruleclass=\count306
 \@thisrulewidth=\dimen190
 )
+(C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/multirow\multirow.
+sty
+Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
+\multirow@colwidth=\skip61
+\multirow@cntb=\count307
+\multirow@dima=\skip62
+\bigstrutjot=\dimen191
+)
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.
 sty
 Package: hyperref 2025-07-12 v7.01o Hypertext links for LaTeX
@@ -323,21 +331,21 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 s.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
-\c@section@level=\count307
+\c@section@level=\count308
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.
 sty
 Package: etoolbox 2025/10/02 v2.5m e-TeX tools for LaTeX (JAW)
-\etb@tempcnta=\count308
+\etb@tempcnta=\count309
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/stringenc\string
 enc.sty
 Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
 )
 )
-\@linkdim=\dimen191
-\Hy@linkcounter=\count309
-\Hy@pagecounter=\count310
+\@linkdim=\dimen192
+\Hy@linkcounter=\count310
+\Hy@pagecounter=\count311
 
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.de
 f
@@ -349,7 +357,7 @@ Now handling font encoding PD1 ...
 sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
-\Hy@SavedSpaceFactor=\count311
+\Hy@SavedSpaceFactor=\count312
 
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def
 File: puenc.def 2025-07-12 v7.01o Hyperref: PDF Unicode definition (HO)
@@ -363,13 +371,13 @@ Package hyperref Info: Plain pages OFF on input line 4210.
 Package hyperref Info: Backreferencing OFF on input line 4215.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4462.
-\c@Hy@tempcnt=\count312
+\c@Hy@tempcnt=\count313
  (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
 \Urlmuskip=\muskip18
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 4801.
-\XeTeXLinkMargin=\dimen192
+\XeTeXLinkMargin=\dimen193
 
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.st
 y
@@ -380,9 +388,9 @@ tcalc.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
 )
 ))
-\Fld@menulength=\count313
-\Field@Width=\dimen193
-\Fld@charsize=\dimen194
+\Fld@menulength=\count314
+\Field@Width=\dimen194
+\Fld@charsize=\dimen195
 Package hyperref Info: Hyper figures OFF on input line 6078.
 Package hyperref Info: Link nesting OFF on input line 6083.
 Package hyperref Info: Hyper index ON on input line 6086.
@@ -390,17 +398,17 @@ Package hyperref Info: backreferencing OFF on input line 6093.
 Package hyperref Info: Link coloring OFF on input line 6098.
 Package hyperref Info: Link coloring with OCG OFF on input line 6103.
 Package hyperref Info: PDF/A mode OFF on input line 6108.
-\Hy@abspage=\count314
-\c@Item=\count315
-\c@Hfootnote=\count316
+\Hy@abspage=\count315
+\c@Item=\count316
+\c@Hfootnote=\count317
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
 
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdftex.d
 ef
 File: hpdftex.def 2025-07-12 v7.01o Hyperref driver for pdfTeX
-\Fld@listcount=\count317
-\c@bookmark@seq@number=\count318
+\Fld@listcount=\count318
+\c@bookmark@seq@number=\count319
 
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rer
 unfilecheck.sty
@@ -413,14 +421,14 @@ Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 84.
 )
-\Hy@SectionHShift=\skip61
+\Hy@SectionHShift=\skip63
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/natbib\natbib.sty
 Package: natbib 2010/09/13 8.31b (PWD, AO)
-\bibhang=\skip62
-\bibsep=\skip63
+\bibhang=\skip64
+\bibsep=\skip65
 LaTeX Info: Redefining \cite on input line 694.
-\c@NAT@ctr=\count319
+\c@NAT@ctr=\count320
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.
 sty
@@ -429,17 +437,17 @@ Package: geometry 2026/03/07 v6.0 Page Geometry
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
 Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 )
-\Gm@cnth=\count320
-\Gm@cntv=\count321
-\c@Gm@tempcnt=\count322
-\Gm@bindingoffset=\dimen195
-\Gm@wd@mp=\dimen196
-\Gm@odd@mp=\dimen197
-\Gm@even@mp=\dimen198
-\Gm@layoutwidth=\dimen199
-\Gm@layoutheight=\dimen256
-\Gm@layouthoffset=\dimen257
-\Gm@layoutvoffset=\dimen258
+\Gm@cnth=\count321
+\Gm@cntv=\count322
+\c@Gm@tempcnt=\count323
+\Gm@bindingoffset=\dimen196
+\Gm@wd@mp=\dimen197
+\Gm@odd@mp=\dimen198
+\Gm@even@mp=\dimen199
+\Gm@layoutwidth=\dimen256
+\Gm@layoutheight=\dimen257
+\Gm@layouthoffset=\dimen258
+\Gm@layoutvoffset=\dimen259
 \Gm@dimlist=\toks31
 
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.
@@ -453,8 +461,8 @@ cs.sty
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pg
 futil-common.tex
 \pgfutil@everybye=\toks32
-\pgfutil@tempdima=\dimen259
-\pgfutil@tempdimb=\dimen260
+\pgfutil@tempdima=\dimen260
+\pgfutil@tempdimb=\dimen261
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pg
 futil-latex.def
@@ -485,26 +493,26 @@ fkeys.code.tex
 fkeyslibraryfiltered.code.tex
 \pgfkeys@tmptoks=\toks35
 ))
-\pgf@x=\dimen261
-\pgf@y=\dimen262
-\pgf@xa=\dimen263
-\pgf@ya=\dimen264
-\pgf@xb=\dimen265
-\pgf@yb=\dimen266
-\pgf@xc=\dimen267
-\pgf@yc=\dimen268
-\pgf@xd=\dimen269
-\pgf@yd=\dimen270
+\pgf@x=\dimen262
+\pgf@y=\dimen263
+\pgf@xa=\dimen264
+\pgf@ya=\dimen265
+\pgf@xb=\dimen266
+\pgf@yb=\dimen267
+\pgf@xc=\dimen268
+\pgf@yc=\dimen269
+\pgf@xd=\dimen270
+\pgf@yd=\dimen271
 \w@pgf@writea=\write3
 \r@pgf@reada=\read2
-\c@pgf@counta=\count323
-\c@pgf@countb=\count324
-\c@pgf@countc=\count325
-\c@pgf@countd=\count326
+\c@pgf@counta=\count324
+\c@pgf@countb=\count325
+\c@pgf@countc=\count326
+\c@pgf@countd=\count327
 \t@pgf@toka=\toks36
 \t@pgf@tokb=\toks37
 \t@pgf@tokc=\toks38
-\pgf@sys@id@count=\count327
+\pgf@sys@id@count=\count328
 
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\
 pgf.cfg
@@ -523,8 +531,8 @@ File: pgfsys-common-pdf.def 2025-08-29 v3.1.11a (3.1.11a)
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\
 pgfsyssoftpath.code.tex
 File: pgfsyssoftpath.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfsyssoftpath@smallbuffer@items=\count328
-\pgfsyssoftpath@bigbuffer@items=\count329
+\pgfsyssoftpath@smallbuffer@items=\count329
+\pgfsyssoftpath@bigbuffer@items=\count330
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\
 pgfsysprotocol.code.tex
@@ -561,8 +569,8 @@ Package: pgfcore 2025-08-29 v3.1.11a (3.1.11a)
 util.code.tex)
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath
 parser.code.tex
-\pgfmath@dimen=\dimen271
-\pgfmath@count=\count330
+\pgfmath@dimen=\dimen272
+\pgfmath@count=\count331
 \pgfmath@box=\box57
 \pgfmath@toks=\toks39
 \pgfmath@stack@operand=\toks40
@@ -590,39 +598,39 @@ functions.integerarithmetics.code.tex)
 calc.code.tex)
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath
 float.code.tex
-\c@pgfmathroundto@lastzeros=\count331
+\c@pgfmathroundto@lastzeros=\count332
 ))
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfint.
 code.tex)
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\p
 gfcorepoints.code.tex
 File: pgfcorepoints.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@picminx=\dimen272
-\pgf@picmaxx=\dimen273
-\pgf@picminy=\dimen274
-\pgf@picmaxy=\dimen275
-\pgf@pathminx=\dimen276
-\pgf@pathmaxx=\dimen277
-\pgf@pathminy=\dimen278
-\pgf@pathmaxy=\dimen279
-\pgf@xx=\dimen280
-\pgf@xy=\dimen281
-\pgf@yx=\dimen282
-\pgf@yy=\dimen283
-\pgf@zx=\dimen284
-\pgf@zy=\dimen285
+\pgf@picminx=\dimen273
+\pgf@picmaxx=\dimen274
+\pgf@picminy=\dimen275
+\pgf@picmaxy=\dimen276
+\pgf@pathminx=\dimen277
+\pgf@pathmaxx=\dimen278
+\pgf@pathminy=\dimen279
+\pgf@pathmaxy=\dimen280
+\pgf@xx=\dimen281
+\pgf@xy=\dimen282
+\pgf@yx=\dimen283
+\pgf@yy=\dimen284
+\pgf@zx=\dimen285
+\pgf@zy=\dimen286
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\p
 gfcorepathconstruct.code.tex
 File: pgfcorepathconstruct.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@path@lastx=\dimen286
-\pgf@path@lasty=\dimen287
+\pgf@path@lastx=\dimen287
+\pgf@path@lasty=\dimen288
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\p
 gfcorepathusage.code.tex
 File: pgfcorepathusage.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@shorten@end@additional=\dimen288
-\pgf@shorten@start@additional=\dimen289
+\pgf@shorten@end@additional=\dimen289
+\pgf@shorten@start@additional=\dimen290
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\p
 gfcorescopes.code.tex
@@ -630,19 +638,19 @@ File: pgfcorescopes.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 \pgfpic=\box58
 \pgf@hbox=\box59
 \pgf@layerbox@main=\box60
-\pgf@picture@serial@count=\count332
+\pgf@picture@serial@count=\count333
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\p
 gfcoregraphicstate.code.tex
 File: pgfcoregraphicstate.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgflinewidth=\dimen290
+\pgflinewidth=\dimen291
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\p
 gfcoretransformations.code.tex
 File: pgfcoretransformations.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@pt@x=\dimen291
-\pgf@pt@y=\dimen292
-\pgf@pt@temp=\dimen293
+\pgf@pt@x=\dimen292
+\pgf@pt@y=\dimen293
+\pgf@pt@temp=\dimen294
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\p
 gfcorequick.code.tex
@@ -659,14 +667,14 @@ File: pgfcorepathprocessing.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\p
 gfcorearrows.code.tex
 File: pgfcorearrows.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfarrowsep=\dimen294
+\pgfarrowsep=\dimen295
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\p
 gfcoreshade.code.tex
 File: pgfcoreshade.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@max=\dimen295
-\pgf@sys@shading@range@num=\count333
-\pgf@shadingcount=\count334
+\pgf@max=\dimen296
+\pgf@sys@shading@range@num=\count334
+\pgf@shadingcount=\count335
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\p
 gfcoreimage.code.tex
@@ -705,8 +713,8 @@ File: pgfmoduleplot.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\
 pgfcomp-version-0-65.sty
 Package: pgfcomp-version-0-65 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@nodesepstart=\dimen296
-\pgf@nodesepend=\dimen297
+\pgf@nodesepstart=\dimen297
+\pgf@nodesepend=\dimen298
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\
 pgfcomp-version-1-18.sty
@@ -725,8 +733,8 @@ ty
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pg
 ffor.code.tex
 Package: pgffor 2025-08-29 v3.1.11a (3.1.11a)
-\pgffor@iter=\dimen298
-\pgffor@skip=\dimen299
+\pgffor@iter=\dimen299
+\pgffor@skip=\dimen300
 \pgffor@stack=\toks42
 \pgffor@toks=\toks43
 ))
@@ -737,34 +745,34 @@ Package: tikz 2025-08-29 v3.1.11a (3.1.11a)
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pg
 flibraryplothandlers.code.tex
 File: pgflibraryplothandlers.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@plot@mark@count=\count335
-\pgfplotmarksize=\dimen300
+\pgf@plot@mark@count=\count336
+\pgfplotmarksize=\dimen301
 )
-\tikz@lastx=\dimen301
-\tikz@lasty=\dimen302
-\tikz@lastxsaved=\dimen303
-\tikz@lastysaved=\dimen304
-\tikz@lastmovetox=\dimen305
-\tikz@lastmovetoy=\dimen306
-\tikzleveldistance=\dimen307
-\tikzsiblingdistance=\dimen308
+\tikz@lastx=\dimen302
+\tikz@lasty=\dimen303
+\tikz@lastxsaved=\dimen304
+\tikz@lastysaved=\dimen305
+\tikz@lastmovetox=\dimen306
+\tikz@lastmovetoy=\dimen307
+\tikzleveldistance=\dimen308
+\tikzsiblingdistance=\dimen309
 \tikz@figbox=\box63
 \tikz@figbox@bg=\box64
 \tikz@tempbox=\box65
 \tikz@tempbox@bg=\box66
-\tikztreelevel=\count336
-\tikznumberofchildren=\count337
-\tikznumberofcurrentchild=\count338
-\tikz@fig@count=\count339
+\tikztreelevel=\count337
+\tikznumberofchildren=\count338
+\tikznumberofcurrentchild=\count339
+\tikz@fig@count=\count340
 
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfm
 odulematrix.code.tex
 File: pgfmodulematrix.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfmatrixcurrentrow=\count340
-\pgfmatrixcurrentcolumn=\count341
-\pgf@matrix@numberofcolumns=\count342
+\pgfmatrixcurrentrow=\count341
+\pgfmatrixcurrentcolumn=\count342
+\pgf@matrix@numberofcolumns=\count343
 )
-\tikz@expandcount=\count343
+\tikz@expandcount=\count344
 
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlaye
 r/tikz/libraries\tikzlibrarytopaths.code.tex
@@ -773,10 +781,10 @@ File: tikzlibrarytopaths.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pg
 flibraryarrows.meta.code.tex
 File: pgflibraryarrows.meta.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfarrowinset=\dimen309
-\pgfarrowlength=\dimen310
-\pgfarrowwidth=\dimen311
-\pgfarrowlinewidth=\dimen312
+\pgfarrowinset=\dimen310
+\pgfarrowlength=\dimen311
+\pgfarrowwidth=\dimen312
+\pgfarrowlinewidth=\dimen313
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlaye
 r/tikz/libraries\tikzlibrarypositioning.code.tex
@@ -789,17 +797,17 @@ File: tikzlibrarycalc.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/algorithm2e\algori
 thm2e.sty
 Package: algorithm2e 2017/07/18 v5.2 algorithms environments
-\c@AlgoLine=\count344
+\c@AlgoLine=\count345
 
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/base\ifthen.sty
 Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
 )
-\algocf@hangindent=\skip64
+\algocf@hangindent=\skip66
 
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/ifoddpage\ifoddpag
 e.sty
 Package: ifoddpage 2022/10/18 v1.2 Conditionals for odd/even page detection
-\c@checkoddpage=\count345
+\c@checkoddpage=\count346
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/tools\xspace.sty
 Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
@@ -808,83 +816,83 @@ Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
 y
 Package: relsize 2013/03/29 ver 4.1
 )
-\skiptotal=\skip65
-\skiplinenumber=\skip66
-\skiprule=\skip67
-\skiphlne=\skip68
-\skiptext=\skip69
-\skiplength=\skip70
-\algomargin=\skip71
-\skipalgocfslide=\skip72
-\algowidth=\dimen313
-\inoutsize=\dimen314
-\inoutindent=\dimen315
-\interspacetitleruled=\dimen316
-\interspacealgoruled=\dimen317
-\interspacetitleboxruled=\dimen318
-\algocf@ruledwidth=\skip73
+\skiptotal=\skip67
+\skiplinenumber=\skip68
+\skiprule=\skip69
+\skiphlne=\skip70
+\skiptext=\skip71
+\skiplength=\skip72
+\algomargin=\skip73
+\skipalgocfslide=\skip74
+\algowidth=\dimen314
+\inoutsize=\dimen315
+\inoutindent=\dimen316
+\interspacetitleruled=\dimen317
+\interspacealgoruled=\dimen318
+\interspacetitleboxruled=\dimen319
+\algocf@ruledwidth=\skip75
 \algocf@inoutbox=\box67
 \algocf@inputbox=\box68
-\AlCapSkip=\skip74
-\AlCapHSkip=\skip75
-\algoskipindent=\skip76
+\AlCapSkip=\skip76
+\AlCapHSkip=\skip77
+\algoskipindent=\skip78
 \algocf@nlbox=\box69
 \algocf@hangingbox=\box70
 \algocf@untilbox=\box71
-\algocf@skipuntil=\skip77
+\algocf@skipuntil=\skip79
 \algocf@capbox=\box72
-\algocf@lcaptionbox=\skip78
-\algoheightruledefault=\skip79
-\algoheightrule=\skip80
-\algotitleheightruledefault=\skip81
-\algotitleheightrule=\skip82
-\c@algocfline=\count346
-\c@algocfproc=\count347
-\c@algocf=\count348
+\algocf@lcaptionbox=\skip80
+\algoheightruledefault=\skip81
+\algoheightrule=\skip82
+\algotitleheightruledefault=\skip83
+\algotitleheightrule=\skip84
+\c@algocfline=\count347
+\c@algocfproc=\count348
+\c@algocf=\count349
 \algocf@algoframe=\box73
 \algocf@algobox=\box74
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 29.
+Package hyperref Info: Option `colorlinks' set `true' on input line 30.
 
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backen
 d-pdftex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count349
+\l__color_backend_stack_int=\count350
 ) (dcegmSearch.aux)
 \openout1 = `dcegmSearch.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 43.
+LaTeX Font Info:    ... okay on input line 43.
 
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-p
 df.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count350
-\scratchdimen=\dimen319
+\scratchcounter=\count351
+\scratchdimen=\dimen320
 \scratchbox=\box75
-\nofMPsegments=\count351
-\nofMParguments=\count352
+\nofMPsegments=\count352
+\nofMParguments=\count353
 \everyMPshowfont=\toks44
-\MPscratchCnt=\count353
-\MPscratchDim=\dimen320
-\MPnumerator=\count354
-\makeMPintoPDFobject=\count355
+\MPscratchCnt=\count354
+\MPscratchDim=\dimen321
+\MPnumerator=\count355
+\makeMPintoPDFobject=\count356
 \everyMPtoPDFconversion=\toks45
 )
 (C:\Users\amonninger\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epsto
@@ -900,7 +908,7 @@ File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: hyperref package is loaded.
 Package caption Info: End \AtBeginDocument code.
-Package hyperref Info: Link coloring ON on input line 42.
+Package hyperref Info: Link coloring ON on input line 43.
  (dcegmSearch.out) (dcegmSearch.out)
 \@outlinefile=\write4
 \openout4 = `dcegmSearch.out'.
@@ -993,7 +1001,7 @@ Package natbib Warning: Citation `McKay2021' on page 3 undefined on input line
 78.
 
 ) (RetirementModel.tex [3]
-<timeline_RetirementModel.pdf, id=275, 420.06938pt x 141.52875pt>
+<timeline_RetirementModel.pdf, id=279, 420.06938pt x 141.52875pt>
 File: timeline_RetirementModel.pdf Graphic file (type pdf)
 <use timeline_RetirementModel.pdf>
 Package pdftex.def Info: timeline_RetirementModel.pdf  used on input line 75.
@@ -1025,26 +1033,26 @@ Overfull \hbox (18.9034pt too wide) detected at line 257
 [][][][][]
  []
 
-<../Figures/Figures_v3/p1_xi0_eta0.pdf, id=318, 462.52798pt x 346.89601pt>
+<../Figures/Figures_v3/p1_xi0_eta0.pdf, id=322, 462.52798pt x 346.89601pt>
 File: ../Figures/Figures_v3/p1_xi0_eta0.pdf Graphic file (type pdf)
 <use ../Figures/Figures_v3/p1_xi0_eta0.pdf>
 Package pdftex.def Info: ../Figures/Figures_v3/p1_xi0_eta0.pdf  used on input l
 ine 278.
 (pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
-<../Figures/Figures_v3/p0_xi0_eta0.pdf, id=319, 462.52798pt x 346.89601pt>
+<../Figures/Figures_v3/p0_xi0_eta0.pdf, id=323, 462.52798pt x 346.89601pt>
 File: ../Figures/Figures_v3/p0_xi0_eta0.pdf Graphic file (type pdf)
 <use ../Figures/Figures_v3/p0_xi0_eta0.pdf>
 Package pdftex.def Info: ../Figures/Figures_v3/p0_xi0_eta0.pdf  used on input l
 ine 283.
 (pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
 [7]
-<../Figures/Figures_v3/p0_xi0p005_eta0.pdf, id=338, 462.52798pt x 346.89601pt>
+<../Figures/Figures_v3/p0_xi0p005_eta0.pdf, id=342, 462.52798pt x 346.89601pt>
 File: ../Figures/Figures_v3/p0_xi0p005_eta0.pdf Graphic file (type pdf)
 <use ../Figures/Figures_v3/p0_xi0p005_eta0.pdf>
 Package pdftex.def Info: ../Figures/Figures_v3/p0_xi0p005_eta0.pdf  used on inp
 ut line 327.
 (pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
-<../Figures/Figures_v3/p0_xi0p02_eta0.pdf, id=339, 462.52798pt x 346.89601pt>
+<../Figures/Figures_v3/p0_xi0p02_eta0.pdf, id=343, 462.52798pt x 346.89601pt>
 File: ../Figures/Figures_v3/p0_xi0p02_eta0.pdf Graphic file (type pdf)
 <use ../Figures/Figures_v3/p0_xi0p02_eta0.pdf>
 Package pdftex.def Info: ../Figures/Figures_v3/p0_xi0p02_eta0.pdf  used on inpu
@@ -1052,7 +1060,7 @@ t line 332.
 (pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
  [8 <../Figures/Figures_v3/p1_xi0_eta0.pdf> <../Figures/Figures_v3/p0_xi0_eta0.
 pdf>]
-<../Figures/Figures_v3/p0_xi0p005_etaSqrt0p005.pdf, id=439, 462.52798pt x 346.8
+<../Figures/Figures_v3/p0_xi0p005_etaSqrt0p005.pdf, id=443, 462.52798pt x 346.8
 9601pt>
 File: ../Figures/Figures_v3/p0_xi0p005_etaSqrt0p005.pdf Graphic file (type pdf)
 
@@ -1060,7 +1068,7 @@ File: ../Figures/Figures_v3/p0_xi0p005_etaSqrt0p005.pdf Graphic file (type pdf)
 Package pdftex.def Info: ../Figures/Figures_v3/p0_xi0p005_etaSqrt0p005.pdf  use
 d on input line 356.
 (pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
-<../Figures/Figures_v3/p0_xi0p02_etaSqrt0p005.pdf, id=440, 462.52798pt x 346.89
+<../Figures/Figures_v3/p0_xi0p02_etaSqrt0p005.pdf, id=444, 462.52798pt x 346.89
 601pt>
 File: ../Figures/Figures_v3/p0_xi0p02_etaSqrt0p005.pdf Graphic file (type pdf)
 <use ../Figures/Figures_v3/p0_xi0p02_etaSqrt0p005.pdf>
@@ -1070,32 +1078,32 @@ Package pdftex.def Info: ../Figures/Figures_v3/p0_xi0p02_etaSqrt0p005.pdf  used
  [9 <../Figures/Figures_v3/p0_xi0p005_eta0.pdf> <../Figures/Figures_v3/p0_xi0p0
 2_eta0.pdf> <../Figures/Figures_v3/p0_xi0p005_etaSqrt0p005.pdf> <../Figures/Fig
 ures_v3/p0_xi0p02_etaSqrt0p005.pdf>]
-<../Figures/Figures_v3/VaryP.pdf, id=645, 462.52798pt x 346.89601pt>
+<../Figures/Figures_v3/VaryP.pdf, id=649, 462.52798pt x 346.89601pt>
 File: ../Figures/Figures_v3/VaryP.pdf Graphic file (type pdf)
 <use ../Figures/Figures_v3/VaryP.pdf>
 Package pdftex.def Info: ../Figures/Figures_v3/VaryP.pdf  used on input line 40
 8.
 (pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
-<../Figures/Figures_v3/VaryS.pdf, id=646, 462.52798pt x 346.89601pt>
+<../Figures/Figures_v3/VaryS.pdf, id=650, 462.52798pt x 346.89601pt>
 File: ../Figures/Figures_v3/VaryS.pdf Graphic file (type pdf)
 <use ../Figures/Figures_v3/VaryS.pdf>
 Package pdftex.def Info: ../Figures/Figures_v3/VaryS.pdf  used on input line 41
 3.
 (pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
-<../Figures/Figures_v3/VaryXi.pdf, id=647, 462.52798pt x 346.89601pt>
+<../Figures/Figures_v3/VaryXi.pdf, id=651, 462.52798pt x 346.89601pt>
 File: ../Figures/Figures_v3/VaryXi.pdf Graphic file (type pdf)
 <use ../Figures/Figures_v3/VaryXi.pdf>
 Package pdftex.def Info: ../Figures/Figures_v3/VaryXi.pdf  used on input line 4
 25.
 (pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
-<../Figures/Figures_v3/VaryEta.pdf, id=648, 462.52798pt x 346.89601pt>
+<../Figures/Figures_v3/VaryEta.pdf, id=652, 462.52798pt x 346.89601pt>
 File: ../Figures/Figures_v3/VaryEta.pdf Graphic file (type pdf)
 <use ../Figures/Figures_v3/VaryEta.pdf>
 Package pdftex.def Info: ../Figures/Figures_v3/VaryEta.pdf  used on input line 
 430.
 (pdftex.def)             Requested size: 225.4804pt x 169.11244pt.
  [10 <../Figures/Figures_v3/VaryP.pdf> <../Figures/Figures_v3/VaryS.pdf>]
-<../Figures/Figures_v3/IncomeDiscMethod_Convergence.pdf, id=767, 462.52798pt x 
+<../Figures/Figures_v3/IncomeDiscMethod_Convergence.pdf, id=771, 462.52798pt x 
 346.89601pt>
 File: ../Figures/Figures_v3/IncomeDiscMethod_Convergence.pdf Graphic file (type
  pdf)
@@ -1106,7 +1114,7 @@ Package pdftex.def Info: ../Figures/Figures_v3/IncomeDiscMethod_Convergence.pdf
  [11 <../Figures/Figures_v3/VaryXi.pdf> <../Figures/Figures_v3/VaryEta.pdf>] [1
 2 <../Figures/Figures_v3/IncomeDiscMethod_Convergence.pdf>]) (DurableModel.tex 
 [13] [14]
-<timeline_DurableModel.pdf, id=1014, 813.34265pt x 106.60829pt>
+<timeline_DurableModel.pdf, id=1018, 813.34265pt x 106.60829pt>
 File: timeline_DurableModel.pdf Graphic file (type pdf)
 <use timeline_DurableModel.pdf>
 Package pdftex.def Info: timeline_DurableModel.pdf  used on input line 10.
@@ -1121,20 +1129,20 @@ File: ueuf.fd 2013/01/14 v3.01 Euler Fraktur
 
 LaTeX Warning: Float too large for page by 78.68704pt on input line 134.
 
-<../Figures/DurableModel/Baseline_Ss_T.pdf, id=1100, 423.82477pt x 353.95424pt>
+<../Figures/DurableModel/Baseline_Ss_T.pdf, id=1104, 423.82477pt x 353.95424pt>
 
 File: ../Figures/DurableModel/Baseline_Ss_T.pdf Graphic file (type pdf)
 <use ../Figures/DurableModel/Baseline_Ss_T.pdf>
 Package pdftex.def Info: ../Figures/DurableModel/Baseline_Ss_T.pdf  used on inp
 ut line 143.
 (pdftex.def)             Requested size: 225.4804pt x 188.31317pt.
-<../Figures/DurableModel/Baseline_d_T.pdf, id=1101, 469.755pt x 325.215pt>
+<../Figures/DurableModel/Baseline_d_T.pdf, id=1105, 469.755pt x 325.215pt>
 File: ../Figures/DurableModel/Baseline_d_T.pdf Graphic file (type pdf)
 <use ../Figures/DurableModel/Baseline_d_T.pdf>
 Package pdftex.def Info: ../Figures/DurableModel/Baseline_d_T.pdf  used on inpu
 t line 149.
 (pdftex.def)             Requested size: 225.4804pt x 156.10143pt.
-<../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf, id=1102, 469.755pt x 325.
+<../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf, id=1106, 469.755pt x 325.
 215pt>
 File: ../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf Graphic file (type pd
 f)
@@ -1142,7 +1150,7 @@ f)
 Package pdftex.def Info: ../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf  u
 sed on input line 155.
 (pdftex.def)             Requested size: 225.4804pt x 156.10143pt.
-<../Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf, id=1103, 469.755pt x 325.
+<../Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf, id=1107, 469.755pt x 325.
 215pt>
 File: ../Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf Graphic file (type pd
 f)
@@ -1150,7 +1158,7 @@ f)
 Package pdftex.def Info: ../Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf  u
 sed on input line 161.
 (pdftex.def)             Requested size: 225.4804pt x 156.10143pt.
-<../Figures/DurableModel/Baseline_c_periodt_MPC_decomp.pdf, id=1105, 469.755pt 
+<../Figures/DurableModel/Baseline_c_periodt_MPC_decomp.pdf, id=1109, 469.755pt 
 x 325.215pt>
 File: ../Figures/DurableModel/Baseline_c_periodt_MPC_decomp.pdf Graphic file (t
 ype pdf)
@@ -1158,7 +1166,7 @@ ype pdf)
 Package pdftex.def Info: ../Figures/DurableModel/Baseline_c_periodt_MPC_decomp.
 pdf  used on input line 175.
 (pdftex.def)             Requested size: 225.4804pt x 156.10143pt.
-<../Figures/DurableModel/Baseline_d_periodt_MPC_decomp.pdf, id=1106, 469.755pt 
+<../Figures/DurableModel/Baseline_d_periodt_MPC_decomp.pdf, id=1110, 469.755pt 
 x 325.215pt>
 File: ../Figures/DurableModel/Baseline_d_periodt_MPC_decomp.pdf Graphic file (t
 ype pdf)
@@ -1171,14 +1179,14 @@ del/Baseline_d_T.pdf> <../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf> <..
 /Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf>] [20 <../Figures/DurableMode
 l/Baseline_c_periodt_MPC_decomp.pdf> <../Figures/DurableModel/Baseline_d_period
 t_MPC_decomp.pdf>]
-<../Figures/DurableModel/TasteShock_Ss_T.pdf, id=1520, 712.9048pt x 591.72256pt
+<../Figures/DurableModel/TasteShock_Ss_T.pdf, id=1524, 712.9048pt x 591.72256pt
 >
 File: ../Figures/DurableModel/TasteShock_Ss_T.pdf Graphic file (type pdf)
 <use ../Figures/DurableModel/TasteShock_Ss_T.pdf>
 Package pdftex.def Info: ../Figures/DurableModel/TasteShock_Ss_T.pdf  used on i
 nput line 230.
 (pdftex.def)             Requested size: 469.75502pt x 389.9151pt.
-<../Figures/DurableModel/TasteShock_c_periodt_MPC_decomp.pdf, id=1522, 722.7pt 
+<../Figures/DurableModel/TasteShock_c_periodt_MPC_decomp.pdf, id=1526, 722.7pt 
 x 578.16pt>
 File: ../Figures/DurableModel/TasteShock_c_periodt_MPC_decomp.pdf Graphic file 
 (type pdf)
@@ -1186,7 +1194,7 @@ File: ../Figures/DurableModel/TasteShock_c_periodt_MPC_decomp.pdf Graphic file
 Package pdftex.def Info: ../Figures/DurableModel/TasteShock_c_periodt_MPC_decom
 p.pdf  used on input line 242.
 (pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
-<../Figures/DurableModel/TasteShock_d_periodt_MPC_decomp.pdf, id=1523, 722.7pt 
+<../Figures/DurableModel/TasteShock_d_periodt_MPC_decomp.pdf, id=1527, 722.7pt 
 x 578.16pt>
 File: ../Figures/DurableModel/TasteShock_d_periodt_MPC_decomp.pdf Graphic file 
 (type pdf)
@@ -1195,13 +1203,13 @@ Package pdftex.def Info: ../Figures/DurableModel/TasteShock_d_periodt_MPC_decom
 p.pdf  used on input line 248.
 (pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
  [21 <../Figures/DurableModel/TasteShock_Ss_T.pdf>]
-<../Figures/DurableModel/Search_Ss_T.pdf, id=1600, 712.9048pt x 591.72256pt>
+<../Figures/DurableModel/Search_Ss_T.pdf, id=1604, 712.9048pt x 591.72256pt>
 File: ../Figures/DurableModel/Search_Ss_T.pdf Graphic file (type pdf)
 <use ../Figures/DurableModel/Search_Ss_T.pdf>
 Package pdftex.def Info: ../Figures/DurableModel/Search_Ss_T.pdf  used on input
  line 274.
 (pdftex.def)             Requested size: 469.75502pt x 389.9151pt.
-<../Figures/DurableModel/Search_c_periodt_MPC_decomp.pdf, id=1602, 722.7pt x 57
+<../Figures/DurableModel/Search_c_periodt_MPC_decomp.pdf, id=1606, 722.7pt x 57
 8.16pt>
 File: ../Figures/DurableModel/Search_c_periodt_MPC_decomp.pdf Graphic file (typ
 e pdf)
@@ -1209,7 +1217,7 @@ e pdf)
 Package pdftex.def Info: ../Figures/DurableModel/Search_c_periodt_MPC_decomp.pd
 f  used on input line 284.
 (pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
-<../Figures/DurableModel/Search_d_periodt_MPC_decomp.pdf, id=1603, 722.7pt x 57
+<../Figures/DurableModel/Search_d_periodt_MPC_decomp.pdf, id=1607, 722.7pt x 57
 8.16pt>
 File: ../Figures/DurableModel/Search_d_periodt_MPC_decomp.pdf Graphic file (typ
 e pdf)
@@ -1221,13 +1229,13 @@ f  used on input line 290.
 DurableModel/TasteShock_d_periodt_MPC_decomp.pdf>] [23 <../Figures/DurableModel
 /Search_Ss_T.pdf>] [24 <../Figures/DurableModel/Search_c_periodt_MPC_decomp.pdf
 > <../Figures/DurableModel/Search_d_periodt_MPC_decomp.pdf>] [25]
-<../Figures/DurableModel/PriceStd_Ss_T.pdf, id=1953, 712.9048pt x 591.72256pt>
+<../Figures/DurableModel/PriceStd_Ss_T.pdf, id=1957, 712.9048pt x 591.72256pt>
 File: ../Figures/DurableModel/PriceStd_Ss_T.pdf Graphic file (type pdf)
 <use ../Figures/DurableModel/PriceStd_Ss_T.pdf>
 Package pdftex.def Info: ../Figures/DurableModel/PriceStd_Ss_T.pdf  used on inp
 ut line 359.
 (pdftex.def)             Requested size: 399.29463pt x 331.42557pt.
-<../Figures/DurableModel/PriceStd_c_periodt_MPC_decomp.pdf, id=1956, 722.7pt x 
+<../Figures/DurableModel/PriceStd_c_periodt_MPC_decomp.pdf, id=1960, 722.7pt x 
 578.16pt>
 File: ../Figures/DurableModel/PriceStd_c_periodt_MPC_decomp.pdf Graphic file (t
 ype pdf)
@@ -1235,7 +1243,7 @@ ype pdf)
 Package pdftex.def Info: ../Figures/DurableModel/PriceStd_c_periodt_MPC_decomp.
 pdf  used on input line 369.
 (pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
-<../Figures/DurableModel/PriceStd_d_periodt_MPC_decomp.pdf, id=1957, 722.7pt x 
+<../Figures/DurableModel/PriceStd_d_periodt_MPC_decomp.pdf, id=1961, 722.7pt x 
 578.16pt>
 File: ../Figures/DurableModel/PriceStd_d_periodt_MPC_decomp.pdf Graphic file (t
 ype pdf)
@@ -1243,7 +1251,7 @@ ype pdf)
 Package pdftex.def Info: ../Figures/DurableModel/PriceStd_d_periodt_MPC_decomp.
 pdf  used on input line 375.
 (pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
-<../Figures/DurableModel/PriceCount_c_periodt_MPC_decomp.pdf, id=1958, 722.7pt 
+<../Figures/DurableModel/PriceCount_c_periodt_MPC_decomp.pdf, id=1962, 722.7pt 
 x 578.16pt>
 File: ../Figures/DurableModel/PriceCount_c_periodt_MPC_decomp.pdf Graphic file 
 (type pdf)
@@ -1251,7 +1259,7 @@ File: ../Figures/DurableModel/PriceCount_c_periodt_MPC_decomp.pdf Graphic file
 Package pdftex.def Info: ../Figures/DurableModel/PriceCount_c_periodt_MPC_decom
 p.pdf  used on input line 387.
 (pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
-<../Figures/DurableModel/PriceCount_d_periodt_MPC_decomp.pdf, id=1959, 722.7pt 
+<../Figures/DurableModel/PriceCount_d_periodt_MPC_decomp.pdf, id=1963, 722.7pt 
 x 578.16pt>
 File: ../Figures/DurableModel/PriceCount_d_periodt_MPC_decomp.pdf Graphic file 
 (type pdf)
@@ -1263,14 +1271,14 @@ p.pdf  used on input line 393.
 PriceStd_c_periodt_MPC_decomp.pdf> <../Figures/DurableModel/PriceStd_d_periodt_
 MPC_decomp.pdf> <../Figures/DurableModel/PriceCount_c_periodt_MPC_decomp.pdf> <
 ../Figures/DurableModel/PriceCount_d_periodt_MPC_decomp.pdf>]
-<../Figures/DurableModel/PriceStd_Search_Ss_T.pdf, id=2278, 712.9048pt x 591.72
+<../Figures/DurableModel/PriceStd_Search_Ss_T.pdf, id=2282, 712.9048pt x 591.72
 256pt>
 File: ../Figures/DurableModel/PriceStd_Search_Ss_T.pdf Graphic file (type pdf)
 <use ../Figures/DurableModel/PriceStd_Search_Ss_T.pdf>
 Package pdftex.def Info: ../Figures/DurableModel/PriceStd_Search_Ss_T.pdf  used
  on input line 434.
 (pdftex.def)             Requested size: 399.29463pt x 331.42557pt.
-<../Figures/DurableModel/PriceStd_Search_c_periodt_MPC_decomp.pdf, id=2279, 722
+<../Figures/DurableModel/PriceStd_Search_c_periodt_MPC_decomp.pdf, id=2283, 722
 .7pt x 578.16pt>
 File: ../Figures/DurableModel/PriceStd_Search_c_periodt_MPC_decomp.pdf Graphic 
 file (type pdf)
@@ -1278,7 +1286,7 @@ file (type pdf)
 Package pdftex.def Info: ../Figures/DurableModel/PriceStd_Search_c_periodt_MPC_
 decomp.pdf  used on input line 443.
 (pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
-<../Figures/DurableModel/PriceStd_Search_d_periodt_MPC_decomp.pdf, id=2280, 722
+<../Figures/DurableModel/PriceStd_Search_d_periodt_MPC_decomp.pdf, id=2284, 722
 .7pt x 578.16pt>
 File: ../Figures/DurableModel/PriceStd_Search_d_periodt_MPC_decomp.pdf Graphic 
 file (type pdf)
@@ -1289,7 +1297,7 @@ decomp.pdf  used on input line 449.
  [28] [29 <../Figures/DurableModel/PriceStd_Search_Ss_T.pdf> <../Figures/Durabl
 eModel/PriceStd_Search_c_periodt_MPC_decomp.pdf> <../Figures/DurableModel/Price
 Std_Search_d_periodt_MPC_decomp.pdf>]
-<../Figures/DurableModel/SmoothingShifts_c_periodt.pdf, id=2485, 722.7pt x 578.
+<../Figures/DurableModel/SmoothingShifts_c_periodt.pdf, id=2489, 722.7pt x 578.
 16pt>
 File: ../Figures/DurableModel/SmoothingShifts_c_periodt.pdf Graphic file (type 
 pdf)
@@ -1297,7 +1305,7 @@ pdf)
 Package pdftex.def Info: ../Figures/DurableModel/SmoothingShifts_c_periodt.pdf 
  used on input line 491.
 (pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
-<../Figures/DurableModel/SmoothingShifts_d_periodt.pdf, id=2486, 722.7pt x 578.
+<../Figures/DurableModel/SmoothingShifts_d_periodt.pdf, id=2490, 722.7pt x 578.
 16pt>
 File: ../Figures/DurableModel/SmoothingShifts_d_periodt.pdf Graphic file (type 
 pdf)
@@ -1305,7 +1313,7 @@ pdf)
 Package pdftex.def Info: ../Figures/DurableModel/SmoothingShifts_d_periodt.pdf 
  used on input line 497.
 (pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
-<../Figures/DurableModel/SmoothingShifts_c_MPC_periodt.pdf, id=2487, 722.7pt x 
+<../Figures/DurableModel/SmoothingShifts_c_MPC_periodt.pdf, id=2491, 722.7pt x 
 578.16pt>
 File: ../Figures/DurableModel/SmoothingShifts_c_MPC_periodt.pdf Graphic file (t
 ype pdf)
@@ -1313,7 +1321,7 @@ ype pdf)
 Package pdftex.def Info: ../Figures/DurableModel/SmoothingShifts_c_MPC_periodt.
 pdf  used on input line 508.
 (pdftex.def)             Requested size: 225.4804pt x 180.38342pt.
-<../Figures/DurableModel/SmoothingShifts_d_MPC_periodt.pdf, id=2488, 722.7pt x 
+<../Figures/DurableModel/SmoothingShifts_d_MPC_periodt.pdf, id=2492, 722.7pt x 
 578.16pt>
 File: ../Figures/DurableModel/SmoothingShifts_d_MPC_periodt.pdf Graphic file (t
 ype pdf)
@@ -1325,10 +1333,11 @@ pdf  used on input line 514.
 [30] [31 <../Figures/DurableModel/SmoothingShifts_c_periodt.pdf> <../Figures/Du
 rableModel/SmoothingShifts_d_periodt.pdf> <../Figures/DurableModel/SmoothingShi
 fts_c_MPC_periodt.pdf> <../Figures/DurableModel/SmoothingShifts_d_MPC_periodt.p
-df>]) (Conclusion.tex) [32] (dcegmSearch.bbl [33]) [34] (Appendix.tex
-(ApndxDurableModelBasic.tex [35
+df>] (../Output/DurableModel_Inf_SS.tex) [32] (../Tables/smoothing_euler.tex))
+(Conclusion.tex) (dcegmSearch.bbl [33] [34]) [35] (Appendix.tex
+(ApndxDurableModelBasic.tex [36
 
-] [36] [37] [38]
+] [37] [38] [39]
 Underfull \hbox (badness 10000) in paragraph at lines 249--250
 
  []
@@ -1338,13 +1347,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 267--268
 
  []
 
-[39]
+[40]
 Overfull \hbox (8.76169pt too wide) in paragraph at lines 297--299
 \T1/cmr/m/n/10.95 and the com-bined (marginal) value func-tions fol-low equa-ti
 ons []--[]. When com-put-ing (marginal)
  []
 
-[40] [41]
+[41] [42]
 Overfull \hbox (40.03902pt too wide) in paragraph at lines 362--364
 \T1/cmr/m/n/10.95 mer-i-cally sta-ble form $[]\OMS/cmsy/m/n/10.95 f\OML/cmm/m/i
 t/10.95 v[]; v[]\OMS/cmsy/m/n/10.95 g \OT1/cmr/m/n/10.95 + \OML/cmm/m/it/10.95 
@@ -1358,12 +1367,12 @@ Overfull \hbox (28.48837pt too wide) detected at line 382
 []
  []
 
-[42]
+[43]
 Overfull \hbox (55.55864pt too wide) detected at line 404
 []
  []
 
-[43]
+[44]
 Overfull \hbox (30.68985pt too wide) in paragraph at lines 440--442
 \T1/cmr/m/n/10.95 Define the state- and price-contingent in-di-ca-tors $\U/msb/
 m/n/10.95 1[]\OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 m[]; n[]; p[]\OT1/cmr/m/n/
@@ -1373,29 +1382,29 @@ sb/m/n/10.95 1[]\OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 m[]; n[]; p[]\OT1/cmr/m
 /n/10.95 )$
  []
 
-[44]
+[45]
 Overfull \hbox (11.2661pt too wide) detected at line 457
 []
  []
 
-[45] [46] [47]
+[46] [47] [48]
 Overfull \hbox (12.89024pt too wide) detected at line 583
 []
  []
 
-[48]) [49] [50] (ApndxSmoothnessTheory.tex
-\c@lemma=\count356
-\c@assumption=\count357
- [51
+[49]) [50] [51] (ApndxSmoothnessTheory.tex
+\c@lemma=\count357
+\c@assumption=\count358
+ [52
 
-] [52] [53] [54] [55]
+] [53] [54] [55] [56]
 Overfull \hbox (0.55757pt too wide) in paragraph at lines 449--455
 []\T1/cmr/m/n/10.95 Proposition [][]B.7[][] iden-ti-fies the jump mag-ni-tude w
 ith $\OMS/cmsy/m/n/10.95 jr\OT1/cmr/m/n/10.95 ^^A[]\OMS/cmsy/m/n/10.95 j$\T1/cm
 r/m/n/10.95 , i.e. with the dif-fer-ence in the branches'
  []
 
-[56] [57] [58] [59]
+[57] [58] [59] [60]
 Overfull \hbox (7.22311pt too wide) in paragraph at lines 816--828
 []\T1/cmr/m/n/10.95 Differentiating the en-ve-lope iden-tity $\OML/cmm/m/it/10.
 95 v[] \OT1/cmr/m/n/10.95 = \OML/cmm/m/it/10.95 u[]\OT1/cmr/m/n/10.95 (\OML/cmm
@@ -1406,12 +1415,12 @@ n/10.95 R[] \U/msb/m/n/10.95 E[]\OT1/cmr/m/n/10.95 [\OML/cmm/m/it/10.95 v[]\OT1
 /cmr/m/n/10.95 ] \OMS/cmsy/m/n/10.95 ^^A
  []
 
-[60] [61]
+[61] [62]
 Overfull \hbox (18.14001pt too wide) in paragraph at lines 977--996
  [][] 
  []
 
-[62] [63] [64] [65] [66]
+[63] [64] [65] [66] [67]
 Overfull \hbox (22.00677pt too wide) in paragraph at lines 1320--1328
 []\T1/cmr/m/n/10.95 A quadra-ture rule re-places $[] \OML/cmm/m/it/10.95 h dF$ 
 \T1/cmr/m/n/10.95 by $[][] \OML/cmm/m/it/10.95 ![]h\OT1/cmr/m/n/10.95 (\OML/cmm
@@ -1428,11 +1437,11 @@ m/n/10.95 (\OML/cmm/m/it/10.95 a\OT1/cmr/m/n/10.95 ))\OMS/cmsy/m/n/10.95 g$\T1/
 cmr/m/n/10.95 ,
  []
 
-[67]))
+[68]))
 
 Package natbib Warning: There were undefined citations.
 
-[68] (dcegmSearch.aux)
+[69] (dcegmSearch.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
@@ -1442,13 +1451,13 @@ L3 programming layer <2025-12-24>
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `dcegmSearch.out' has not changed.
-(rerunfilecheck)             Checksum: 43A12318C18DCEF03A3D1C75BFFFDA7C;10229.
+(rerunfilecheck)             Checksum: 7C78B79B7783022BBE9478F2B8FAB220;10371.
  ) 
 Here is how much of TeX's memory you used:
- 26686 strings out of 467871
- 501804 string characters out of 5415956
- 900075 words of memory out of 5000000
- 54486 multiletter control sequences out of 15000+600000
+ 26779 strings out of 467871
+ 504052 string characters out of 5415956
+ 901123 words of memory out of 5000000
+ 54561 multiletter control sequences out of 15000+600000
  664521 words of font info for 154 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,21n,104p,1291b,696s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1484,25 +1493,27 @@ type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/amonninger/AppData/Local/Programs
 ocal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/amonnin
 ger/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/
 Users/amonninger/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/c
-mmib10.pfb><C:/Users/amonninger/AppData/Local/Programs/MiKTeX/fonts/type1/publi
-c/amsfonts/cmextra/cmmib8.pfb><C:/Users/amonninger/AppData/Local/Programs/MiKTe
-X/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/amonninger/AppData/Local/P
-rograms/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/amonninger/Ap
-pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/a
-monninger/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb
-><C:/Users/amonninger/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts
-/cm/cmr8.pfb><C:/Users/amonninger/AppData/Local/Programs/MiKTeX/fonts/type1/pub
-lic/amsfonts/cm/cmsy10.pfb><C:/Users/amonninger/AppData/Local/Programs/MiKTeX/f
-onts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/amonninger/AppData/Local/Prog
-rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/amonninger/AppDa
-ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/euler/eufm10.pfb><C:/Users
-/amonninger/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/m
-sbm10.pfb><C:/Users/amonninger/AppData/Local/Programs/MiKTeX/fonts/type1/public
-/rsfs/rsfs10.pfb><C:/Users/amonninger/AppData/Local/Programs/MiKTeX/fonts/type1
-/public/hoekwater/stmary10.pfb>
-Output written on dcegmSearch.pdf (68 pages, 4417834 bytes).
+mmi9.pfb><C:/Users/amonninger/AppData/Local/Programs/MiKTeX/fonts/type1/public/
+amsfonts/cm/cmmib10.pfb><C:/Users/amonninger/AppData/Local/Programs/MiKTeX/font
+s/type1/public/amsfonts/cmextra/cmmib8.pfb><C:/Users/amonninger/AppData/Local/P
+rograms/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/amonninger/Ap
+pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/
+amonninger/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pf
+b><C:/Users/amonninger/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
+s/cm/cmr7.pfb><C:/Users/amonninger/AppData/Local/Programs/MiKTeX/fonts/type1/pu
+blic/amsfonts/cm/cmr8.pfb><C:/Users/amonninger/AppData/Local/Programs/MiKTeX/fo
+nts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/amonninger/AppData/Local/Progra
+ms/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/amonninger/AppDat
+a/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/amon
+ninger/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><
+C:/Users/amonninger/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/e
+uler/eufm10.pfb><C:/Users/amonninger/AppData/Local/Programs/MiKTeX/fonts/type1/
+public/amsfonts/symbols/msbm10.pfb><C:/Users/amonninger/AppData/Local/Programs/
+MiKTeX/fonts/type1/public/rsfs/rsfs10.pfb><C:/Users/amonninger/AppData/Local/Pr
+ograms/MiKTeX/fonts/type1/public/hoekwater/stmary10.pfb>
+Output written on dcegmSearch.pdf (69 pages, 4449731 bytes).
 PDF statistics:
- 4475 PDF objects out of 5155 (max. 8388607)
- 585 named destinations out of 1000 (max. 500000)
- 590 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 4512 PDF objects out of 5155 (max. 8388607)
+ 589 named destinations out of 1000 (max. 500000)
+ 598 words of extra memory for PDF output out of 10000 (max. 10000000)
 
