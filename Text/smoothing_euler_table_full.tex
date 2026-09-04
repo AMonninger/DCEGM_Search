@@ -1,0 +1,27 @@
+\begin{table}[htbp]
+\centering
+\caption{Period-$t$ kink counts and off-grid Euler residuals along the same four-channel sweep as Figure~\ref{fig:smoothing_shifts_levels}. Residuals are mean and 95th percentile of~\eqref{eq:judd_ee}; constrained points excluded. The $\sigma_p$ adjuster count sums over price nodes.}
+\label{tab:smoothing_euler_full}
+\small
+\begin{tabular}{lcccccccc}
+\hline
+ & \multicolumn{2}{c}{Keeper} & \multicolumn{2}{c}{Adjuster} & \multicolumn{2}{c}{$\mathrm{EE}_c^{\mathrm{keep}}$} & \multicolumn{2}{c}{$\mathrm{EE}_d^{\mathrm{adj}}$} \\
+\cline{2-3}\cline{4-5}\cline{6-7}\cline{8-9}
+Specification & Decr.\ seg. & Share & Kinks rem. & Share & Mean & P95 & Mean & P95 \\
+\hline
+Hard max & 9 & 0.076 & 30 & 0.246 & -4.14 & -2.38 & -3.10 & 0.17 \\
+$\sigma_{\varepsilon} = 0.05$ & 0 & 0 & 0 & 0 & -4.23 & -3.32 & -2.82 & 0.55 \\
+$\sigma_{\varepsilon} = 0.1$ & 0 & 0 & 0 & 0 & -4.39 & -3.39 & -2.97 & 0.76 \\
+$\sigma_{\varepsilon} = 0.2$ & 0 & 0 & 0 & 0 & -4.52 & -3.45 & -3.06 & 0.85 \\
+$S = 0.1$ & 0 & 0 & 0 & 0 & -4.15 & -3.23 & -3.00 & 0.27 \\
+$S = 0.2$ & 0 & 0 & 0 & 0 & -4.29 & -3.29 & -3.11 & 0.20 \\
+$S = 0.3$ & 0 & 0 & 0 & 0 & -4.37 & -3.33 & -3.20 & 0.17 \\
+$\sigma_{p} = 0.05$ & 0 & 0 & 61 & 0.117 & -4.02 & -2.90 & -2.91 & 0.35 \\
+$\sigma_{p} = 0.1$ & 0 & 0 & 63 & 0.121 & -4.06 & -2.95 & -2.92 & 0.59 \\
+$\sigma_{p} = 0.2$ & 0 & 0 & 107 & 0.204 & -4.20 & -3.03 & -2.90 & 0.93 \\
+$\sigma_{\eta} = 0.1$ & 0 & 0 & 0 & 0 & -4.20 & -3.30 & -2.77 & 0.63 \\
+$\sigma_{\eta} = 0.2$ & 0 & 0 & 0 & 0 & -4.23 & -3.32 & -2.82 & 0.55 \\
+$\sigma_{\eta} = 0.4$ & 0 & 0 & 0 & 0 & -4.23 & -3.24 & -2.79 & 0.77 \\
+\hline
+\end{tabular}
+\end{table}

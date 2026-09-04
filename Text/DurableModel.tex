@@ -455,7 +455,7 @@ Using a combination of endogeneous search and stochastic prices can smooth polic
 \end{figure}
 
 
-\subsection{Comparing smoothness mechanisms}\label{subsec:ModelBasicSmoothingCompare}
+\subsection{Comparing smoothness mechanisms: Lifecycle}\label{subsec:ModelBasicSmoothingCompare}
 
 As in the retirement application of Section~\ref{sec:RetirementModel}, each of the mechanisms above---EV Type~I taste shocks $\sigma_\varepsilon$, search frictions $S$, durable-price dispersion $\sigma_p$, and transitory income risk $\sigma_\eta$---can smooth the discontinuities that arise from the hard keep-versus-adjust margin. It is therefore natural to ask whether they also shift the combined decision rules in economically distinct directions, as taste shocks and search frictions do for the worker's consumption function.
 
@@ -519,7 +519,7 @@ The retirement contrast is immediate. There, lowering the probability of a succe
 	\label{fig:smoothing_shifts_mpcs}
 \end{figure}
 
-\subsection{Infinite horizon}
+\subsection{Comparing smoothness mechanisms: Infinite horizon}
 \label{subsec:ModelBasicInf}
 
 The comparisons above are period-$t$ objects on a fixed beginning-of-period durable stock. I next ask how the same three discrete-choice smoothers---EV taste shocks $\sigma_\varepsilon$, search frictions $S$, and durable-price dispersion $\sigma_p$---shape the \emph{stationary} economy. For each channel I solve the infinite-horizon problem with that smoother active and the other two shut off, using the same magnitudes as in Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs}. Given the converged policies, I build the transition matrix over the joint $(n,m)$ histogram grid, compute the ergodic distribution, and report aggregate steady-state nondurable consumption $C$, durable stock $D$, durable expenditure $\mathrm{DEX}$, total expenditure $\mathrm{TEX}$, liquid assets $A$, and the adjustment probability $\mathrm{ADJ}$.
@@ -535,9 +535,10 @@ I also compute sequence-space Jacobians of these aggregates with respect to the 
 \end{table}
 
 \paragraph{Results.}
-\emph{[Placeholder: discuss how steady-state aggregates and labor MPCs vary across $\sigma_\varepsilon$, $S$, and $\sigma_p$.]}
 
-\subsection{Kinks and Euler residuals}
+All numerical smoothing mechanisms also smooth consumption policy functions. As a result, both the steady state non-durable consumption, and durable expenditure reduce with higher smoothing intensity. The flip site are slightly larger asset holdings. One key divergence is the share of adjuster. A larger taste shock leads to more households who exogenously want to adjust. For prices, we get a larger share as well, but for a different reason. Higher price dispersion lead to cheaper durable goods and hence, households who draw a lucky price draw adjust more frequently. The opposite is true for search. With a higher search friction, households start searching earlier, but the intensity reduces which leads to a lower share of adjusters. Therefore, when we want to target MPC or MPX, all three measures lead to a dampened number. But when we also want to target the share of adjusters, taste and price shocks lead to the opposite effect of search frictions.
+
+\paragraph{Kinks and Euler residuals}
 \label{subsec:ModelBasicEuler}
 
 Table~\ref{tab:smoothing_kinks} records cleanliness of the raw EGM cloud. The object that is stored and plotted is an interpolant of the refined cloud, so a zero deletion count does not by itself establish that the computed rule solves the problem that was posed. A policy mixed over dominated Euler roots can look as smooth as one whose envelope has nothing left to delete. I therefore pair the kink counts with off-grid Euler residuals in the sense of \citet{Judd1992-sp}. For an unconstrained continuous choice $c$ with implied Euler consumption $c^{\mathrm{impl}}$,
@@ -554,7 +555,7 @@ More negative is more accurate: $-4$ is a $0.01\%$ consumption error, $-3$ a $0.
 
 Table~\ref{tab:smoothing_euler} places both diagnostics in the same period as Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs}, now for every listed magnitude of $\sigma_\varepsilon$, $S$, and $\sigma_p$. For the keeper the computational claim holds. Decreasing segments are zero at all three taste and search values, and $\mathrm{EE}_c^{\mathrm{keep}}$ improves with the smoother: the hard-max mean and 95th percentile are $-4.19$ and $-2.50$; at $\sigma_\varepsilon=0.2$ they are $-4.52$ and $-3.39$, and at $S=0.3$ they are $-4.42$ and $-3.24$. The smoother combined consumption rule is not an average over dominated keeper roots. Price dispersion likewise zeros the keeper count at all three $\sigma_p$, with only a small deterioration in the mean (from $-4.11$ at $\sigma_p=0.05$ to $-4.00$ at $0.2$).
 
-For the adjuster the deletion count is not enough. Taste and search eliminate FUES removals at every listed magnitude, but the 95th percentile of $\mathrm{EE}_d^{\mathrm{adj}}$ remains positive---$0.45$ to $0.69$ as $\sigma_\varepsilon$ rises, $0.27$ to $0.22$ as $S$ rises---while the mean stays around $-3$. Raising the smoother does not repair the tail. Price dispersion continues to remove points ($20$, $17$, $34$ as $\sigma_p$ increases) and has a similar tail. Cleanliness of the raw FOC cloud is not the same as accuracy of the stored $(c,d)$ interpolant, so FUES is not shown to be redundant by the deletion count alone. Taste, search, and prices are different economies and are not ranked by residual size; the residuals certify internal accuracy of each specification, not proximity to the frictionless target.
+For the adjuster the deletion count is not enough. Taste and search eliminate FUES removals at every listed magnitude, but the 95th percentile of $\mathrm{EE}_d^{\mathrm{adj}}$ remains positive---$0.45$ to $0.69$ as $\sigma_\varepsilon$ rises, $0.27$ to $0.22$ as $S$ rises---while the mean stays around $-3$. Raising the smoother does not repair the tail. Price dispersion continues to remove points ($20$, $17$, $34$ as $\sigma_p$ increases) and has a similar tail. Cleanliness of the raw FOC cloud is not the same as accuracy of the stored $(c,d)$ interpolant, so FUES is not shown to be redundant by the deletion count alone. Taste, search, and prices are different economies and are not ranked by residual size; the residuals certify internal accuracy of each specification, not proximity to the frictionless target. Table~\ref{tab:smoothing_euler_inf} reports the same kink and Euler diagnostics for the infinite-horizon stationary policies of Section~\ref{subsec:ModelBasicInf}.
 
 \begin{table}[htbp]
 \centering
@@ -562,4 +563,12 @@ For the adjuster the deletion count is not enough. Taste and search eliminate FU
 \label{tab:smoothing_euler}
 \small
 \input{../Tables/smoothing_euler}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Infinite-horizon kink counts and Euler residuals under the same $\sigma_\varepsilon$, $S$, and $\sigma_p$ sweep as Figure~\ref{fig:smoothing_shifts_levels} and Table~\ref{tab:inf_ss}. Each channel is varied with the other two shut off. Residuals are mean and 95th percentile of~\eqref{eq:judd_ee} on an off-grid test mesh evaluated at the stationary policy; constrained points excluded. The $\sigma_p$ adjuster kink count sums over price nodes.}
+\label{tab:smoothing_euler_inf}
+\small
+\input{../Tables/smoothing_euler_Inf}
 \end{table}
