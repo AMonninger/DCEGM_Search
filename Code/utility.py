@@ -1014,7 +1014,7 @@ from numba import njit
 import copy
 
 
-@njit
+@njit(cache=True)
 def append_push(x_array, m):
     """ Delete first value of array,
         pushes back index of all undeleted
@@ -1027,7 +1027,7 @@ def append_push(x_array, m):
     return x_array
 
 
-@njit
+@njit(cache=True)
 def back_scan_gradients(m_array, a_prime, vf_full, e_grid, j, q):
     """ Compute gradients of value correspondence points
         and policy points with respect to all m values and policy
@@ -1048,7 +1048,7 @@ def back_scan_gradients(m_array, a_prime, vf_full, e_grid, j, q):
     return gradients_m_vf, gradients_m_a
 
 
-@njit
+@njit(cache=True)
 def fwd_scan_gradients(a_prime, vf_full, e_grid, j, q, LB):
     """ Computes gradients of value correspondence points
         and  policy points with respect to values and policy
@@ -1068,7 +1068,7 @@ def fwd_scan_gradients(a_prime, vf_full, e_grid, j, q, LB):
     return gradients_f_vf, gradients_f_a
 
 
-@njit
+@njit(cache=True)
 def perp(a):
     """ Finds perpendicilar line to 1D line
 
@@ -1090,7 +1090,7 @@ def perp(a):
     return b
 
 
-@njit
+@njit(cache=True)
 def seg_intersect(a1, a2, b1, b2):
     """ Intersection of two 1D line segments
 
@@ -1359,7 +1359,7 @@ def _scan(e_grid, vf, c, a_prime, m_bar, LB, fwd_scan_do=True):
 
 
 
-@njit
+@njit(cache=True)
 def FUES_allPol(e_grid, vf, c, a_prime, d_prime, b=1e-10, m_bar=2, LB=10):
     """
     FUES function returns refined EGM grid, value function and
@@ -1457,7 +1457,7 @@ def FUES_allPol(e_grid, vf, c, a_prime, d_prime, b=1e-10, m_bar=2, LB=10):
         dela
 
 
-@njit
+@njit(cache=True)
 def _scan_allPol(e_grid, vf, c, a_prime, d_prime, m_bar, LB, fwd_scan_do=True):
     """" Implements the scan for FUES"""
 

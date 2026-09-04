@@ -304,6 +304,8 @@ class DurableConsumerSolution(MetricObject):
         dFuncAdj_1d=None,
         cFuncAdj_1d_list=None,
         dFuncAdj_1d_list=None,
+        inv_vFuncKeep=None,
+        inv_vFuncAdj_1d_list=None,
         adjusting_arr=None,
         cFunc_arr=None,
         dFunc_arr=None,
@@ -358,6 +360,9 @@ class DurableConsumerSolution(MetricObject):
         # All price-node-specific 1-D adjuster policies
         self.cFuncAdj_1d_list = cFuncAdj_1d_list
         self.dFuncAdj_1d_list = dFuncAdj_1d_list
+        # Conditional values: keeper on (n,m), adjuster 1-D on liquidity x
+        self.inv_vFuncKeep = inv_vFuncKeep
+        self.inv_vFuncAdj_1d_list = inv_vFuncAdj_1d_list
         self.adjusting_arr = adjusting_arr
         self.cFunc_arr = cFunc_arr
         self.dFunc_arr = dFunc_arr
@@ -403,7 +408,7 @@ durable_defaults = dict(
     alpha=0.75,
     d_ubar=1e-4,
     dDepr=0.05,
-    adjC=0.3,
+    adjC=0.15,
     MaintCost=0.0,
     OpCost=0.0,
     Rfree=1.04 ** (0.25),
@@ -466,6 +471,7 @@ durable_defaults = dict(
     cycles=1,
     T_cycle=1,       # number of periods before terminal when cycles >= 1
     tol=1e-6,        # infinite-horizon convergence tolerance (matches background)
+    min_cycles=0,    # minimum iterations before accepting convergence (cycles=0)
     max_cycles=500,  # iteration cap for cycles=0 (matches background max_cycles)
     # Aggregation used for the infinite-horizon convergence distance:
     #   "max"  -> max absolute difference (matches HARK's default behavior)
@@ -504,13 +510,18 @@ class DurableConsumer:
         the terminal (solution has ``T_cycle + 1`` entries; ``solution[-1]`` is
         terminal). ``cycles = 0`` solves the infinite horizon: the one-period
         operator is iterated from the terminal seed until the solution
-        ``distance`` falls below ``tol`` (or ``max_cycles`` iterations are
-        reached).
+        ``distance`` falls below ``tol`` after at least ``min_cycles``
+        iterations (or ``max_cycles`` iterations are reached).
     T_cycle : int
         Number of periods before the terminal when ``cycles >= 1``
         (T_cycle=1 solves T-1 and T).
     tol : float
         Convergence tolerance for the infinite-horizon iteration (cycles=0).
+    min_cycles : int
+        Minimum number of iterations before convergence is accepted when
+        ``cycles=0``. Use e.g. ``min_cycles=200`` to force a burn-in even if
+        the distance falls below ``tol`` earlier. Must satisfy
+        ``0 <= min_cycles <= max_cycles``.
     max_cycles : int
         Maximum number of iterations for the infinite-horizon iteration.
     distance_metric : str
@@ -606,6 +617,130 @@ class DurableConsumer:
         return np.ones_like(np.asarray(x, dtype=float)) * self.tau
 
     # --------------------------------------------------------------- setup
+    @staticmethod
+    def _as_scalar(x):
+        """First element if ``x`` is a sequence; otherwise ``x`` itself."""
+        if isinstance(x, (list, tuple, np.ndarray)):
+            return x[0]
+        return x
+
+    def _build_inc_shk(
+        self,
+        labor=None,
+        taxrate=None,
+        wage=None,
+        UnempPrb=None,
+        IncUnemp=None,
+        PermShkStd=None,
+        TranShkStd=None,
+    ):
+        """Build one ``HANKIncShkDstn_Truncated`` for the given income parameters."""
+        labor = self._as_scalar(self.labor if labor is None else labor)
+        taxrate = self._as_scalar(self.taxrate if taxrate is None else taxrate)
+        wage = self._as_scalar(self.wage if wage is None else wage)
+        UnempPrb = self._as_scalar(self.UnempPrb if UnempPrb is None else UnempPrb)
+        IncUnemp = self._as_scalar(self.IncUnemp if IncUnemp is None else IncUnemp)
+        PermShkStd = self._as_scalar(self.PermShkStd if PermShkStd is None else PermShkStd)
+        TranShkStd = self._as_scalar(self.TranShkStd if TranShkStd is None else TranShkStd)
+        return HANKIncShkDstn_Truncated(
+            sigma_Perm=PermShkStd,
+            sigma_Tran=TranShkStd,
+            n_approx_Perm=self.PermShkCount if PermShkStd > 0.0 else 1,
+            n_approx_Tran=self.TranShkCount if TranShkStd > 0.0 else 1,
+            UnempPrb=UnempPrb,
+            IncUnemp=IncUnemp,
+            taxrate=taxrate,
+            TranShkMean_Func=TranShkMean_Func,
+            labor=labor,
+            wage=wage,
+            truncation=self.truncation,
+            neutral_measure=False,
+        )
+
+    def _activate_income(self, shk, prob_grid=None):
+        """
+        Install ``shk`` as the active single-period income distribution used by
+        ``_end_of_period`` / ``solve_one_period``. Optionally install
+        ``prob_grid`` when ``use_TransitionMatrix`` is True.
+        """
+        if not hasattr(shk, "pmv"):
+            raise TypeError(
+                "_activate_income expects a single DiscreteDistribution with .pmv, "
+                f"got {type(shk)!r}."
+            )
+        self.IncShkDstn = shk
+        self.ShkPrbsNext = shk.pmv
+        self.PermShkValsNext = shk.atoms[0]
+        self.TranShkValsNext = shk.atoms[1]
+        self.PermShkValsNext_only = np.unique(self.PermShkValsNext)
+        self.ShkPrbsNext_PermShk = (
+            np.ones_like(self.PermShkValsNext_only) / len(self.PermShkValsNext_only)
+        )
+        self.TranShkMinNext = float(np.min(self.TranShkValsNext))
+        self.PermShkMinNext = float(np.min(self.PermShkValsNext))
+        if self.use_TransitionMatrix and prob_grid is not None:
+            self.probGrid_income = prob_grid
+
+    def _ensure_income_tran_grids(self, shk):
+        """Build ``mNrmGrid_income`` / ``bNrmGrid_income`` sized from ``shk``."""
+        PermShkMin = float(np.min(shk.atoms[0]))
+        TranShkMax = float(np.max(shk.atoms[1]))
+        mNrmMax_income = (
+            self.Rfree / (self.PermGroFac * PermShkMin) * self.aXtraMax + TranShkMax
+        )
+        self.mNrmGrid_income = np.asarray(
+            make_grid_exp_mult(0.0001, mNrmMax_income, self.TranMatrix_mCount, timestonest=1)
+        ).flatten()
+        self.bNrmGrid_income = np.asarray(
+            make_grid_exp_mult(0.0, mNrmMax_income - 1.0, self.TranMatrix_bCount, timestonest=1)
+        ).flatten()
+
+    def _build_prob_grid_income(
+        self,
+        shk,
+        labor=None,
+        taxrate=None,
+        wage=None,
+        UnempPrb=None,
+        IncUnemp=None,
+        TranShkStd=None,
+    ):
+        """
+        Build one ``probGrid_income`` lottery for ``shk`` / income scalars.
+
+        Requires ``mNrmGrid_income`` and ``bNrmGrid_income`` to already exist
+        (call ``_ensure_income_tran_grids`` first). Grids are held fixed across
+        a finite-horizon labor path so only the lottery changes with labor.
+        """
+        labor = self._as_scalar(self.labor if labor is None else labor)
+        taxrate = self._as_scalar(self.taxrate if taxrate is None else taxrate)
+        wage = self._as_scalar(self.wage if wage is None else wage)
+        UnempPrb = self._as_scalar(self.UnempPrb if UnempPrb is None else UnempPrb)
+        IncUnemp = self._as_scalar(self.IncUnemp if IncUnemp is None else IncUnemp)
+        TranShkStd = self._as_scalar(self.TranShkStd if TranShkStd is None else TranShkStd)
+        TranShkMin = float(np.min(shk.atoms[1]))
+        mu_transformed = (
+            (1.0 - UnempPrb * IncUnemp) / (1.0 - UnempPrb)
+            if UnempPrb < 1.0
+            else 1.0
+        )
+        b_mesh, m_mesh = np.meshgrid(
+            self.bNrmGrid_income, self.mNrmGrid_income, indexing="ij"
+        )
+        diff_grid = m_mesh - b_mesh
+        z = TranShkMean_Func(taxrate, labor, wage)
+        return update_prob_grid_list_with_trunc(
+            1,
+            diff_grid,
+            np.array([TranShkStd]),
+            np.array([UnempPrb]),
+            np.array([IncUnemp if UnempPrb > 0 else 1e-12]),
+            np.array([mu_transformed]),
+            np.array([TranShkMin]),
+            np.array([z]),
+            self.IncUnemp_Std,
+        )[0]
+
     def update(self):
         """Build grids, shock distributions, income process, and search cost."""
         # Price shocks
@@ -642,65 +777,15 @@ class DurableConsumer:
             np.ones_like(self.xNrmGrid) * self.SearchCost, [self.xNrmGrid]
         )
 
-        # Income
-        self.IncShkDstn = HANKIncShkDstn_Truncated(
-            sigma_Perm=self.PermShkStd,
-            sigma_Tran=self.TranShkStd,
-            n_approx_Perm=self.PermShkCount if self.PermShkStd > 0.0 else 1,
-            n_approx_Tran=self.TranShkCount if self.TranShkStd > 0.0 else 1,
-            UnempPrb=self.UnempPrb,
-            IncUnemp=self.IncUnemp,
-            taxrate=self.taxrate,
-            TranShkMean_Func=TranShkMean_Func,
-            labor=self.labor,
-            wage=self.wage,
-            truncation=self.truncation,
-            neutral_measure=False,
-        )
-        self.ShkPrbsNext = self.IncShkDstn.pmv
-        self.PermShkValsNext = self.IncShkDstn.atoms[0]
-        self.TranShkValsNext = self.IncShkDstn.atoms[1]
-        self.PermShkValsNext_only = np.unique(self.PermShkValsNext)
-        self.ShkPrbsNext_PermShk = (
-            np.ones_like(self.PermShkValsNext_only) / len(self.PermShkValsNext_only)
-        )
-        self.TranShkMinNext = float(np.min(self.TranShkValsNext))
-        self.PermShkMinNext = float(np.min(self.PermShkValsNext))
+        # Income (single-period SS representation)
+        shk = self._build_inc_shk()
+        self._activate_income(shk)
+        self.IncShkDstn_path = None
+        self.probGrid_income_path = None
 
         if self.use_TransitionMatrix:
-            mNrmMax_income = (
-                self.Rfree
-                / (self.PermGroFac * self.PermShkMinNext)
-                * self.aXtraMax
-                + float(np.max(self.TranShkValsNext))
-            )
-            self.mNrmGrid_income = np.asarray(
-                make_grid_exp_mult(0.0001, mNrmMax_income, self.TranMatrix_mCount, timestonest=1)
-            ).flatten()
-            self.bNrmGrid_income = np.asarray(
-                make_grid_exp_mult(0.0, mNrmMax_income - 1.0, self.TranMatrix_bCount, timestonest=1)
-            ).flatten()
-            mu_transformed = (
-                (1.0 - self.UnempPrb * self.IncUnemp) / (1.0 - self.UnempPrb)
-                if self.UnempPrb < 1.0
-                else 1.0
-            )
-            b_mesh, m_mesh = np.meshgrid(
-                self.bNrmGrid_income, self.mNrmGrid_income, indexing="ij"
-            )
-            diff_grid = m_mesh - b_mesh
-            z = TranShkMean_Func(self.taxrate, self.labor, self.wage)
-            self.probGrid_income = update_prob_grid_list_with_trunc(
-                1,
-                diff_grid,
-                np.array([self.TranShkStd]),
-                np.array([self.UnempPrb]),
-                np.array([self.IncUnemp if self.UnempPrb > 0 else 1e-12]),
-                np.array([mu_transformed]),
-                np.array([self.TranShkMinNext]),
-                np.array([z]),
-                self.IncUnemp_Std,
-            )[0]
+            self._ensure_income_tran_grids(shk)
+            self.probGrid_income = self._build_prob_grid_income(shk)
         else:
             self.mNrmGrid_income = None
             self.bNrmGrid_income = None
@@ -845,6 +930,16 @@ class DurableConsumer:
             LinearFast((1.0 - alpha) * self.xNrmGrid / p0, [self.xNrmGrid])
             for p0 in PriceShkVals
         ]
+        inv_vFuncKeep_T = LinearFast(inv_vFuncKeep_T_arr, [nNrmGrid_T, mNrmGrid_T])
+        inv_vAdj_1d_list_T = [
+            LinearFast(
+                self.CRRAutility_inv(
+                    alpha * self.xNrmGrid, (1.0 - alpha) * self.xNrmGrid / p0
+                ),
+                [self.xNrmGrid],
+            )
+            for p0 in PriceShkVals
+        ]
         sol = DurableConsumerSolution(
             cFunc=cFunc_T,
             dFunc=dFunc_T,
@@ -864,6 +959,8 @@ class DurableConsumer:
             dFuncAdj_1d=LinearFast(d_1d, [self.xNrmGrid]),
             cFuncAdj_1d_list=c_1d_list,
             dFuncAdj_1d_list=d_1d_list,
+            inv_vFuncKeep=inv_vFuncKeep_T,
+            inv_vFuncAdj_1d_list=inv_vAdj_1d_list_T,
             adjusting_arr=adjusting_T_arr,
             cFunc_arr=cFunc_T_arr,
             dFunc_arr=dFunc_T_arr,
@@ -1143,12 +1240,15 @@ class DurableConsumer:
 
             cKeep_upper = np.full_like(mKeep_upper, np.nan)
             for k, c_segm in enumerate(c_segments):
-                if start[-1] + 1 == len(mKeep_egm):
+                # Background DCEGM special case: last nondecreasing segment is a
+                # singleton tip (start[-1] == n-1). Reuse segment 0 only when it
+                # has enough nodes for LinearFast (>=2); otherwise fall through.
+                if start[-1] + 1 == len(mKeep_egm) and len(m_segments[0]) >= 2:
                     cKeep_upper = LinearFast(c_segments[0], [m_segments[0]])(mKeep_upper)
                     break
                 elif len(m_segments[k]) == 1:
                     cKeep_upper[inds_upper == k] = c_segm
-                else:
+                elif len(m_segments[k]) >= 2:
                     cKeep_upper[inds_upper == k] = LinearFast(c_segm, [m_segments[k]])(
                         mKeep_upper[inds_upper == k]
                     )
@@ -1158,6 +1258,9 @@ class DurableConsumer:
                 m_interp = np.insert(mKeep_upper, 0, BoroCnstNat)
             else:
                 c_interp, m_interp = cKeep_upper, mKeep_upper
+            if len(np.asarray(m_interp)) < 2 or not np.any(np.isfinite(c_interp)):
+                c_interp = np.array([0.0, 1.0])
+                m_interp = np.array([BoroCnstNat, 1.0])
             cFuncKeepList.append(LinearFast(c_interp, [m_interp]))
 
         keep_shape = (len(nNrmGrid), len(mNrmGrid))
@@ -1443,6 +1546,7 @@ class DurableConsumer:
             dFuncAdj=dFuncAdj_NM,
             cFuncAdj_list=cFuncAdj_list,
             dFuncAdj_list=dFuncAdj_list,
+            inv_vFuncAdj_1d_list=inv_vFuncAdj_1d_list,
             xAdj_pre_list=xAdj_pre_list,
             cAdj_pre_list=cAdj_pre_list,
             dAdj_pre_list=dAdj_pre_list,
@@ -1545,6 +1649,8 @@ class DurableConsumer:
             dFuncAdj_1d=adj["dFuncAdj_list"][i_p0],
             cFuncAdj_1d_list=adj["cFuncAdj_list"],
             dFuncAdj_1d_list=adj["dFuncAdj_list"],
+            inv_vFuncKeep=keep["inv_vFuncKeep"],
+            inv_vFuncAdj_1d_list=adj["inv_vFuncAdj_1d_list"],
             adjusting_arr=adjusting_arr,
             cFunc_arr=cFunc_arr,
             dFunc_arr=dFunc_arr,
@@ -1641,11 +1747,13 @@ class DurableConsumer:
 
         Infinite horizon (``cycles == 0``): iterates the one-period operator
         from the terminal seed until the convergence distance falls below
-        ``self.tol`` or ``self.max_cycles`` is reached. The distance aggregates
-        the differences of the solution ``distance_criteria`` according to
+        ``self.tol`` *and* at least ``self.min_cycles`` iterations have run,
+        or until ``self.max_cycles`` is reached. The distance aggregates the
+        differences of the solution ``distance_criteria`` according to
         ``self.distance_metric`` ("max", "mse", or "rmse"). Sets
         ``self.solution`` to a single-element list holding the converged (limit)
-        solution.
+        solution, and stores ``self.distance`` (final scalar distance) and
+        ``self.completed_cycles`` (number of iterations performed).
         """
         self.update()
         if not self.analytic_terminal and self.solution_terminal is not None:
@@ -1655,8 +1763,16 @@ class DurableConsumer:
             self.solution_terminal = terminal
 
         if int(self.cycles) == 0:
+            min_cycles = int(getattr(self, "min_cycles", 0))
+            max_cycles = int(self.max_cycles)
+            if min_cycles < 0:
+                raise ValueError(f"min_cycles must be >= 0; got {min_cycles}")
+            if min_cycles > max_cycles:
+                raise ValueError(
+                    f"min_cycles ({min_cycles}) cannot exceed max_cycles ({max_cycles})"
+                )
             prev = terminal
-            for it in range(int(self.max_cycles)):
+            for it in range(max_cycles):
                 sol = self.solve_one_period(prev)
                 dist = self._solution_distance(sol, prev)
                 ###
@@ -1667,13 +1783,18 @@ class DurableConsumer:
                     f"Infinite-horizon iter {it}: {self.distance_metric} "
                     f"distance = {dist:.3e}"
                 )
-                if dist < self.tol:
+                # it is 0-based; completed count after this step is it + 1
+                if dist < self.tol and (it + 1) >= min_cycles:
+                    self.distance = dist
+                    self.completed_cycles = it + 1
                     self._log(f"Converged after {it + 1} iterations (distance {dist:.3e}).")
                     self.solution = [sol]
                     return self.solution
                 prev = sol
+            self.distance = dist
+            self.completed_cycles = max_cycles
             self._log(
-                f"Warning: reached max_cycles={self.max_cycles} without converging "
+                f"Warning: reached max_cycles={max_cycles} without converging "
                 f"(last distance {dist:.3e})."
             )
             self.solution = [prev]
@@ -1693,11 +1814,20 @@ class DurableConsumer:
 
         ``param_path`` maps a parameter name to a list of length ``T_cycle``
         giving that parameter's value in each period (index 0 = earliest period,
-        index T_cycle-1 = the period just before the terminal). Only the
-        "direct" parameters consumed in ``_end_of_period`` are supported.
+        index T_cycle-1 = the period just before the terminal).
+
+        Supports:
+        - "direct" parameters consumed in ``_end_of_period`` (``Rfree``,
+          ``RSpread``, ``DiscFac``, ``PermGroFac``) via set-and-restore;
+        - income-mean parameters in ``_JAC_INCOME`` (currently ``labor``) by
+          precomputing ``IncShkDstn_path[t]`` (and ``probGrid_income_path[t]``
+          when ``use_TransitionMatrix``) and activating period ``t`` before
+          each backward step.
 
         Produces ``self.solution`` of length ``T_cycle + 1`` where
         ``solution[k]`` is period k and ``solution[-1]`` is the terminal seed.
+        Also stores ``self.IncShkDstn_path`` (list of length ``T_cycle``, or
+        ``None`` if no income shock) for ``calc_transition_matrix_dur``.
         """
         self.update()
         if self.solution_terminal is None:
@@ -1706,6 +1836,34 @@ class DurableConsumer:
             )
         T = int(self.T_cycle)
         saved = {k: getattr(self, k) for k in param_path}
+
+        def _path_or_ss(name, t):
+            if name in param_path:
+                return self._as_scalar(param_path[name][t])
+            return self._as_scalar(getattr(self, name))
+
+        # Precompute per-period income objects when an income shock is present.
+        self.IncShkDstn_path = None
+        self.probGrid_income_path = None
+        if any(k in self._JAC_INCOME for k in param_path):
+            IncShkDstn_path = []
+            probGrid_income_path = [] if self.use_TransitionMatrix else None
+            for t in range(T):
+                labor_t = _path_or_ss("labor", t)
+                tax_t = _path_or_ss("taxrate", t)
+                wage_t = _path_or_ss("wage", t)
+                shk_t = self._build_inc_shk(labor=labor_t, taxrate=tax_t, wage=wage_t)
+                IncShkDstn_path.append(shk_t)
+                if self.use_TransitionMatrix:
+                    # Keep m/b grids from update(); only the lottery tracks labor.
+                    probGrid_income_path.append(
+                        self._build_prob_grid_income(
+                            shk_t, labor=labor_t, taxrate=tax_t, wage=wage_t
+                        )
+                    )
+            self.IncShkDstn_path = IncShkDstn_path
+            self.probGrid_income_path = probGrid_income_path
+
         sols = [self.solution_terminal]
         try:
             # Backward step j produces period index (T-1-j): j=0 -> period T-1.
@@ -1713,10 +1871,25 @@ class DurableConsumer:
                 period = T - 1 - j
                 for k, path in param_path.items():
                     setattr(self, k, path[period])
+                if self.IncShkDstn_path is not None:
+                    prob_t = (
+                        self.probGrid_income_path[period]
+                        if self.probGrid_income_path is not None
+                        else None
+                    )
+                    self._activate_income(self.IncShkDstn_path[period], prob_t)
                 sols.insert(0, self.solve_one_period(sols[0]))
         finally:
             for k, v in saved.items():
                 setattr(self, k, v)
+            # Restore SS income on the agent (paths remain for transition matrices).
+            shk_ss = self._build_inc_shk()
+            prob_ss = (
+                self._build_prob_grid_income(shk_ss)
+                if self.use_TransitionMatrix
+                else None
+            )
+            self._activate_income(shk_ss, prob_ss)
         self.solution = sols
         return self.solution
 
@@ -1810,20 +1983,44 @@ class DurableConsumer:
             dexPol=dexPol, texPol=texPol, TranMatrix=TranMatrix,
         )
 
+    def _resolve_period_shk(self, k, shk_dstn=None):
+        """
+        Income distribution for period ``k`` of a finite-horizon transition.
+
+        Resolution order:
+        1. ``shk_dstn[k]`` if ``shk_dstn`` is a sequence of distributions;
+        2. ``shk_dstn`` if it is a single distribution (broadcast);
+        3. ``self.IncShkDstn_path[k]`` if a path was stored by
+           ``_solve_perturbed_finite``;
+        4. ``self.IncShkDstn`` (steady-state single distribution).
+        """
+        if shk_dstn is not None:
+            if hasattr(shk_dstn, "pmv"):
+                return shk_dstn
+            return shk_dstn[k]
+        path = getattr(self, "IncShkDstn_path", None)
+        if path is not None:
+            return path[k]
+        return self.IncShkDstn
+
     def calc_transition_matrix_dur(self, shk_dstn=None):
         """
         Evaluate solved policies on the histogram grid and build the transition
         matrix. For ``cycles=0`` a single matrix is stored; for the finite case a
         list over ``T_cycle`` periods is stored.
 
+        Finite-horizon periods use the period-specific income distribution from
+        ``IncShkDstn_path`` (or ``shk_dstn[k]``) when available, so a labor
+        impulse at period ``k`` enters both policy and the transition lottery.
+
         No CarCrash channel and no Harmenberg neutral measure in the simplified
         port (default has degenerate permanent shocks).
         """
-        if shk_dstn is None:
-            shk_dstn = self.IncShkDstn
-
         if int(self.cycles) == 0:
-            out = self._tran_matrix_one_period(self.solution[0], shk_dstn)
+            shk = shk_dstn if shk_dstn is not None else self.IncShkDstn
+            if not hasattr(shk, "pmv"):
+                shk = shk[0]
+            out = self._tran_matrix_one_period(self.solution[0], shk)
             self.cPol_Grid = out["cPol"]
             self.dPol_Grid = out["dPol"]
             self.aPol_Grid = out["aPol"]
@@ -1840,7 +2037,8 @@ class DurableConsumer:
             self.texPol_Grid = []
             self.tran_matrix = []
             for k in range(int(self.T_cycle)):
-                out = self._tran_matrix_one_period(self.solution[k], shk_dstn)
+                shk_k = self._resolve_period_shk(k, shk_dstn)
+                out = self._tran_matrix_one_period(self.solution[k], shk_k)
                 self.cPol_Grid.append(out["cPol"])
                 self.dPol_Grid.append(out["dPol"])
                 self.aPol_Grid.append(out["aPol"])
@@ -1890,17 +2088,19 @@ class DurableConsumer:
         self.DEX_ss = self.dex_ss.flatten() @ ss_dstn
         self.TEX_ss = self.C_ss + self.DEX_ss
         self.ADJ_ss = self.adj_ss.flatten() @ ss_dstn
+        self._ss_method = "interp"
 
         return self.A_ss, self.C_ss, self.D_ss, self.DEX_ss, self.TEX_ss, self.ADJ_ss
 
     # --------------------------------------------------- sequence-space Jacobian
-    # Parameters whose Jacobian is currently supported (consumed directly in
-    # _end_of_period, so time variation is handled by set-and-restore).
-    _JAC_SUPPORTED = ("Rfree", "RSpread", "DiscFac", "PermGroFac")
-    # Not implemented yet (need a per-period income process rebuild, or the
-    # newborn/survival distribution which is trivial at LivPrb=1).
+    # Direct parameters: enter ``_end_of_period`` as scalars (set-and-restore).
+    # Income parameters: enter via per-period ``IncShkDstn_path`` rebuild.
+    _JAC_SUPPORTED = ("Rfree", "RSpread", "DiscFac", "PermGroFac", "labor")
+    _JAC_INCOME = ("labor",)
+    # Not implemented yet (need richer income rebuild / LivPrb newborn channel).
     _JAC_NOT_IMPLEMENTED = (
         "LivPrb", "PermShkStd", "TranShkStd", "UnempPrb", "IncUnemp",
+        "taxrate", "wage",
     )
 
     def _params_dict(self):
@@ -1926,8 +2126,13 @@ class DurableConsumer:
         (uses the stored SS policy grids, transition matrix, and ergodic
         distribution). Returns ``(J_C, J_DEX, J_TEX, J_D, J_A, J_ADJ)``.
 
-        Only the "direct" parameters in ``_JAC_SUPPORTED`` are implemented; other
-        shocks print a not-implemented message and return ``None``.
+        Supported shocks (``_JAC_SUPPORTED``):
+        - direct: ``Rfree``, ``RSpread``, ``DiscFac``, ``PermGroFac``
+        - income: ``labor`` (rebuilds ``IncShkDstn_path[t]`` / optional
+          ``probGrid_income_path[t]``; finite-horizon transitions use period-``k``
+          shocks)
+
+        Other shocks print a not-implemented message and return ``None``.
         """
         if shk_param in self._JAC_NOT_IMPLEMENTED:
             print(
@@ -1950,7 +2155,7 @@ class DurableConsumer:
 
         T = int(T)
         dx = self.jac_dx
-        ss_val = getattr(self, shk_param)
+        ss_val = self._as_scalar(getattr(self, shk_param))
 
         # Steady-state objects (single arrays / matrix for cycles=0).
         a_ss = self.aPol_Grid
@@ -2074,6 +2279,387 @@ class DurableConsumer:
                 dstn = tranmat_zeroth @ dstn
             else:
                 dstn = tranmat_ss @ dstn
+            A_t_no_sim[k] = self.aPol_Grid.flatten() @ dstn
+            C_t_no_sim[k] = self.cPol_Grid.flatten() @ dstn
+            D_t_no_sim[k] = self.dPol_Grid.flatten() @ dstn
+            DEX_t_no_sim[k] = self.dexPol_Grid.flatten() @ dstn
+            ADJ_t_no_sim[k] = self.adjPol_Grid.flatten() @ dstn
+
+        J_A.T[0] = (A_t_no_sim - self.A_ss) / dx
+        J_C.T[0] = (C_t_no_sim - self.C_ss) / dx
+        J_D.T[0] = (D_t_no_sim - self.D_ss) / dx
+        J_DEX.T[0] = (DEX_t_no_sim - self.DEX_ss) / dx
+        J_TEX.T[0] = J_C.T[0] + J_DEX.T[0]
+        J_ADJ.T[0] = (ADJ_t_no_sim - self.ADJ_ss) / dx
+
+        return J_C, J_DEX, J_TEX, J_D, J_A, J_ADJ
+
+    # -------------------------------------------- cond SS / Jacobian (search)
+    def _nm_dist_mesh(self):
+        n = np.asarray(self.dist_nGrid, dtype=float)
+        m = np.asarray(self.dist_mGrid, dtype=float)
+        n_aux = np.repeat(n[:, None], len(m), axis=1)
+        m_aux = np.tile(m, (len(n), 1))
+        return n, m, n_aux, m_aux
+
+    def _tran_matrix_from_pols(self, cPol, dPol, aPol, shk):
+        """Sparse transition matrix from mixed policies on the histogram grid."""
+        dist_nGrid, dist_mGrid = self.dist_nGrid, self.dist_mGrid
+        R_vec = np.where(aPol < 0, self.Rfree + self.RSpread, self.Rfree)
+        bNext = (R_vec * aPol) - dPol * (self.OpCost + self.dDepr * self.MaintCost)
+        nNext_unshocked = (1.0 - self.dDepr * (1.0 - self.MaintCost)) * dPol
+        NewBornDist = jump_to_grid_dur(
+            np.ones_like(shk.atoms[1]) * self.nNrmInitMean,
+            np.ones_like(shk.atoms[1]) * self.mNrmInitMean,
+            shk.pmv, dist_nGrid, dist_mGrid,
+        )
+        rows, cols, data, nStates = gen_tran_matrix_dur_sparse(
+            dist_nGrid, dist_mGrid, bNext, nNext_unshocked,
+            shk.pmv, shk.atoms[0], shk.atoms[1], self.LivPrb, NewBornDist,
+        )
+        return sps.csr_matrix(
+            (np.asarray(data, dtype=np.float64),
+             (np.asarray(rows, dtype=np.int32), np.asarray(cols, dtype=np.int32))),
+            shape=(nStates, nStates),
+        )
+
+    def _search_on_dist_grid(self, sol, sol_next, period_params=None):
+        """
+        Interpolate keeper / adjuster conditionals onto the histogram grid
+        and re-combine (search / EV taste / hard max via ``_combine``).
+        Does not use ``sol.adjusting``.
+
+        For EV taste / hard max (``SearchCost == 0``), mix probabilities use
+        the solver's stored ``inv_vFuncKeep`` / ``inv_vFuncAdj_1d_list``.
+        Rebuilding ``u(c)+EOP`` from interpolated policies mismeasures
+        ``Δv`` (logit / ``σ_ε`` is very sensitive) and can flip Jacobians.
+        Directed search still reconstructs values on the dist grid so ``ε*``
+        can be relocated relative to the solution-grid border.
+        """
+        saved = {}
+        saved_inc = None
+        try:
+            if period_params:
+                period_params = dict(period_params)
+                k_inc = period_params.pop("_period_k", None)
+                for key, val in period_params.items():
+                    saved[key] = getattr(self, key)
+                    setattr(self, key, val)
+                if k_inc is not None and getattr(self, "IncShkDstn_path", None) is not None:
+                    saved_inc = (
+                        self.IncShkDstn,
+                        getattr(self, "probGrid_income", None),
+                    )
+                    prob_t = (
+                        self.probGrid_income_path[k_inc]
+                        if getattr(self, "probGrid_income_path", None) is not None
+                        else None
+                    )
+                    self._activate_income(self.IncShkDstn_path[k_inc], prob_t)
+            nGrid, mGrid, n_aux, m_aux = self._nm_dist_mesh()
+            shape = n_aux.shape
+
+            cKeep = np.clip(np.asarray(sol.cFuncKeep(n_aux, m_aux), dtype=float), 0.0, None)
+            dKeep = np.asarray(sol.dFuncKeep(n_aux, m_aux), dtype=float)
+            aKeep = np.maximum(m_aux - cKeep, 0.0)
+
+            nPrice = int(self.nPrice)
+            price_vals = np.asarray(self.PriceShkVals, dtype=float)
+            cAdj = np.zeros((nPrice,) + shape)
+            dAdj = np.zeros_like(cAdj)
+            aAdj = np.zeros_like(cAdj)
+            tau_nm = self.tau_func(n_aux + m_aux)
+            x_aux = np.clip(m_aux + (1.0 - tau_nm) * n_aux, 0.0, None)
+            x_flat = x_aux.ravel()
+
+            c_list = sol.cFuncAdj_1d_list
+            d_list = sol.dFuncAdj_1d_list
+            for i_p, p0 in enumerate(price_vals):
+                if c_list is not None:
+                    c_i = np.maximum(
+                        np.asarray(c_list[i_p](x_flat), dtype=float), 0.0
+                    ).reshape(shape)
+                    d_i = np.maximum(
+                        np.asarray(d_list[i_p](x_flat), dtype=float), 0.0
+                    ).reshape(shape)
+                else:
+                    c_i = np.maximum(np.asarray(sol.cFuncAdj(n_aux, m_aux), dtype=float), 0.0)
+                    d_i = np.maximum(np.asarray(sol.dFuncAdj(n_aux, m_aux), dtype=float), 0.0)
+                cAdj[i_p] = c_i
+                dAdj[i_p] = d_i
+                aAdj[i_p] = np.maximum(x_aux - c_i - p0 * d_i, 0.0)
+
+            inv_vKeep_fn = getattr(sol, "inv_vFuncKeep", None)
+            inv_vAdj_list = getattr(sol, "inv_vFuncAdj_1d_list", None)
+            use_sol_values = (
+                self.SearchCost <= 0.0
+                and inv_vKeep_fn is not None
+                and inv_vAdj_list is not None
+            )
+
+            inv_vAdj = np.zeros_like(cAdj)
+            vPAdj = np.zeros_like(cAdj)
+            vPDAdj = np.zeros_like(cAdj)
+            vPKeep = self.CRRAutilityP(cKeep, dKeep)
+            if use_sol_values:
+                inv_vKeep = np.asarray(inv_vKeep_fn(n_aux, m_aux), dtype=float)
+                vPDKeep = self.CRRAutilityPD(cKeep, dKeep)
+                for i_p in range(nPrice):
+                    inv_vAdj[i_p] = np.asarray(
+                        inv_vAdj_list[i_p](x_flat), dtype=float
+                    ).reshape(shape)
+                    vPAdj[i_p] = self.CRRAutilityP(cAdj[i_p], dAdj[i_p])
+                    vPDAdj[i_p] = (1.0 - tau_nm) * vPAdj[i_p]
+            else:
+                eop = self._end_of_period(sol_next)
+                EndOfPrdvFunc = eop["EndOfPrdvFunc"]
+                EndOfPrdvPDFunc = eop["EndOfPrdvPDFunc"]
+                vKeep = self.CRRAutility(cKeep, dKeep) + EndOfPrdvFunc(dKeep, aKeep)
+                inv_vKeep = utility_inv(vKeep, self.CRRA)
+                vPDKeep = self.CRRAutilityPD(cKeep, dKeep) + EndOfPrdvPDFunc(
+                    dKeep, aKeep
+                )
+                for i_p in range(nPrice):
+                    v_adj = self.CRRAutility(cAdj[i_p], dAdj[i_p]) + EndOfPrdvFunc(
+                        dAdj[i_p], aAdj[i_p]
+                    )
+                    inv_vAdj[i_p] = utility_inv(v_adj, self.CRRA)
+                    vPAdj[i_p] = self.CRRAutilityP(cAdj[i_p], dAdj[i_p])
+                    vPDAdj[i_p] = (1.0 - tau_nm) * vPAdj[i_p]
+
+            c, d, a, _v, _vp, _vpd, eps = self._combine(
+                cAdj, dAdj, aAdj, inv_vAdj, vPAdj, vPDAdj,
+                cKeep, dKeep, aKeep, inv_vKeep, vPKeep, vPDKeep,
+                nGrid, mGrid,
+            )
+            return dict(
+                c=np.asarray(c, dtype=float),
+                d=np.asarray(d, dtype=float),
+                a=np.asarray(a, dtype=float),
+                eps=np.clip(np.asarray(eps, dtype=float), 0.0, 1.0),
+            )
+        finally:
+            for key, val in saved.items():
+                setattr(self, key, val)
+            if saved_inc is not None:
+                shk_ss, prob_ss = saved_inc
+                self._activate_income(shk_ss, prob_ss)
+
+    def _cond_one_period(self, sol, sol_next, shk, period_params=None):
+        """Mixed policies + transition matrix after re-search on the dist grid."""
+        cond = self._search_on_dist_grid(sol, sol_next, period_params)
+        n_aux = np.repeat(self.dist_nGrid[:, None], len(self.dist_mGrid), axis=1)
+        dex = cond["d"] - n_aux
+        return dict(
+            cPol=cond["c"],
+            dPol=cond["d"],
+            aPol=cond["a"],
+            adjPol=cond["eps"],
+            dexPol=dex,
+            texPol=cond["c"] + dex,
+            TranMatrix=self._tran_matrix_from_pols(cond["c"], cond["d"], cond["a"], shk),
+        )
+
+    def calc_transition_matrix_dur_cond(self, shk_dstn=None, param_path=None):
+        """Like ``calc_transition_matrix_dur``, but re-combines on the dist grid."""
+        if int(self.cycles) == 0:
+            shk = shk_dstn if shk_dstn is not None else self.IncShkDstn
+            if not hasattr(shk, "pmv"):
+                shk = shk[0]
+            out = self._cond_one_period(self.solution[0], self.solution[0], shk)
+            self.cPol_Grid = out["cPol"]
+            self.dPol_Grid = out["dPol"]
+            self.aPol_Grid = out["aPol"]
+            self.adjPol_Grid = out["adjPol"]
+            self.dexPol_Grid = out["dexPol"]
+            self.texPol_Grid = out["texPol"]
+            self.tran_matrix = out["TranMatrix"]
+        else:
+            self.cPol_Grid = []
+            self.dPol_Grid = []
+            self.aPol_Grid = []
+            self.adjPol_Grid = []
+            self.dexPol_Grid = []
+            self.texPol_Grid = []
+            self.tran_matrix = []
+            T = int(self.T_cycle)
+            for k in range(T):
+                shk_k = self._resolve_period_shk(k, shk_dstn)
+                period_params = None
+                if param_path:
+                    period_params = {name: path[k] for name, path in param_path.items()}
+                    period_params["_period_k"] = k
+                sol_next = self.solution[k + 1]
+                out = self._cond_one_period(
+                    self.solution[k], sol_next, shk_k, period_params
+                )
+                self.cPol_Grid.append(out["cPol"])
+                self.dPol_Grid.append(out["dPol"])
+                self.aPol_Grid.append(out["aPol"])
+                self.adjPol_Grid.append(out["adjPol"])
+                self.dexPol_Grid.append(out["dexPol"])
+                self.texPol_Grid.append(out["texPol"])
+                self.tran_matrix.append(out["TranMatrix"])
+
+    def compute_steady_state_cond(self):
+        """
+        Infinite-horizon SS with discrete choice re-combined on the histogram
+        grid (conditional keeper / adjuster policies, then ``_combine``).
+
+        Same return and stored attributes as ``compute_steady_state``.
+        """
+        if self.solution is None or int(self.cycles) != 0:
+            self.cycles = 0
+            self.update()
+            self.solve()
+
+        self.define_distribution_grid_dur()
+        self.calc_transition_matrix_dur_cond()
+
+        self.c_ss = self.cPol_Grid
+        self.d_ss = self.dPol_Grid
+        self.dex_ss = self.dexPol_Grid
+        self.a_ss = self.aPol_Grid
+        self.adj_ss = self.adjPol_Grid
+
+        self.calc_ergodic_dist()
+        ss_dstn = self.vec_erg_dstn
+
+        self.A_ss = self.a_ss.flatten() @ ss_dstn
+        self.C_ss = self.c_ss.flatten() @ ss_dstn
+        self.D_ss = self.d_ss.flatten() @ ss_dstn
+        self.DEX_ss = self.dex_ss.flatten() @ ss_dstn
+        self.TEX_ss = self.C_ss + self.DEX_ss
+        self.ADJ_ss = self.adj_ss.flatten() @ ss_dstn
+        self._ss_method = "cond"
+
+        return self.A_ss, self.C_ss, self.D_ss, self.DEX_ss, self.TEX_ss, self.ADJ_ss
+
+    def calc_jacobian_cond(self, shk_param, T):
+        """
+        Fake-news Jacobians using histogram-grid re-combined policies.
+
+        Same signature and return as ``calc_jacobian``. Calls
+        ``compute_steady_state_cond()`` if that SS has not been built yet.
+        """
+        if shk_param in self._JAC_NOT_IMPLEMENTED:
+            print(
+                f"calc_jacobian_cond: shock parameter '{shk_param}' is not implemented "
+                "yet. Supported: "
+                f"{', '.join(self._JAC_SUPPORTED)}."
+            )
+            return None
+        if shk_param not in self._JAC_SUPPORTED:
+            print(
+                f"calc_jacobian_cond: unknown shock parameter '{shk_param}'. "
+                f"Supported: {', '.join(self._JAC_SUPPORTED)}."
+            )
+            return None
+        if getattr(self, "_ss_method", None) != "cond" or getattr(
+            self, "vec_erg_dstn", None
+        ) is None:
+            self.compute_steady_state_cond()
+
+        T = int(T)
+        dx = self.jac_dx
+        ss_val = self._as_scalar(getattr(self, shk_param))
+
+        a_ss = self.aPol_Grid
+        c_ss = self.cPol_Grid
+        d_ss = self.dPol_Grid
+        dex_ss = self.dexPol_Grid
+        adj_ss = self.adjPol_Grid
+        tranmat_ss = self.tran_matrix
+        Dist_ss = self.vec_erg_dstn.T
+
+        FinHorizonAgent = self._make_finite_agent(T)
+        path = [ss_val] * T
+        path[T - 1] = ss_val + dx
+        FinHorizonAgent._solve_perturbed_finite({shk_param: path})
+        FinHorizonAgent.define_distribution_grid_dur()
+        FinHorizonAgent.calc_transition_matrix_dur_cond(param_path={shk_param: path})
+
+        a_t = list(FinHorizonAgent.aPol_Grid) + [self.a_ss]
+        c_t = list(FinHorizonAgent.cPol_Grid) + [self.c_ss]
+        d_t = list(FinHorizonAgent.dPol_Grid) + [self.d_ss]
+        dex_t = list(FinHorizonAgent.dexPol_Grid) + [self.dex_ss]
+        adj_t = list(FinHorizonAgent.adjPol_Grid) + [self.adj_ss]
+        tranmat_t = list(FinHorizonAgent.tran_matrix) + [tranmat_ss]
+
+        A_curl_s = np.zeros(T)
+        C_curl_s = np.zeros(T)
+        D_curl_s = np.zeros(T)
+        DEX_curl_s = np.zeros(T)
+        ADJ_curl_s = np.zeros(T)
+        nStates = len(self.dist_nGrid) * len(self.dist_mGrid)
+        Dist_curl_s = np.zeros((T, nStates))
+        for k in range(T):
+            A_curl_s[k] = ((a_t[T - k] - a_ss).flatten() @ Dist_ss) / dx
+            C_curl_s[k] = ((c_t[T - k] - c_ss).flatten() @ Dist_ss) / dx
+            D_curl_s[k] = ((d_t[T - k] - d_ss).flatten() @ Dist_ss) / dx
+            DEX_curl_s[k] = ((dex_t[T - k] - dex_ss).flatten() @ Dist_ss) / dx
+            ADJ_curl_s[k] = ((adj_t[T - k] - adj_ss).flatten() @ Dist_ss) / dx
+            Dist_curl_s[k] = ((tranmat_t[T - k] - tranmat_ss) @ Dist_ss) / dx
+
+        exp_vecs_a = np.zeros((T, nStates))
+        exp_vecs_c = np.zeros((T, nStates))
+        exp_vecs_d = np.zeros((T, nStates))
+        exp_vecs_dex = np.zeros((T, nStates))
+        exp_vecs_adj = np.zeros((T, nStates))
+        ev_a, ev_c, ev_d = a_ss.flatten(), c_ss.flatten(), d_ss.flatten()
+        ev_dex, ev_adj = dex_ss.flatten(), adj_ss.flatten()
+        for k in range(T):
+            exp_vecs_a[k] = ev_a
+            exp_vecs_c[k] = ev_c
+            exp_vecs_d[k] = ev_d
+            exp_vecs_dex[k] = ev_dex
+            exp_vecs_adj[k] = ev_adj
+            ev_a = ev_a @ tranmat_ss
+            ev_c = ev_c @ tranmat_ss
+            ev_d = ev_d @ tranmat_ss
+            ev_dex = ev_dex @ tranmat_ss
+            ev_adj = ev_adj @ tranmat_ss
+
+        Curl_F_A = np.zeros((T, T))
+        Curl_F_C = np.zeros((T, T))
+        Curl_F_D = np.zeros((T, T))
+        Curl_F_DEX = np.zeros((T, T))
+        Curl_F_ADJ = np.zeros((T, T))
+        Curl_F_A[0] = A_curl_s
+        Curl_F_C[0] = C_curl_s
+        Curl_F_D[0] = D_curl_s
+        Curl_F_DEX[0] = DEX_curl_s
+        Curl_F_ADJ[0] = ADJ_curl_s
+        for r in range(T - 1):
+            for s in range(T):
+                Curl_F_A[r + 1][s] = np.dot(exp_vecs_a[r], Dist_curl_s[s])
+                Curl_F_C[r + 1][s] = np.dot(exp_vecs_c[r], Dist_curl_s[s])
+                Curl_F_D[r + 1][s] = np.dot(exp_vecs_d[r], Dist_curl_s[s])
+                Curl_F_DEX[r + 1][s] = np.dot(exp_vecs_dex[r], Dist_curl_s[s])
+                Curl_F_ADJ[r + 1][s] = np.dot(exp_vecs_adj[r], Dist_curl_s[s])
+
+        J_A = J_from_F(Curl_F_A)
+        J_C = J_from_F(Curl_F_C)
+        J_D = J_from_F(Curl_F_D)
+        J_DEX = J_from_F(Curl_F_DEX)
+        J_TEX = J_C + J_DEX
+        J_ADJ = J_from_F(Curl_F_ADJ)
+
+        ZerothColAgent = self._make_finite_agent(2)
+        path0 = [ss_val + dx, ss_val]
+        ZerothColAgent._solve_perturbed_finite({shk_param: path0})
+        ZerothColAgent.define_distribution_grid_dur()
+        ZerothColAgent.calc_transition_matrix_dur_cond(param_path={shk_param: path0})
+        tranmat_zeroth = ZerothColAgent.tran_matrix[0]
+
+        dstn = self.vec_erg_dstn.T
+        A_t_no_sim = np.zeros(T)
+        C_t_no_sim = np.zeros(T)
+        D_t_no_sim = np.zeros(T)
+        DEX_t_no_sim = np.zeros(T)
+        ADJ_t_no_sim = np.zeros(T)
+        for k in range(T):
+            dstn = (tranmat_zeroth if k == 0 else tranmat_ss) @ dstn
             A_t_no_sim[k] = self.aPol_Grid.flatten() @ dstn
             C_t_no_sim[k] = self.cPol_Grid.flatten() @ dstn
             D_t_no_sim[k] = self.dPol_Grid.flatten() @ dstn
