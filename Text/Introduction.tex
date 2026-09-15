@@ -25,7 +25,7 @@ space where discrete choices are made. These discontinuities make the decision r
 non-monotonic, which leads to the Euler equation producing suboptimal points. In
 addition, each period's kinks and discontinuities are propagated back in time as the
 solution is solved by backward iteration, thus, exacerbating the problem.
-\citet{Fella2014-pm}, \citet{Druedahl2017-ve}, and \citet{Iskhakov2017-jb}
+\citet{Fella2014-pm}, \citet{Druedahl2017-ve}, \citet{Iskhakov2017-jb}, and \citet{dobrescu2022fast}
 provide methods for finding and discarding these suboptimal points from the final
 solution.
 
@@ -37,10 +37,17 @@ the expected marginal utility function. With larger taste shocks, the value func
 be `concavified' to a greater degree. Such taste shocks, however, are in fact `behavioral'
 shocks that add a degree of randomization to the discrete choice outcomes.
 
+% In contrast, this paper introduces search frictions whereby agents exert search
+% effort that determines the likelihood of changing the discrete state. In addition, it
+% includes log-normally distributed taste shocks that affect the utility that agents derive
+% from making discrete choices. Combined, these two features not only lead to greater
+% smoothness of the decision rule, they also rationalize the smoothness arising from the
+% taste shocks, as these shocks determine the search effort that the agents exert.
+
 In contrast, this paper introduces search frictions whereby agents exert search
 effort that determines the likelihood of changing the discrete state. In addition, it
-includes log-normally distributed taste shocks that affect the utility that agents derive
-from making discrete choices. Combined, these two features not only lead to greater
+includes log-normally distributed price shocks that affect the amount of resources the agent
+has to pay to make the transaction. Combined, these two features not only lead to greater
 smoothness of the decision rule, they also rationalize the smoothness arising from the
 taste shocks, as these shocks determine the search effort that the agents exert.
 
@@ -51,24 +58,27 @@ binary retirement decision, depending on the search effort that they make. If th
 makes no search effort, they receive the option to retire with exogenous probability $p$
 and if they make the maximum effort, they receive the option to retire with certainty.
 Effort, however, is costly and the cost function is assumed to be a convex function of
-effort. In addition, households receive taste shocks that affect the relative value they
+effort. In addition, households receive information about their exact retirement wealth account
+only after searching and are presented different values depending on their bank. Afterwards, they
+can either reject or accept the offer. Furthermore, households receive taste shocks that affect the relative value they
 derive from working and are also exposed to income uncertainty.
 
-All four of the aforementioned modeling features, i.e.\ search, exogenous switching
-probability, taste shocks, and income shocks, serve to smooth out the decision rule in
+All five of the aforementioned modeling features, i.e.\ search, exogenous switching
+probability, price dispersion, taste shocks, and income shocks, serve to smooth out the decision rule in
 the DC model with varying degrees of effectiveness. While search provides the highest
 degree of smoothness, in terms of reducing the size of the discontinuities in the decision
-rule, it has to be combined with taste shocks to yield uniform smoothness around the
+rule, it has to be combined with either price dispersion or taste shocks to yield uniform smoothness around the
 discontinuities. Moreover, each of the smoothing mechanisms have different economic
 interpretations and affect the decision rules differently. While greater smoothness from
 search and exogenous switching probability shifts the consumption function upwards,
 greater smoothness from taste shocks and income shocks shifts the consumption function
-downwards.
+downwards. %For price dispersion?
+
 Separately, we show that a coarse income-shock discretization introduces
 \emph{phantom kinks}---spurious numerical non-monotonicities that should not be
 confused with the economic discontinuities from discrete retirement---and that
 integrating the continuous income density with a transition-matrix method removes
-those artifacts at moderate computational cost (Section~\ref{sec:incdisc}).
+those artifacts at moderate computational cost (Section~\ref{sec:incdisc}). %Re-do since message is not clear
 
 In a second exercise, we show how the logic can be applied to a model of durable good adjustments similar to \cite{Carroll1997-oi, Berger2015-kp} and many others. Here, choices of buying a durable good are reversable as the agent can decide each period to buy or not to buy a new durable good. Additionally, the value of the car is continuous. Hence, the problem is a discrete-continuous choice problem.
 We show that the same level of smoothness can be created using endogeneous search and tasteshocks. Additionally, we show how stochastic prices of durable goods can introduce additional smootheness if necessary.

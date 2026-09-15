@@ -1928,7 +1928,18 @@ class DurableConsumer:
         else:
             self.dist_nGrid = dist_nGrid
 
-    def _tran_matrix_one_period(self, sol, shk):
+    def _R_for_period(self, k=None, param_path=None):
+        """Period-``k`` ``Rfree`` / ``RSpread`` from ``param_path``, else ``self``."""
+        R = self._as_scalar(self.Rfree)
+        Rs = self._as_scalar(self.RSpread)
+        if param_path is not None and k is not None:
+            if "Rfree" in param_path:
+                R = self._as_scalar(param_path["Rfree"][k])
+            if "RSpread" in param_path:
+                Rs = self._as_scalar(param_path["RSpread"][k])
+        return float(R), float(Rs)
+
+    def _tran_matrix_one_period(self, sol, shk, k=None, param_path=None):
         """Policy grids + sparse transition matrix for a single solved period."""
         dist_nGrid = self.dist_nGrid
         dist_mGrid = self.dist_mGrid
@@ -1951,8 +1962,8 @@ class DurableConsumer:
         if np.any(np.isnan(cPol)):
             print("cPol_Grid has NaNs")
 
-        # Scalar Rfree/RSpread/LivPrb in the simplified model (no time variation).
-        R_vec = np.where(aPol < 0, self.Rfree + self.RSpread, self.Rfree)
+        R, Rs = self._R_for_period(k, param_path)
+        R_vec = np.where(aPol < 0, R + Rs, R)
         bNext = (R_vec * aPol) - dPol * (self.OpCost + self.dDepr * self.MaintCost)
         nNext_unshocked = (1.0 - self.dDepr * (1.0 - self.MaintCost)) * dPol
 
@@ -2003,7 +2014,7 @@ class DurableConsumer:
             return path[k]
         return self.IncShkDstn
 
-    def calc_transition_matrix_dur(self, shk_dstn=None):
+    def calc_transition_matrix_dur(self, shk_dstn=None, param_path=None):
         """
         Evaluate solved policies on the histogram grid and build the transition
         matrix. For ``cycles=0`` a single matrix is stored; for the finite case a
@@ -2014,7 +2025,8 @@ class DurableConsumer:
         impulse at period ``k`` enters both policy and the transition lottery.
 
         No CarCrash channel and no Harmenberg neutral measure in the simplified
-        port (default has degenerate permanent shocks).
+        port (default has degenerate permanent shocks). ``param_path`` may supply
+        period-k ``Rfree`` / ``RSpread`` for the histogram law of motion.
         """
         if int(self.cycles) == 0:
             shk = shk_dstn if shk_dstn is not None else self.IncShkDstn
@@ -2038,7 +2050,9 @@ class DurableConsumer:
             self.tran_matrix = []
             for k in range(int(self.T_cycle)):
                 shk_k = self._resolve_period_shk(k, shk_dstn)
-                out = self._tran_matrix_one_period(self.solution[k], shk_k)
+                out = self._tran_matrix_one_period(
+                    self.solution[k], shk_k, k=k, param_path=param_path
+                )
                 self.cPol_Grid.append(out["cPol"])
                 self.dPol_Grid.append(out["dPol"])
                 self.aPol_Grid.append(out["aPol"])
@@ -2117,7 +2131,7 @@ class DurableConsumer:
         agent.solution_terminal = deepcopy(self.solution[0])
         return agent
 
-    def calc_jacobian(self, shk_param, T):
+    def calc_jacobian(self, shk_param, T, updated_R=False):
         """
         Sequence-space (fake-news) Jacobians of aggregate ``C, DEX, TEX, D, A,
         ADJ`` with respect to ``shk_param`` over a horizon ``T``.
@@ -2173,7 +2187,9 @@ class DurableConsumer:
         path[i] = ss_val + dx
         FinHorizonAgent._solve_perturbed_finite({shk_param: path})
         FinHorizonAgent.define_distribution_grid_dur()
-        FinHorizonAgent.calc_transition_matrix_dur()
+        FinHorizonAgent.calc_transition_matrix_dur(
+            param_path={shk_param: path} if updated_R else None
+        )
 
         a_t = FinHorizonAgent.aPol_Grid
         c_t = FinHorizonAgent.cPol_Grid
@@ -2264,7 +2280,9 @@ class DurableConsumer:
         path0 = [ss_val + dx, ss_val]
         ZerothColAgent._solve_perturbed_finite({shk_param: path0})
         ZerothColAgent.define_distribution_grid_dur()
-        ZerothColAgent.calc_transition_matrix_dur()
+        ZerothColAgent.calc_transition_matrix_dur(
+            param_path={shk_param: path0} if updated_R else None
+        )
 
         tranmat_zeroth = ZerothColAgent.tran_matrix[0]
         dstn = self.vec_erg_dstn.T
@@ -2302,10 +2320,12 @@ class DurableConsumer:
         m_aux = np.tile(m, (len(n), 1))
         return n, m, n_aux, m_aux
 
-    def _tran_matrix_from_pols(self, cPol, dPol, aPol, shk):
+    def _tran_matrix_from_pols(self, cPol, dPol, aPol, shk, Rfree=None, RSpread=None):
         """Sparse transition matrix from mixed policies on the histogram grid."""
         dist_nGrid, dist_mGrid = self.dist_nGrid, self.dist_mGrid
-        R_vec = np.where(aPol < 0, self.Rfree + self.RSpread, self.Rfree)
+        R = self._as_scalar(self.Rfree if Rfree is None else Rfree)
+        Rs = self._as_scalar(self.RSpread if RSpread is None else RSpread)
+        R_vec = np.where(aPol < 0, R + Rs, R)
         bNext = (R_vec * aPol) - dPol * (self.OpCost + self.dDepr * self.MaintCost)
         nNext_unshocked = (1.0 - self.dDepr * (1.0 - self.MaintCost)) * dPol
         NewBornDist = jump_to_grid_dur(
@@ -2445,11 +2465,14 @@ class DurableConsumer:
                 shk_ss, prob_ss = saved_inc
                 self._activate_income(shk_ss, prob_ss)
 
-    def _cond_one_period(self, sol, sol_next, shk, period_params=None):
+    def _cond_one_period(self, sol, sol_next, shk, period_params=None, use_period_R=False):
         """Mixed policies + transition matrix after re-search on the dist grid."""
         cond = self._search_on_dist_grid(sol, sol_next, period_params)
         n_aux = np.repeat(self.dist_nGrid[:, None], len(self.dist_mGrid), axis=1)
         dex = cond["d"] - n_aux
+        Rkw = {}
+        if use_period_R and period_params:
+            Rkw = {k: period_params[k] for k in ("Rfree", "RSpread") if k in period_params}
         return dict(
             cPol=cond["c"],
             dPol=cond["d"],
@@ -2457,10 +2480,10 @@ class DurableConsumer:
             adjPol=cond["eps"],
             dexPol=dex,
             texPol=cond["c"] + dex,
-            TranMatrix=self._tran_matrix_from_pols(cond["c"], cond["d"], cond["a"], shk),
+            TranMatrix=self._tran_matrix_from_pols(cond["c"], cond["d"], cond["a"], shk, **Rkw),
         )
 
-    def calc_transition_matrix_dur_cond(self, shk_dstn=None, param_path=None):
+    def calc_transition_matrix_dur_cond(self, shk_dstn=None, param_path=None, use_period_R=False):
         """Like ``calc_transition_matrix_dur``, but re-combines on the dist grid."""
         if int(self.cycles) == 0:
             shk = shk_dstn if shk_dstn is not None else self.IncShkDstn
@@ -2491,7 +2514,7 @@ class DurableConsumer:
                     period_params["_period_k"] = k
                 sol_next = self.solution[k + 1]
                 out = self._cond_one_period(
-                    self.solution[k], sol_next, shk_k, period_params
+                    self.solution[k], sol_next, shk_k, period_params, use_period_R
                 )
                 self.cPol_Grid.append(out["cPol"])
                 self.dPol_Grid.append(out["dPol"])
@@ -2535,7 +2558,7 @@ class DurableConsumer:
 
         return self.A_ss, self.C_ss, self.D_ss, self.DEX_ss, self.TEX_ss, self.ADJ_ss
 
-    def calc_jacobian_cond(self, shk_param, T):
+    def calc_jacobian_cond(self, shk_param, T, updated_R=False):
         """
         Fake-news Jacobians using histogram-grid re-combined policies.
 
@@ -2577,7 +2600,9 @@ class DurableConsumer:
         path[T - 1] = ss_val + dx
         FinHorizonAgent._solve_perturbed_finite({shk_param: path})
         FinHorizonAgent.define_distribution_grid_dur()
-        FinHorizonAgent.calc_transition_matrix_dur_cond(param_path={shk_param: path})
+        FinHorizonAgent.calc_transition_matrix_dur_cond(
+            param_path={shk_param: path}, use_period_R=updated_R
+        )
 
         a_t = list(FinHorizonAgent.aPol_Grid) + [self.a_ss]
         c_t = list(FinHorizonAgent.cPol_Grid) + [self.c_ss]
@@ -2649,7 +2674,9 @@ class DurableConsumer:
         path0 = [ss_val + dx, ss_val]
         ZerothColAgent._solve_perturbed_finite({shk_param: path0})
         ZerothColAgent.define_distribution_grid_dur()
-        ZerothColAgent.calc_transition_matrix_dur_cond(param_path={shk_param: path0})
+        ZerothColAgent.calc_transition_matrix_dur_cond(
+            param_path={shk_param: path0}, use_period_R=updated_R
+        )
         tranmat_zeroth = ZerothColAgent.tran_matrix[0]
 
         dstn = self.vec_erg_dstn.T
@@ -2674,6 +2701,14 @@ class DurableConsumer:
         J_ADJ.T[0] = (ADJ_t_no_sim - self.ADJ_ss) / dx
 
         return J_C, J_DEX, J_TEX, J_D, J_A, J_ADJ
+
+    def calc_jacobian_updatedR(self, shk_param, T):
+        """Like ``calc_jacobian``, but period-t ``Rfree`` / ``RSpread`` enter ``Λ_t``."""
+        return self.calc_jacobian(shk_param, T, updated_R=True)
+
+    def calc_jacobian_updatedR_cond(self, shk_param, T):
+        """Like ``calc_jacobian_cond``, but period-t ``Rfree`` / ``RSpread`` enter ``Λ_t``."""
+        return self.calc_jacobian_cond(shk_param, T, updated_R=True)
 
     # ---------------------------------------------------------- Euler errors
     @staticmethod

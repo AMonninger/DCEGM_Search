@@ -1,0 +1,95 @@
+\documentclass[12pt,twoside]{article}
+\usepackage{../../../Templates/johannes}  % Loads my formatting 
+%\usepackage{tweaklist}  % I use this package as well; you may need to download
+
+\usepackage[section] {placeins}
+\usepackage[shortcuts]{extdash}
+% \usepackage{biblatex}
+%% Shortcut commands
+%\newcommand{\proptitle}[1]{\color{black} \textnormal{(#1):}}
+%\newtheorem{proposition}{\color{black} Proposition}
+%\newcommand{\assume}[2]{{\bf{Assumption #1}} (#2)} 
+%\newcommand{\clr}[1]{{\color{black} #1}}
+%\newcommand{\clrg}[1]{{\color{black} #1}}
+%\newcommand{\Proof}[2]{\newline {\hspace{-\parindent} {\color{black}\bf Proof of Proposition}~\ref{#1}.}
+%{\color{black} #2} \vspace{.1in}}
+%\usepackage{fix-cm} % allow Computer Modern fonts of all sizes
+
+% draft-specific commands
+%\renewcommand{\arraystretch}{1.25} % space between rows
+% \setlength{\bibsep}{1.5pt} % bibliography spacing
+
+\renewcommand{\tabularxcolumn}[1]{>{\centering\arraybackslash}m{#1}}
+%\newcolumntype{L}{>{\centering}X}
+%\newcolumntype{H}{>{\lrbox0}c<{\endlrbox}@{}}
+
+\oddsidemargin=1mm 
+\evensidemargin=1mm
+\textheight=23cm 
+\textwidth=16.5cm 
+\topmargin=-1.5cm
+% If you've loaded *tweaklist.sty* above, uncomment these lines:
+% Adjust spacing in itemize/enumerate; see tweaklist.sty
+%\renewcommand{\enumhook}{\setlength{\topsep}{2pt}%
+%  \setlength{\itemsep}{0pt}}
+%\renewcommand{\itemhook}{\setlength{\topsep}{2pt}%
+%  \setlength{\itemsep}{0pt}}
+%\renewcommand{\arraystretch}{1}
+
+
+
+% separate bibilographies for main text and appendix
+%\newcites{appref}{Appendix References}
+
+\long\def\symbolfootnote[#1]#2{\begingroup%
+\def\thefootnote{\fnsymbol{footnote}}\footnote[#1]{#2}\endgroup}
+
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TITLE PAGE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Readme file for data and programs accompanying McKay and Wieland (2021), ``Lumpy Durable Consumption Demand and the Limited Ammunition of Monetary Policy.''}
+\date{\today}
+
+\maketitle
+
+The enclosed data and programs reproduce the tables and figures in
+the paper. All data and programs are provided without warranty. 
+
+\begin{enumerate}
+\item To recreate all the figures in the paper, including the appendix figure run the python script rundirectory.py.
+\begin{itemize}
+	\item On line 6 of the rundirectory.py you need to enter the path of the replication directory.
+\end{itemize}
+\item Running this script takes around 2 days on an 8-core iMac (2020 model). Most of this time is spent estimating the model and computing the partial equilibrium Jacobians. The programs were executed using:
+\begin{itemize}
+	\item Matlab 2020a
+	\begin{itemize}
+		\item Matlab needs to be executable from the command line.
+	\end{itemize}
+	\item Python 3.8.8 (Anaconda distribution)
+\end{itemize}
+\item The script runs the following files in sequence:
+\begin{enumerate}
+	\item IRFs/main.m: Creates Figures 2, 3, and Appendix Figure A.3. All subroutines are included in the Folder IRFs. The programs call raw data files from the Data folder.
+\begin{itemize}
+	\item Appendix Figure A.2 can be obtained by changing the parameters in the Specification section at the beginning of main.m.
+\end{itemize}
+	\item Model/figure1.m: Creates Figure 1 and Appendix Figure A.1. This file runs the estimation of the model which takes around one day to complete.
+	\item Model/solvesteadystate.m: solves for the steady state of the model.
+	\item Model/computejacobians.m: solves for the partial equilibrium Jacobians of the model. This code will run for around a day.
+	\item Model/constructirfs.m: solves for the general equilibrium Jacobians of the model.
+	\item Model/figure45.m: Creates Figures 4 and 5.
+	\item Model/figure6.m: Creates Figure 6. 
+	\item Run Model/figure7.m: Creates Figure 7.  
+	\item Model/figure811.m.: Creates Figures 8-11 and Appendix Figure A.4.  
+\end{enumerate}
+\item All figures are stored in the Figure folder of the base directory in png format.
+\end{enumerate}
+
+
+\end{document}

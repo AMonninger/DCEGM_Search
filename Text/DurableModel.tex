@@ -524,14 +524,14 @@ The retirement contrast is immediate. There, lowering the probability of a succe
 
 The comparisons above are period-$t$ objects on a fixed beginning-of-period durable stock. I next ask how the same three discrete-choice smoothers---EV taste shocks $\sigma_\varepsilon$, search frictions $S$, and durable-price dispersion $\sigma_p$---shape the \emph{stationary} economy. For each channel I solve the infinite-horizon problem with that smoother active and the other two shut off, using the same magnitudes as in Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs}. Given the converged policies, I build the transition matrix over the joint $(n,m)$ histogram grid, compute the ergodic distribution, and report aggregate steady-state nondurable consumption $C$, durable stock $D$, durable expenditure $\mathrm{DEX}$, total expenditure $\mathrm{TEX}$, liquid assets $A$, and the adjustment probability $\mathrm{ADJ}$.
 
-I also compute sequence-space Jacobians of these aggregates with respect to the risk-free return $R$ and to a labor (mean-income) shock, using the fake-news algorithm for sequence-space Jacobians. Table~\ref{tab:inf_ss} reports the steady-state aggregates together with the impact labor responses: MPC Non is $J_C^{\mathrm{labor}}[0,0]$, MPC Dur is $J_{\mathrm{DEX}}^{\mathrm{labor}}[0,0]$, and MPX is $J_{\mathrm{TEX}}^{\mathrm{labor}}[0,0]$.
+I also compute sequence-space Jacobians of these aggregates with respect to the risk-free return $R$ and to a labor (mean-income) shock, using the fake-news algorithm for sequence-space Jacobians; the labor Jacobians are reported separately below. Table~\ref{tab:inf_ss} reports the steady-state aggregates.
 
 \begin{table}[htbp]
 \centering
-\caption{Infinite-horizon steady-state aggregates and impact labor MPCs under the same $\sigma_\varepsilon$, $S$, and $\sigma_p$ sweep as Figure~\ref{fig:smoothing_shifts_levels}. Each channel is varied with the other two shut off. Labor MPCs are the $(0,0)$ entries of the sequence-space Jacobians of $C$, $\mathrm{DEX}$, and $\mathrm{TEX}$ with respect to labor.}
+\caption{Infinite-horizon steady-state aggregates: EV taste shocks $\sigma_\varepsilon$, and search+price with either $\sigma_p$ varied at $S=0.2$ or $S$ varied at $\sigma_p=0.1$.}
 \label{tab:inf_ss}
 \footnotesize
-\input{../Output/DurableModel_Inf_SS}
+\input{../Output/DurableModel_Inf_SS_short}
 \end{table}
 
 \paragraph{Results.}
@@ -572,3 +572,28 @@ For the adjuster the deletion count is not enough. Taste and search eliminate FU
 \small
 \input{../Tables/smoothing_euler_Inf}
 \end{table}
+
+\paragraph{Jacobians}
+Using the smoothing mechanism also allows us to calculate Jacobians smoother:
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.85\linewidth]{../Figures/DurableModel/Taste_Inf_Jacobians_labor.pdf}
+	\caption{Jacobians wrt labor varying taste intensity.}
+	\label{fig:Taste_Inf_Jacobians_labor}
+\end{figure}
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.85\linewidth]{../Figures/DurableModel/Combined_varS_Inf_Jacobians_labor.pdf}
+	\caption{Jacobians wrt labor varying search intensity.}
+	\label{fig:Combined_varS_Inf_Jacobians_labor}
+\end{figure}
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.85\linewidth]{../Figures/DurableModel/Combined_varP_Inf_Jacobians_labor.pdf}
+	\caption{Jacobians wrt labor varying price dispersion.}
+	\label{fig:Combined_varS_InP_Jacobians_labor}
+\end{figure}
+
