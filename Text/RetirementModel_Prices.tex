@@ -1,37 +1,16 @@
 %============================================================
 \section{Retirement model with stochastic account realizations}\label{sec:RetirementModelPrices}
 %============================================================
-The retirement application of Section~\ref{sec:RetirementModel} smooths the work--retire margin with three mechanisms: an exogenous probability $p$ of receiving the option to switch, directed search at convex cost, and multiplicative log-normal taste shocks, with transitory income risk as a fourth, continuous-choice, smoother. This section introduces idiosyncratic price dispersion as a fifth source of variatition.
+The baseline of Section~\ref{sec:RetirementModel} smooths the work--retire margin with directed search and with an endogenous price of the retirement account. That combination takes the place of the Extreme Value Type I taste shocks that usually smooth this margin. This section isolates the account price by shutting search down, and then shows how the two mechanisms work together.
 
-The idea is very intuitively discribed in Section~\ref{sec:DurableModel} for a durable goods model. In the durable model the household searches for a car; contingent on a successful search it observes a stochastic price $p_t$ and then decides whether to buy or to keep. Here the household searches for the option to retire; contingent on receiving that option it observes a stochastic realization of its retirement account and then decides whether to take the draw---retire, absorbing, with that wealth---or to deny it and work another period. Continuing to work is the analog of keeping; claiming the realized account is the analog of adjusting at the realized price. Because $p$ already denotes the exogenous option probability, we write $\phi_t$ for the account realization. Agents who have the option observe $\phi_t$ before choosing and can reject an unattractive draw by remaining at work. Detailed derivations---envelope conditions, Euler equations, the interaction with search, and the EGM algorithm---are in Appendix~\ref{sec:appdx_retirement}.
+The same idea is described for a durable goods model in Section~\ref{sec:DurableModel}. In the durable model the household searches for a car; contingent on a successful search it observes a stochastic price $p_t$ and then decides whether to buy or to keep. Here the household searches for the option to retire; contingent on receiving that option it observes a stochastic realization of its retirement account and then decides whether to take the draw---retire, absorbing, with that wealth---or to deny it and work another period. Continuing to work is the analog of keeping; claiming the realized account is the analog of adjusting at the realized price. Because $p$ already denotes the exogenous option probability, we write $\phi_t$ for the account realization. Agents who have the option observe $\phi_t$ before choosing and can reject an unattractive draw by remaining at work. The account distribution and claimed wealth are \eqref{eq:ret_price_dist} and \eqref{eq:ret_price_Mtilde}, and the worker's problem is \eqref{eq:ret_full_VW}. Detailed derivations---envelope conditions, Euler equations, the interaction with search, and the EGM algorithm---are in Appendix~\ref{sec:appdx_retirement}.
 
 %------------------------------------------------------------
-\subsection{Extension: Stochastic retirement wealth}\label{subsec:RetirementPrices}
+\subsection{Account-value dispersion on its own}\label{subsec:RetirementPrices}
 %------------------------------------------------------------
-This subsection isolates account-value dispersion from the other retirement smoothers, in the same spirit as Section~\ref{subsec:ModelBasicPrice}. Neither taste shocks nor search frictions are present, so a worker who receives the option to retire resolves the discrete choice by a hard maximum. The comparison itself is contingent on the realized account value; the retiree's \emph{problem}, once the draw has been accepted, is not. To shut down search we set the exogenous option probability to $p=1$, so the option---and therefore a draw of $\phi_t$---arrives with certainty and optimal effort is identically zero.
+This subsection shuts search down, in the same spirit as Section~\ref{subsec:ModelBasicPrice}. A worker who receives the option to retire resolves the discrete choice by the hard maximum \eqref{eq:ret_price_discrete}. The comparison itself is contingent on the realized account value; the retiree's problem, once the draw has been accepted, is not. To shut down search we set the exogenous option probability to $p=1$, so the option---and therefore a draw of $\phi_t$---arrives with certainty and optimal effort is identically zero. The account realization is \eqref{eq:ret_price_dist}. Claiming maps book resources into retirement wealth by \eqref{eq:ret_price_Mtilde}, and the value of claiming is \eqref{eq:ret_price_VRet}.
 
-At the start of period $t$, after the transitory income shock $\eta_t$ has materialized and beginning-of-period book resources $M_t$ are known, the household observes an i.i.d.\ multiplicative realization of the retirement account
-\begin{align}
-	\log \phi_t \sim \mathcal{N}\Big(-\frac{\sigma_\phi^2}{2},\,\sigma_\phi^2\Big),
-	\qquad \mathbb{E}[\phi_t]=1, \label{eq:ret_price_dist}
-\end{align}
-independent of $\eta_t$ and independent across periods. If the household claims, retirement begins with wealth
-\begin{align}
-	\tilde M_t = \phi_t M_t, \label{eq:ret_price_Mtilde}
-\end{align}
-and from that point the agent is an ordinary retiree: the Bellman problem, budget $A_t=\tilde M_t-c_t$, and Euler equation are exactly those of Section~\ref{sec:RetirementModel}, evaluated at $\tilde M_t$ rather than at $M_t$. If the household denies the draw, it remains a worker with book resources $M_t$ and the standard budget $A_t=M_t-c_t$; the realization $\phi_t$ is discarded. The draw is therefore a one-shot, rejectable mark-to-market of the nest egg at the moment of claiming---a stochastic liquidation value, annuity conversion factor, or defined-contribution account realization---not an ongoing price of consumption in retirement. Once the draw is accepted, $\phi_t$ is locked into the level of wealth and is not redrawn.
-
-This is the analog of the durable model's assumption that only the \emph{purchase} of new durables is exposed to $p_t$. The worker who does not claim never transacts in the retirement account, just as the keeper never transacts in the durable market. A high realization of $\phi_t$ raises the value of retiring and, conditional on claiming, the resources out of which the retiree consumes; a low realization has the opposite effect and can be rejected.
-
-The retiree's problem is therefore unchanged in form. Write $V_t^{\Ret}(\cdot)$ for the baseline retiree value of Section~\ref{sec:RetirementModel}. The value of claiming at the realized account is simply that function evaluated at scaled wealth,
-\begin{align}
-	V_t^{\Ret}(\tilde M_t)
-	= V_t^{\Ret}(\phi_t M_t),
-	\label{eq:ret_price_VRet}
-\end{align}
-with claiming-period consumption $c_t^{\Ret}(\phi_t M_t)$ read off the same baseline policy. There is no separate price-contingent retiree Euler equation and no need to re-solve the retiree problem at each quadrature node of $\phi$: unlike the durable adjuster, whose first-order condition in $d_t$ depends on $p_t$ (equation~\eqref{eq:price_foc_d}), the intensive margin here is movement along a single consumption function.
-
-The worker who does not claim solves, with $p=1$ and no taste shocks,
+The worker who does not claim solves, with $p=1$,
 \begin{align}
 	V_t^{W}(M_t)
 	&= \max_{0\le c_t\le M_t}
@@ -41,20 +20,11 @@ The worker who does not claim solves, with $p=1$ and no taste shocks,
 	\right\},
 	\label{eq:ret_price_VW}
 \end{align}
-with $A_t=M_t-c_t$ and $\goth{V}_t^{1}$ the expected value of saving $A_t$ when the option---and a fresh draw of $\phi$---arrives next period.
+with $A_t=M_t-c_t$ and $\goth{V}_t^{1}$ the expected value of saving $A_t$ when the option---and a fresh draw of $\phi$---arrives next period. There is no second continuation, because the option arrives with certainty.
 
-Because $\phi_t$ is observed before the discrete choice is made, the beginning-of-period problem of a worker who has the option is the realization-contingent hard maximum
-\begin{align}
-	V_t(M_t,\phi_t)
-	= \max\Big\{
-		V_t^{\Ret}(\phi_t M_t),\;
-		V_t^{W}(M_t)
-	\Big\}.
-	\label{eq:ret_price_discrete}
-\end{align}
-A high $\phi_t$ makes claiming more attractive and, if accepted, delivers higher retirement consumption along $c_t^{\Ret}(\cdot)$; a low $\phi_t$ makes claiming less attractive and is denied whenever $V_t^{\Ret}(\phi_t M_t)<V_t^{W}(M_t)$. The model therefore induces state-contingent variation in both the retirement margin and the wealth at which the retiree starts, while leaving the retiree's decision \emph{rule} unchanged.
+A high $\phi_t$ makes claiming more attractive and, if accepted, delivers higher retirement consumption along $c_t^{\Ret}(\cdot)$; a low $\phi_t$ makes claiming less attractive and is denied whenever $V_t^{\Ret}(\phi_t M_t)<V_t^{W}(M_t)$. The model therefore induces state-contingent variation in both the retirement margin and the wealth at which the retiree starts, while leaving the retiree's decision rule unchanged.
 
-As with the price-integrated durable value~\eqref{eq:price_barv}, the object that matters for the previous period's continuation is
+The object that matters for the previous period's continuation is the $\phi$-integrated value. With the option arriving for sure it is
 \begin{align}
 	\bar V_t(M_t)
 	\equiv \mathbb{E}_{\phi_t}\big[V_t(M_t,\phi_t)\big]
@@ -66,81 +36,16 @@ As with the price-integrated durable value~\eqref{eq:price_barv}, the object tha
 	\Big],
 	\label{eq:ret_price_barV}
 \end{align}
-which replaces $V_t(M_t,\{R,W\})$ inside $\goth{V}_{t-1}^{1}$. Unlike the multiplicative taste shock $\xi_t$ of Section~\ref{sec:RetirementModel}, which scales the worker's value and thereby reweights the discrete comparison without changing either branch's consumption, $\phi_t$ changes the \emph{argument} of the retiree's consumption function. The policy $c_t^{\Ret}(\phi_t M_t)$ is realization-contingent even though the function $c_t^{\Ret}(\cdot)$ itself is not, and the model's reported (ex-ante) consumption function is the $\phi$-weighted average of the realized hard choices. As $\sigma_\phi\to 0$, $\phi_t\to 1$ almost surely and the model collapses to the hard-maximum baseline of Section~\ref{sec:RetirementModel} with $p=1$ and $\sigma_\xi=0$.
+which is \eqref{eq:ret_full_barVRW} in the case $p=1$. An Extreme Value Type I taste shock reweights the discrete comparison and leaves both branches' consumption functions unchanged. The account price $\phi_t$ instead changes the argument of the retiree's consumption function. The policy $c_t^{\Ret}(\phi_t M_t)$ is realization-contingent even though the function $c_t^{\Ret}(\cdot)$ itself is not, and the model's reported (ex-ante) consumption function is the $\phi$-weighted average of the realized hard choices. As $\sigma_\phi\to 0$, $\phi_t\to 1$ almost surely and, with $p=1$, the discrete choice is a hard maximum at book resources.
 
-Two differences from the durable-price extension are worth flagging. First, retirement is self-absorbing, so a household that accepts $\phi_t$ cannot return to work next period to wait for a better draw; the analog of ``keeping'' is available only before claiming. Second, because $\phi_t$ rescales the state rather than the first-order condition, the retiree is solved once, and each $\phi$-node is only an evaluation point---cheaper than re-solving the durable adjuster at every $p_k$. The smoothing mechanism is nevertheless the same: integrating~\eqref{eq:ret_price_discrete} over $\phi_t$ replaces a single wealth threshold $M^\ast$ at which $V^{\Ret}(M^\ast)=V^{W}(M^\ast)$ with a family of thresholds $M^\ast(\phi)$, so the ex-ante claiming probability is interior and the expected marginal value that enters last period's Euler equation is smoothed. We derive the envelope conditions, the terminal-period solution, and the EGM algorithm in Appendix~\ref{subsec:appdx_ret_price}.
+Two differences from the durable-price extension are worth flagging. First, retirement is self-absorbing, so a household that accepts $\phi_t$ cannot return to work next period to wait for a better draw; the analog of keeping is available only before claiming. Second, because $\phi_t$ rescales the state rather than the first-order condition, the retiree is solved once, and each $\phi$-node is only an evaluation point---cheaper than re-solving the durable adjuster at every $p_k$. The smoothing mechanism is the same: integrating \eqref{eq:ret_price_discrete} over $\phi_t$ replaces a single wealth threshold $M^\ast$ at which $V^{\Ret}(M^\ast)=V^{W}(M^\ast)$ with a family of thresholds $M^\ast(\phi)$, so the ex-ante claiming probability is interior and the expected marginal value that enters last period's Euler equation is smoothed. We derive the envelope conditions, the terminal-period solution, and the EGM algorithm for this case in Appendix~\ref{subsec:appdx_ret_price}.
 
 %------------------------------------------------------------
-\subsection{Extension: Search and stochastic retirement wealth}\label{subsec:RetirementSearchPrices}
+\subsection{Search and the account price together}\label{subsec:RetirementSearchPrices}
 %------------------------------------------------------------
-This subsection nests the directed-search technology of Section~\ref{sec:RetirementModel} with the stochastic account realizations of Section~\ref{subsec:RetirementPrices}. The protocol is now the full analog of searching for a car. The household chooses search effort; contingent on a successful search it receives the option to retire \emph{and} a draw of the retirement account; it then takes the draw or works another period. As in Section~\ref{subsec:ModelBasicFull}, taste shocks and directed search are alternative ways of smoothing the discrete margin, so the nested environment uses search rather than taste shocks. The exogenous option probability $p\in[0,1)$ is restored, so a worker who exerts no effort receives a draw with probability $p$ and a worker who exerts maximal effort receives one with certainty.
+Putting search back in recovers the baseline of Section~\ref{sec:RetirementModel}. The household chooses search effort; contingent on a successful search it receives the option to retire and a draw of the retirement account; it then takes the draw or works another period. The exogenous option probability $p\in[0,1)$ is restored, so a worker who exerts no effort receives a draw with probability $p$ and a worker who exerts maximal effort receives one with certainty. The worker's problem, the two gothic values, the effort rule, and the $\phi$-integrated value are \eqref{eq:ret_full_VW}, \eqref{eq:ret_full_gothV1}, \eqref{eq:ret_full_gothV2}, \eqref{eq:ret_full_effort}, and \eqref{eq:ret_full_barVRW}.
 
-The account realization follows~\eqref{eq:ret_price_dist}, with $\phi_t\perp\eta_t$ and i.i.d.\ across periods. The within-period timeline is as follows. After $\eta_t$ has materialized and $M_t$ is known, the household learns whether the option arrived (determined by last period's effort). If it did not, the agent must work; $\phi_t$ is then irrelevant, because there is no account to claim. If it did, the agent observes $\phi_t$ and chooses the hard maximum~\eqref{eq:ret_price_discrete}: claim $\tilde M_t=\phi_t M_t$ and retire, or deny and work. Search effort $\eff_t$ is chosen at the end of a working period and shifts the probability of receiving a (new) draw next period, exactly as in Section~\ref{sec:RetirementModel}.
-
-The retiree's problem remains the baseline problem evaluated at claimed wealth. The worker who must continue working solves
-\begin{align}
-	V_t^{W}(M_t)
-	&= \max_{\substack{0\le c_t\le M_t\\ 0\le\eff_t\le 1}}
-	\left\{
-		\log(c_t)-\delta-\theta(\eff_t)
-		+ \beta P_1(\eff_t)\,\goth{V}_t^{1}(A_t)
-		+ \beta P_2(\eff_t)\,\goth{V}_t^{2}(A_t)
-	\right\},
-	\label{eq:ret_full_VW}
-\end{align}
-with $A_t=M_t-c_t$, $P_1(\eff_t)=(1-\eff_t)p+\eff_t$, $P_2(\eff_t)=(1-\eff_t)(1-p)$, and the same search-cost function $\theta(\eff_t)=\sigma_s\bigl(\eff_t+(1-\eff_t)\log(1-\eff_t)\bigr)$ as in Section~\ref{sec:RetirementModel}. Current $\phi_t$ does not enter~\eqref{eq:ret_full_VW}: a worker who did not claim does not cash the account this period. What changes is the continuation. The expected value of saving $A_t$ when the option arrives next period now integrates over next period's account draw as well as income,
-\begin{align}
-	\goth{V}_t^{1}(A_t)
-	&= \int_{y_{t+1}}\int_{\phi_{t+1}}
-	V_{t+1}\bigl(M_{t+1}(A_t),\{R,W\},\phi_{t+1}\bigr)\,
-	dF(y_{t+1})\,dF(\phi_{t+1}),
-	\label{eq:ret_full_gothV1}
-\end{align}
-where $M_{t+1}=A_t R+y_{t+1}$ (the agent worked this period) and
-\begin{align}
-	V_{t+1}\bigl(M_{t+1},\{R,W\},\phi_{t+1}\bigr)
-	&= \max\Big\{
-		V_{t+1}^{\Ret}(\phi_{t+1} M_{t+1}),\;
-		V_{t+1}^{W}(M_{t+1})
-	\Big\}.
-	\label{eq:ret_full_discrete}
-\end{align}
-The expected value of saving $A_t$ when the option does \emph{not} arrive,
-\begin{align}
-	\goth{V}_t^{2}(A_t)
-	&= \int_{y_{t+1}}
-	V_{t+1}^{W}\bigl(M_{t+1}(A_t)\bigr)\,
-	dF(y_{t+1}),
-	\label{eq:ret_full_gothV2}
-\end{align}
-does not integrate over $\phi_{t+1}$, because a must-work agent cannot claim. Future draws still sit inside $V^{W}$ through $\goth{V}^{1}$ and $\goth{V}^{2}$ one period ahead.
-
-Search effort is chosen only on the working branch, after consumption, and does not depend on the current draw (the current $\phi_t$ is already sunk from the point of view of next period's option). The closed-form effort rule of Section~\ref{sec:RetirementModel} therefore carries over with the new gothic values~\eqref{eq:ret_full_gothV1}--\eqref{eq:ret_full_gothV2}:
-\begin{align}
-	\eff_t^{\ast}(A_t)
-	&= 1-\exp\left(
-		-\frac{\beta(1-p)}{\sigma_s}
-		\bigl(\goth{V}_t^{1}(A_t)-\goth{V}_t^{2}(A_t)\bigr)
-	\right).
-	\label{eq:ret_full_effort}
-\end{align}
-Account-value dispersion raises $\goth{V}_t^{1}$ relative to $\goth{V}_t^{2}$ because the option to retire is now also an option on $\phi_{t+1}$: the household claims when the draw is attractive and otherwise continues working. That option value increases the excess value of receiving the option, and therefore increases search effort---the two frictions are complements, exactly as a low durable price raises $\varepsilon_t^{\ast}$ in Section~\ref{subsec:ModelBasicFull}.
-
-The object that enters today's Euler equations is the pair of gothic values already defined; equivalently, one may write the beginning-of-period $\phi$-integrated value of a worker who will have the option as
-\begin{align}
-	\bar V_t^{R,W}(M_t)
-	\equiv \mathbb{E}_{\phi_t}\Big[
-		\max\big\{
-			V_t^{\Ret}(\phi_t M_t),\;
-			V_t^{W}(M_t)
-		\big\}
-	\Big],
-	\label{eq:ret_full_barVRW}
-\end{align}
-so that $\goth{V}_{t-1}^{1}(A_{t-1})=\mathbb{E}_{\eta_t}[\bar V_t^{R,W}(R A_{t-1}+y_t)]$. Equation~\eqref{eq:ret_full_VW} nests the standalone extensions: with $\sigma_\phi\to 0$ it collapses to the search problem of Section~\ref{sec:RetirementModel} (without taste shocks); with $\sigma_s\to\infty$ or $p=1$ (so $\eff_t^{\ast}=0$) it collapses to the realization-contingent hard maximum of Section~\ref{subsec:RetirementPrices}; and with both limits simultaneous it collapses to the hard-maximum baseline. We derive the combined envelope conditions, the worker's Euler equation, the terminal-period solution, and the EGM algorithm for the nested model in Appendix~\ref{subsec:appdx_ret_full}.
-
-The two frictions play complementary roles. Search governs whether a draw arrives; $\phi_t$ is the content of the draw, and the hard maximum~\eqref{eq:ret_full_discrete} is the decision to take it or to work another period. Search alone cannot cherry-pick a good account realization, because effort is chosen before $\phi_{t+1}$ is observed; account dispersion alone cannot smooth the problem of a worker who did not receive the option, because that agent cannot claim at any $\phi$. Together they smooth both the arrival of the option and the terms on which it is exercised.
-
+The two frictions play complementary roles, as in Section~\ref{subsec:ModelBasicFull}. Search governs whether a draw arrives. The account price $\phi_t$ is the content of the draw, and the hard maximum \eqref{eq:ret_full_discrete} is the decision to take it or to work another period. Search alone cannot cherry-pick a good account realization, because effort is chosen before $\phi_{t+1}$ is observed. Account dispersion on its own, the case $p=1$ above, cannot smooth the problem of a worker who did not receive the option, because that agent cannot claim at any $\phi$. Together they smooth both the arrival of the option and the terms on which it is exercised. With $\sigma_\phi\to 0$ the baseline collapses to search with a hard maximum at book resources. With $p=1$ it collapses to \eqref{eq:ret_price_VW}. We derive the combined envelope conditions, the worker's Euler equation, the terminal-period solution, and the EGM algorithm in Appendix~\ref{subsec:appdx_ret_full}.
 
 \subsection{Results}
 Introducing price dispersion smooths the problem numerical with two features which figure~\ref{fig:fig8} illustrates. The left panel shows the consumption function for larger price dispersion. A higher price dispersion means that the agent could receive a much larger retirement wealth amount or a smaller amount. Therefore, agents who receive a low draw might want to wait another period and hope for a better draw in the future. As a result, larger price dispersion leads to a smoother consumption function. Numerically, it matters how many price points we are considering. The right panel shows that with only 5 points (red), we increase the number of discontinuities, but it is not enough to smooth the full consumption function. With a larger number of points and th assumption of a large number of agents, the combined consumption function consists of the average of many functions in which some agents accept and others do not. Note that for a large number of shock points -- eg 151 -- the smoothing does not change much compared to an even larger number --eg 351.

@@ -1,0 +1,4 @@
+\beamer@sectionintoc {1}{Previous story}{2}{0}{1}
+\beamer@sectionintoc {2}{Update 1: Price dispersion}{7}{0}{2}
+\beamer@sectionintoc {3}{Update 2: Durable model}{10}{0}{3}
+\beamer@sectionintoc {4}{Open questions}{15}{0}{4}

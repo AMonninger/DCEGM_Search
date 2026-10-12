@@ -1,12 +1,12 @@
 %============================================================
 \section{Retirement-model appendix}\label{sec:appdx_retirement}
 %============================================================
-This appendix derives the objects used in Sections~\ref{sec:RetirementModel} and~\ref{sec:RetirementModelPrices}. Section~\ref{subsec:appdx_ret_baseline} records the baseline envelopes and Euler equations (no account-value risk). Section~\ref{subsec:appdx_ret_price} introduces stochastic retirement-account realizations in isolation. Section~\ref{subsec:appdx_ret_full} nests those realizations with directed search.
+This appendix derives the objects used in Sections~\ref{sec:RetirementModel} and~\ref{sec:RetirementModelPrices}. Section~\ref{subsec:appdx_ret_baseline} records the retiree block and the search problem without account-value risk. Section~\ref{subsec:appdx_ret_price} shuts search down and keeps the stochastic account realization. Section~\ref{subsec:appdx_ret_full} is the baseline of Section~\ref{sec:RetirementModel}: directed search together with that realization.
 
 %------------------------------------------------------------
 \subsection{Baseline envelopes and Euler equations}\label{subsec:appdx_ret_baseline}
 %------------------------------------------------------------
-The environment is that of Section~\ref{sec:RetirementModel}: log utility, disutility of work $\delta$, convex search cost $\theta(\eff_t)=\sigma_s\bigl(\eff_t+(1-\eff_t)\log(1-\eff_t)\bigr)$, option probabilities $P_1(\eff_t)=(1-\eff_t)p+\eff_t$ and $P_2(\eff_t)=(1-\eff_t)(1-p)$, and $M_{t+1}=A_t R+y_{t+1}d_t$ with $y_{t+1}=y\eta_{t+1}$. Claiming delivers book resources one-for-one, so both branches use $A_t=M_t-c_t$.
+This subsection records the blocks that do not depend on the account price $\phi_t$: log utility, disutility of work $\delta$, convex search cost $\theta(\eff_t)=\sigma_s\bigl(\eff_t+(1-\eff_t)\log(1-\eff_t)\bigr)$, option probabilities $P_1(\eff_t)=(1-\eff_t)p+\eff_t$ and $P_2(\eff_t)=(1-\eff_t)(1-p)$, and $M_{t+1}=A_t R+y_{t+1}d_t$ with $y_{t+1}=y\eta_{t+1}$. When there is no account-price draw, claiming delivers book resources one-for-one, so both branches use $A_t=M_t-c_t$. The baseline of Section~\ref{sec:RetirementModel} evaluates the retiree block below at claimed wealth $\phi_t M_t$.
 
 \paragraph{Retiree.}
 Retirement is self-absorbing. The Bellman equation is
@@ -32,7 +32,7 @@ The envelope theorem gives $\partial V_t^{\Ret}/\partial M_t=\lambda_t^{\Ret}=1/
 or $c_t^{\Ret}=\bigl(R\beta(c_{t+1}^{\Ret}(A_t R))^{-1}\bigr)^{-1}$, as in the main text. The gothic retiree value is $\goth{V}_t^{\Ret}(A_t)\equiv V_{t+1}^{\Ret}(A_t R)$. This retiree problem is an input to Sections~\ref{subsec:appdx_ret_price}--\ref{subsec:appdx_ret_full}: a claimed account $\tilde M=\phi M$ is just a different starting point for the same functions $V_t^{\Ret}$ and $c_t^{\Ret}$.
 
 \paragraph{Worker who must work.}
-With the taste shock $\xi_t$ outside the inner maximum, as in Section~\ref{sec:RetirementModel},
+For comparison with a multiplicative taste shock, the worker's problem below keeps $\xi_t$ outside the inner maximum. The baseline of Section~\ref{sec:RetirementModel} shuts that shock down and replaces it with the account price $\phi_t$. With $\xi_t$ outside the inner maximum,
 \begin{align}
 	V_t^{W}(M_t,\xi_t)
 	&= \xi_t\max_{\substack{0\le c_t\le M_t\\ 0\le\eff_t\le 1}}
@@ -97,7 +97,7 @@ so
 	+\mathbbm{1}_{t+1}^{1}\cdot\xi_{t+1}\cdot\frac{1}{c_{t+1}^{W}},
 	\label{eq:ret_baseline_env_RW}
 \end{align}
-with $\mathbbm{1}_{t+1}^{0}=1$ iff $V_{t+1}^{\Ret}\ge V_{t+1}^{W}$ and $\mathbbm{1}_{t+1}^{1}=1-\mathbbm{1}_{t+1}^{0}$. Substituting~\eqref{eq:ret_baseline_env_W}--\eqref{eq:ret_baseline_env_RW} into~\eqref{eq:ret_baseline_foc_c} recovers the worker consumption function in the main text.
+with $\mathbbm{1}_{t+1}^{0}=1$ iff $V_{t+1}^{\Ret}\ge V_{t+1}^{W}$ and $\mathbbm{1}_{t+1}^{1}=1-\mathbbm{1}_{t+1}^{0}$. Substituting~\eqref{eq:ret_baseline_env_W}--\eqref{eq:ret_baseline_env_RW} into~\eqref{eq:ret_baseline_foc_c} recovers the worker consumption function of this taste-shock specification. The baseline consumption function, with search and the account price, is~\eqref{eq:ret_worker_c}.
 
 \paragraph{Terminal period.}
 With $V_{T+1}\equiv 0$ and no borrowing, both branches set $A_T=0$. The retiree consumes $c_T^{\Ret}=M_T$ and $V_T^{\Ret}=\log(M_T)$. The worker consumes $c_T^{W}=M_T$ and $V_T^{W}(M_T,\xi_T)=\xi_T\bigl(\log(M_T)-\delta\bigr)$ (effort is irrelevant because there is no $T+1$). The option-contingent value is the hard maximum of the two.
@@ -147,7 +147,7 @@ Define the state- and draw-contingent indicators $\mathbbm{1}_t^{0}(M_t,\phi_t)=
 	+\mathbbm{1}_t^{1}\cdot\frac{1}{c_t^{W}(M_t)}.
 	\label{eq:ret_price_env_RW}
 \end{align}
-Unlike the multiplicative taste shock of Section~\ref{sec:RetirementModel}, which reweights the two branches without changing either continuous policy, $\phi_t$ affects~\eqref{eq:ret_price_env_RW} both through the indicator (the extensive margin) and through the argument of $c_t^{\Ret}$ and the factor $\phi_t$ (the intensive margin and the mark-to-market of book wealth).
+A multiplicative taste shock would reweight the two branches without changing either continuous policy. The account price $\phi_t$ affects~\eqref{eq:ret_price_env_RW} both through the indicator (the extensive margin) and through the argument of $c_t^{\Ret}$ and the factor $\phi_t$ (the intensive margin and the mark-to-market of book wealth).
 
 \paragraph{Integrating out the account draw.}
 The objects that enter the time-$(t-1)$ Euler equations are the $\phi$-integrated value and marginal-value functions
@@ -249,7 +249,7 @@ Computational cost scales with $K$ only in the combine step and in the $J\times 
 %------------------------------------------------------------
 \subsection{Derivations: Search and stochastic retirement wealth (Section~\ref{subsec:RetirementSearchPrices})}\label{subsec:appdx_ret_full}
 %------------------------------------------------------------
-This subsection derives the optimal search-effort rule, the combined envelope conditions, the Euler equations, the terminal-period solution, and the EGM algorithm for the nested environment of Section~\ref{subsec:RetirementSearchPrices}. The within-branch building blocks are taken from the standalone extensions: the retiree is exactly the baseline of Section~\ref{subsec:appdx_ret_baseline}, evaluated at claimed wealth $\phi_t M_t$; the search cost $\theta(\eff_t)$ and its derivative $\theta'(\eff_t)=-\sigma_s\log(1-\eff_t)$ are those of Section~\ref{sec:RetirementModel}; and the worker's budget remains $A_t=M_t-c_t$. Taste shocks are shut down. What is new is that a successful search delivers a rejectable account draw rather than a sure claim at book value.
+This subsection derives the optimal search-effort rule, the combined envelope conditions, the Euler equations, the terminal-period solution, and the EGM algorithm for the baseline of Section~\ref{sec:RetirementModel}. The retiree is the problem of Section~\ref{subsec:appdx_ret_baseline}, evaluated at claimed wealth $\phi_t M_t$. The search cost is $\theta(\eff_t)=\sigma_s\bigl(\eff_t+(1-\eff_t)\log(1-\eff_t)\bigr)$, with derivative $\theta'(\eff_t)=-\sigma_s\log(1-\eff_t)$, and the worker's budget remains $A_t=M_t-c_t$. A successful search delivers a rejectable account draw.
 
 \paragraph{Claiming first-order conditions.}
 Holding $\phi_t$ fixed and accepting the draw, the retiree's problem is the baseline problem at $\tilde M_t=\phi_t M_t$. The Euler equation is~\eqref{eq:ret_baseline_euler} and the chain-rule envelope is~\eqref{eq:ret_price_env_Ret}. No search takes place after claiming.
@@ -363,7 +363,7 @@ Substituting~\eqref{eq:ret_full_dV1}--\eqref{eq:ret_full_dV2} and the envelopes~
 	\label{eq:ret_full_euler_W}
 \end{aligned}
 \end{equation}
-Relative to the baseline worker Euler in Section~\ref{sec:RetirementModel}, three things change: the taste shock $\xi_{t+1}$ is absent; the retiree-branch marginal utility is $\phi_{t+1}/c_{t+1}^{\Ret}(\phi_{t+1} M_{t+1})$ rather than $1/c_{t+1}^{\Ret}(M_{t+1})$; and $\mathbbm{1}_{t+1}^{0}$ depends on $\phi_{t+1}$. Relative to the account-only Euler~\eqref{eq:ret_price_euler_W}, the continuation additionally mixes over next period's arrival of the option through $P_1(\eff_t^{\ast})$ and $P_2(\eff_t^{\ast})$.
+Equation~\eqref{eq:ret_full_euler_W} is the worker Euler of Section~\ref{sec:RetirementModel}. Relative to the account-only Euler~\eqref{eq:ret_price_euler_W}, the continuation mixes over next period's arrival of the option through $P_1(\eff_t^{\ast})$ and $P_2(\eff_t^{\ast})$.
 
 \paragraph{Terminal period.}
 The within-branch terminal solutions are those of the account-only extension: $c_T^{W}=M_T$, $V_T^{W}=\log(M_T)-\delta$, and $V_T^{\Ret}(\phi_T M_T)=\log(\phi_T M_T)$ from~\eqref{eq:ret_price_terminal}. Search effort is irrelevant at $T$ because there is no $T+1$. The terminal discrete problem of a worker who has the option is the hard maximum~\eqref{eq:ret_price_terminal_threshold}, and $\bar V_T^{R,W}(M_T)=\mathbb{E}_{\phi_T}[V_T(M_T,\phi_T)]$ is the continuation handed to period $T-1$ through $\goth{V}_{T-1}^{1}$. A worker who does not have the option at $T$ must work, so $\goth{V}_{T-1}^{2}$ is the expected value of $V_T^{W}(R A_{T-1}+y_T)$.

@@ -21,7 +21,7 @@ The paper's computational claim is that a smoother discrete margin can make the 
 
 The second statement is the one the figures cannot address. Visual smoothness of $c_t(n_0,m_t)$ is compatible with two very different mechanisms: the envelope deleted the dominated roots, or the smoother mixed over them. A smooth wrong answer is strictly worse than a jagged right one, because it conceals the error. Euler residuals distinguish those mechanisms only when they are paired with the kink counts. Residuals that remain small as the kink counts fall to zero mean that the EGM step became clean \emph{and} the stored policy still solves the Euler equation of the model that was solved. Residuals that deteriorate as the plots become smoother would mean that smoothness was purchased by averaging over points that should have been discarded.
 
-A caveat, which is why both diagnostics are needed, is that Euler residuals cannot rank the four channels against a common ``true'' hard-max solution. Taste shocks, search, prices, and income risk each change the economy: they are not alternative algorithms for the same Bellman equation. \citet{Santos2000-ec}'s bound from residuals to policy error also requires concavity of the continuation value, which neither the log-sum nor the search aggregator restores (Appendix~\ref{sec:appdx_smoothness}). The residuals therefore certify \emph{internal} accuracy of each specification, not proximity to the frictionless target. Distance to that target is a separate object---a policy or welfare deviation as $S\to 0$ or $\sigma_\varepsilon\to 0$---and is not computed here. The analogous split in \citet{Dobrescu2022-ii} is between Euler errors (identical across envelope methods that recover the same upper envelope) and a ``true deviation'' against a high-resolution benchmark.
+A caveat, which is why both diagnostics are needed, is that Euler residuals cannot rank the four channels against a common ``true'' hard-max solution. Taste shocks, search, prices, and income risk each change the economy: they are not alternative algorithms for the same Bellman equation. \citet{Santos2000-ec}'s bound from residuals to policy error also requires concavity of the continuation value, which neither the log-sum nor the search aggregator restores (Appendix~\ref{sec:appdx_smoothness}). The residuals therefore certify \emph{internal} accuracy of each specification, not proximity to the frictionless target. Distance to that target is a separate object---a policy or welfare deviation as $S\to 0$ or $\sigma_\zeta\to 0$---and is not computed here. The analogous split in \citet{Dobrescu2022-ii} is between Euler errors (identical across envelope methods that recover the same upper envelope) and a ``true deviation'' against a high-resolution benchmark.
 
 \subsubsection{Construction}
 
@@ -77,7 +77,7 @@ I report the mean and the 95th percentile of each residual. The mean can look ac
 
 \subsubsection{The four-channel experiment}
 
-The experiment is the same as Figure~\ref{fig:smoothing_shifts_levels}. Starting from a lightly smoothed reference in each channel, I increase one smoothness parameter at a time, holding the others at their inactive values (except that the income experiment retains a small EV scale so the discrete margin remains defined). The four panels vary $\sigma_\varepsilon$, $S$, $\sigma_p$, and $\sigma_\eta$. All objects are evaluated in the same earlier period and at the same representative $n_0$ as Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs}.
+The experiment is the same as Figure~\ref{fig:smoothing_shifts_levels}. Starting from a lightly smoothed reference in each channel, I increase one smoothness parameter at a time, holding the others at their inactive values (except that the income experiment retains a small EV scale so the discrete margin remains defined). The four panels vary $\sigma_\zeta$, $S$, $\sigma_p$, and $\sigma_\eta$. All objects are evaluated in the same earlier period and at the same representative $n_0$ as Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs}.
 
 Two companion figures replace the single-magnitude snapshot in Table~\ref{tab:smoothing_kinks} with the full sweep.
 
@@ -86,7 +86,7 @@ Two companion figures replace the single-magnitude snapshot in Table~\ref{tab:sm
 	% \includegraphics[width=0.98\linewidth]{../Figures/DurableModel/SmoothingDiag_kinks_periodt.pdf}
 	\fbox{\parbox{0.95\linewidth}{\centering\vspace{2.2cm}
 	\emph{Placeholder.} Four panels, same layout as Figure~\ref{fig:smoothing_shifts_levels}:
-	(a)~$\sigma_\varepsilon$, (b)~$S$, (c)~$\sigma_p$, (d)~$\sigma_\eta$.
+	(a)~$\sigma_\zeta$, (b)~$S$, (c)~$\sigma_p$, (d)~$\sigma_\eta$.
 	Each panel: keeper decreasing-segment count (solid) and adjuster FUES removals (dashed)
 	against the smoothness parameter. Mark the first value at which the keeper count hits zero.
 	\vspace{2.2cm}}}
@@ -99,7 +99,7 @@ Two companion figures replace the single-magnitude snapshot in Table~\ref{tab:sm
 	% \includegraphics[width=0.98\linewidth]{../Figures/DurableModel/SmoothingDiag_euler_periodt.pdf}
 	\fbox{\parbox{0.95\linewidth}{\centering\vspace{2.2cm}
 	\emph{Placeholder.} Four panels, same layout as Figure~\ref{fig:smoothing_shifts_levels}:
-	(a)~$\sigma_\varepsilon$, (b)~$S$, (c)~$\sigma_p$, (d)~$\sigma_\eta$.
+	(a)~$\sigma_\zeta$, (b)~$S$, (c)~$\sigma_p$, (d)~$\sigma_\eta$.
 	Each panel: mean (solid) and 95th percentile (dashed) of $\mathrm{EE}_c^{\mathrm{keep}}$
 	and $\mathrm{EE}_d^{\mathrm{adj}}$ against the smoothness parameter, $\log_{10}$ scale.
 	A horizontal line at $-3$ is a 0.1\% consumption error.
@@ -108,23 +108,23 @@ Two companion figures replace the single-magnitude snapshot in Table~\ref{tab:sm
 	\label{fig:smoothing_diagnostics_euler}
 \end{figure}
 
-Table~\ref{tab:smoothing_euler} reports the same $\sigma_\varepsilon$, $S$, and $\sigma_p$ magnitudes as Figure~\ref{fig:smoothing_shifts_levels}, with residuals alongside the kink counts.
+Table~\ref{tab:smoothing_euler} reports the same $\sigma_\zeta$, $S$, and $\sigma_p$ magnitudes as Figure~\ref{fig:smoothing_shifts_levels}, with residuals alongside the kink counts.
 
 \begin{table}[htbp]
 \centering
-\caption{Period-$t$ kink counts and Euler residuals under the hard-max baseline and the same $\sigma_\varepsilon$, $S$, and $\sigma_p$ sweep as Figure~\ref{fig:smoothing_shifts_levels}. Residuals are mean and 95th percentile of~\eqref{eq:judd_ee} on an off-grid test mesh; constrained points excluded. The $\sigma_p$ adjuster kink count sums over price nodes.}
+\caption{Period-$t$ kink counts and Euler residuals under the hard-max baseline and the same $\sigma_\zeta$, $S$, and $\sigma_p$ sweep as Figure~\ref{fig:smoothing_shifts_levels}. Residuals are mean and 95th percentile of~\eqref{eq:judd_ee} on an off-grid test mesh; constrained points excluded. The $\sigma_p$ adjuster kink count sums over price nodes.}
 \label{tab:smoothing_euler}
 \small
 \input{../Tables/smoothing_euler}
 \end{table}
 
-The prediction from Appendix~\ref{sec:appdx_smoothness} is sharp enough to be wrong, and Table~\ref{tab:smoothing_euler} splits by branch. For the keeper it holds. Decreasing segments are zero at every listed $S$ and $\sigma_\varepsilon$, and $\mathrm{EE}_c^{\mathrm{keep}}$ does \emph{not} deteriorate: the hard-max mean and 95th percentile are $-4.19$ and $-2.50$; they improve to $-4.52$ and $-3.39$ at $\sigma_\varepsilon=0.2$ and to $-4.42$ and $-3.24$ at $S=0.3$. The smoother combined consumption rule is not an average over dominated keeper roots. For the adjuster the deletion count is not enough. FUES removals are zero under taste and search at every listed magnitude, but the 95th percentile of $\mathrm{EE}_d^{\mathrm{adj}}$ remains positive ($0.45$--$0.69$ as $\sigma_\varepsilon$ rises; $0.27$--$0.22$ as $S$ rises), while the mean stays around $-3$. Raising the smoother does not repair the tail. Cleanliness of the raw FOC cloud is not the same as accuracy of the stored $(c,d)$ interpolant; FUES is not shown to be redundant by the deletion count alone. Price dispersion continues to remove adjuster points ($20$, $17$, $34$ as $\sigma_p$ increases; the count sums over nodes) and has a similar tail, consistent with the $d$-FOC nonconvexity being independent of the keep--adjust aggregator. The 95th percentile is the relevant check near the S,s band: the mean can be dominated by the large keep and adjust regions where the Euler equation is well behaved even under a hard maximum.
+The prediction from Appendix~\ref{sec:appdx_smoothness} is sharp enough to be wrong, and Table~\ref{tab:smoothing_euler} splits by branch. For the keeper it holds. Decreasing segments are zero at every listed $S$ and $\sigma_\zeta$, and $\mathrm{EE}_c^{\mathrm{keep}}$ does \emph{not} deteriorate: the hard-max mean and 95th percentile are $-4.19$ and $-2.50$; they improve to $-4.52$ and $-3.39$ at $\sigma_\zeta=0.2$ and to $-4.42$ and $-3.24$ at $S=0.3$. The smoother combined consumption rule is not an average over dominated keeper roots. For the adjuster the deletion count is not enough. FUES removals are zero under taste and search at every listed magnitude, but the 95th percentile of $\mathrm{EE}_d^{\mathrm{adj}}$ remains positive ($0.45$--$0.69$ as $\sigma_\zeta$ rises; $0.27$--$0.22$ as $S$ rises), while the mean stays around $-3$. Raising the smoother does not repair the tail. Cleanliness of the raw FOC cloud is not the same as accuracy of the stored $(c,d)$ interpolant; FUES is not shown to be redundant by the deletion count alone. Price dispersion continues to remove adjuster points ($20$, $17$, $34$ as $\sigma_p$ increases; the count sums over nodes) and has a similar tail, consistent with the $d$-FOC nonconvexity being independent of the keep--adjust aggregator. The 95th percentile is the relevant check near the S,s band: the mean can be dominated by the large keep and adjust regions where the Euler equation is well behaved even under a hard maximum.
 
 Two further restrictions on interpretation follow from the same theory and from the experiment in Figure~\ref{fig:smoothing_shifts_levels}.
 
 First, the four channels are not ranked by who attains the smallest residual. They are different models. They can be ranked by the kink counts at a common adjustment hazard---the apple-to-apple comparison of Section~\ref{subsec:ModelBasicSmoothingCompare}---with Euler residuals serving only as a certificate that each column is a well-solved instance of its own model. That is the same division of labour as in \citet{Dobrescu2022-ii}: envelope methods that recover the same upper envelope have essentially identical Euler errors, and the comparison is then over speed (and, here, over the economic content of the smoother).
 
-Second, residuals that remain small as $S\to\infty$ or $\sigma_\varepsilon\to\infty$ are uninformative about the paper's claim. In those limits the discrete choice is smoothed away by being removed, the keeper problem is a standard concave consumption-saving problem, and the Euler equation is necessary and sufficient for reasons that have nothing to do with search. The informative region is the smallest $S$ (or $\sigma_\varepsilon$) at which Figure~\ref{fig:smoothing_diagnostics_kinks} first reports a clean keeper step, read against Figure~\ref{fig:smoothing_diagnostics_euler} at that same value. That pair is the quantitative version of the abstract's statement that with ample search frictions the suboptimal points can be eliminated entirely.
+Second, residuals that remain small as $S\to\infty$ or $\sigma_\zeta\to\infty$ are uninformative about the paper's claim. In those limits the discrete choice is smoothed away by being removed, the keeper problem is a standard concave consumption-saving problem, and the Euler equation is necessary and sufficient for reasons that have nothing to do with search. The informative region is the smallest $S$ (or $\sigma_\zeta$) at which Figure~\ref{fig:smoothing_diagnostics_kinks} first reports a clean keeper step, read against Figure~\ref{fig:smoothing_diagnostics_euler} at that same value. That pair is the quantitative version of the abstract's statement that with ample search frictions the suboptimal points can be eliminated entirely.
 
 \subsubsection{Implementation notes}
 

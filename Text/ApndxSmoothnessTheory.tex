@@ -61,11 +61,9 @@ theorem, and both properties can be obtained simultaneously.
 
 \begin{remark}[Notation]
 \label{rem:notation}
-Section~\ref{subsec:ModelBasicTaste} uses $\varepsilon_t^{\keep},\varepsilon_t^{\adj}$
-for the Extreme Value Type~I draws while Section~\ref{subsec:ModelBasicSearch} uses
-$\varepsilon_t$ for search intensity. To avoid the collision, this appendix reserves
-$\varepsilon$ for search intensity and writes the Gumbel draws as
-$\zeta_t^{\keep},\zeta_t^{\adj}$. The main text should be harmonised accordingly.
+The Extreme Value Type~I draws are $\zeta_t^{\keep}$ and $\zeta_t^{\adj}$, with scale
+$\sigma_\zeta$, in both the retirement model and Section~\ref{subsec:ModelBasicTaste}.
+Search intensity remains $\varepsilon_t$.
 \end{remark}
 
 %------------------------------------------------------------
@@ -103,7 +101,7 @@ cases of interest are
 \begin{align}
 \Phi^{\max}(\delta) &= \max\{0,\delta\},
 &
-\Phi^{\sigma}(\delta) &= \sigma_\varepsilon\log\!\big(1+e^{\delta/\sigma_\varepsilon}\big),
+\Phi^{\sigma}(\delta) &= \sigma_\zeta\log\!\big(1+e^{\delta/\sigma_\zeta}\big),
 &
 \Phi^{S}(\delta) &= \max_{\varepsilon\in[0,1]}\big\{\varepsilon\delta-\sigma(\varepsilon)\big\},
 \label{eq:three_Phi}
@@ -198,7 +196,7 @@ Assumption~\ref{as:transversal} does double duty. It is what makes the negative 
 \emph{true} --- a degenerate tangential crossing would produce no kink at all --- and
 it is what guarantees that the smoothing region in
 Propositions~\ref{prop:evtaste} and~\ref{prop:search} has positive width of order
-$\sigma_\varepsilon$ and $S$ respectively.
+$\sigma_\zeta$ and $S$ respectively.
 
 \begin{assumption}[Single crossing]
 \label{as:singlecross}
@@ -522,8 +520,7 @@ $a$ is $\kappa_t\mathcal{R}f_\theta(\eta^{\ast})/y$; dividing by $\mathcal{R}$ g
 stated contribution to $\E[v_{mm,t}]$. Apply Lemma~\ref{lem:egm}(ii).
 \end{proof}
 
-Proposition~\ref{prop:exactincome} rationalises the finding in
-Figs.~\ref{fig:fig4}(a)--(b) that income uncertainty adds smoothness but does not
+Proposition~\ref{prop:exactincome} rationalises the finding that income uncertainty adds smoothness but does not
 remove the discontinuities: exact integration upgrades the policy from discontinuous to
 continuous, but leaves a curvature spike whose height is inversely proportional to the
 dispersion of income. The discrete choice must be smoothed as well.
@@ -554,28 +551,28 @@ open to the objection that it smooths away the economics rather than the numeric
 
 \begin{proposition}[EV Type~I delivers $C^{\infty}$]
 \label{prop:evtaste}
-Let $\Phi=\Phi^{\sigma}$ with scale $\sigma_\varepsilon>0$. Then $\Phi^{\sigma}$ is real
+Let $\Phi=\Phi^{\sigma}$ with scale $\sigma_\zeta>0$. Then $\Phi^{\sigma}$ is real
 analytic on $\mathbb{R}$, with
 \begin{align}
-(\Phi^{\sigma})'(\delta) = P^{\adj}=\frac{1}{1+e^{-\delta/\sigma_\varepsilon}}\in(0,1),
+(\Phi^{\sigma})'(\delta) = P^{\adj}=\frac{1}{1+e^{-\delta/\sigma_\zeta}}\in(0,1),
 \qquad
-(\Phi^{\sigma})''(\delta) = \frac{P^{\adj}(1-P^{\adj})}{\sigma_\varepsilon}\le\frac{1}{4\sigma_\varepsilon},
+(\Phi^{\sigma})''(\delta) = \frac{P^{\adj}(1-P^{\adj})}{\sigma_\zeta}\le\frac{1}{4\sigma_\zeta},
 \end{align}
-and $0<\Phi^{\sigma}(\delta)-\Phi^{\max}(\delta)=\sigma_\varepsilon\log\big(1+e^{-|\delta|}\big)\le\sigma_\varepsilon\log 2$.
+and $0<\Phi^{\sigma}(\delta)-\Phi^{\max}(\delta)=\sigma_\zeta\log\big(1+e^{-|\delta|}\big)\le\sigma_\zeta\log 2$.
 Under Assumptions~\ref{as:u}--\ref{as:shocks} and exact income integration,
 $v_t\in C^{\infty}$ for every $t\le T$, $c_t\in C^{\infty}$, marginal propensities to
 consume are continuous, and
 \begin{align}
 \big\|v_{mm,t}\big\|_{\infty} \;\le\; \max_{j}\big\|v_{mm,t}^{j}\big\|_{\infty}
-+ \frac{\Xi_t^{2}}{4\sigma_\varepsilon}.
++ \frac{\Xi_t^{2}}{4\sigma_\zeta}.
 \label{eq:ev_curvature}
 \end{align}
 \end{proposition}
 
 \begin{proof}
 The derivative formulas are direct, and $P(1-P)\le\tfrac14$. The bias identity follows
-from $\sigma_\varepsilon\log(1+e^{\delta/\sigma_\varepsilon})-\max\{0,\delta\}
-=\sigma_\varepsilon\log(1+e^{-|\delta|})$. For the class: by
+from $\sigma_\zeta\log(1+e^{\delta/\sigma_\zeta})-\max\{0,\delta\}
+=\sigma_\zeta\log(1+e^{-|\delta|})$. For the class: by
 Assumption~\ref{as:terminal} the base case holds at $T$; if $v_{t+1}\in C^{\infty}$
 then $v_t^{j}\in C^{\infty}$ by Lemma~\ref{lem:transfer}(iii), and
 $v_t=v_t^{0}+\Phi^{\sigma}(\Delta_t)$ is a composition of real analytic with
@@ -586,10 +583,10 @@ and bounding each term yields~\eqref{eq:ev_curvature}.
 
 Proposition~\ref{prop:evtaste} combined with Lemma~\ref{lem:egm} yields the explicit
 \emph{bias--smoothness trade-off} that the main text asserts only qualitatively:
-curvature is $O(1/\sigma_\varepsilon)$ while the per-period model bias is
-$O(\sigma_\varepsilon)$. Solving~\eqref{eq:egm_condition} for $\sigma_\varepsilon$
-delivers a threshold $\sigma_\varepsilon^{\ast}$ above which the EGM step is clean, and
-$\sigma_\varepsilon^{\ast}\log 2$ is then the model distortion required to purchase an
+curvature is $O(1/\sigma_\zeta)$ while the per-period model bias is
+$O(\sigma_\zeta)$. Solving~\eqref{eq:egm_condition} for $\sigma_\zeta$
+delivers a threshold $\sigma_\zeta^{\ast}$ above which the EGM step is clean, and
+$\sigma_\zeta^{\ast}\log 2$ is then the model distortion required to purchase an
 envelope-free solve. That number is the honest headline statistic for the exercise and
 should be reported.
 
@@ -667,7 +664,7 @@ for $\delta>0$ and equality to zero for $\delta\le0$.
 \end{proof}
 
 Note the contrast in the direction of the bias. The log-sum lies \emph{above} the
-maximum, by at most $\sigma_\varepsilon\log 2$, reflecting the option value of taste
+maximum, by at most $\sigma_\zeta\log 2$, reflecting the option value of taste
 variation; directed search lies \emph{below} it, by at most $S$, reflecting the
 resources absorbed by search. Both biases vanish linearly in the smoothing parameter.
 
@@ -731,7 +728,7 @@ that distinguishes search from logit: under logit, $P^{\adj}(0)=\tfrac12$ and
 probability mass is placed on the dominated branch arbitrarily far from indifference,
 which is the mechanism behind the finding that a large share of adjusters adjust for
 taste rather than fundamental reasons. Part (ii) is the exact reason for the asymmetric
-smoothing visible in Fig.~\ref{fig:fig2}(b): the asymmetry is a property of the
+smoothing visible in Fig.~\ref{fig:search}: the asymmetry is a property of the
 functional form, and \emph{no} choice of $S$ removes it. The paper attributes the
 asymmetry to an economic mechanism (agents with low resources do not search); that
 account is correct but incomplete, since the deeper cause is the truncation at
@@ -789,7 +786,7 @@ required. The following a priori estimate supplies them.
 \label{prop:uniform}
 Let $\Phi$ satisfy $\|\Phi''\|_{\infty}\le C_\Phi<\infty$, so
 $C_\Phi=1/S$ under directed search (Lemma~\ref{lem:searchclosed}) and
-$C_\Phi=1/(4\sigma_\varepsilon)$ under EV Type~I taste shocks
+$C_\Phi=1/(4\sigma_\zeta)$ under EV Type~I taste shocks
 (Proposition~\ref{prop:evtaste}). Suppose
 Assumptions~\ref{as:u}--\ref{as:impatience} hold and $\Xi\equiv\sup_t\Xi_t<\infty$.
 Then
@@ -807,7 +804,7 @@ Consequently, by Lemma~\ref{lem:egm}(ii), the EGM step is clean at every $t$ whe
 S \;>\; S^{\ast} \;\equiv\;
 \frac{\beta\mathcal{R}^{2}\,\Xi^{2}}{\big(1-\beta\mathcal{R}^{2}\big)\,\inf\big|u''\big|},
 \qquad\text{respectively}\qquad
-\sigma_\varepsilon \;>\; \sigma_\varepsilon^{\ast} \;=\; S^{\ast}/4 .
+\sigma_\zeta \;>\; \sigma_\zeta^{\ast} \;=\; S^{\ast}/4 .
 \label{eq:threshold}
 \end{align}
 \end{proposition}
@@ -891,7 +888,7 @@ In the retirement model:
 \end{enumerate}
 \end{proposition}
 
-Proposition~\ref{prop:retirement}(iv) reproduces Fig.~\ref{fig:fig2}(b) analytically:
+Proposition~\ref{prop:retirement}(iv) reproduces Fig.~\ref{fig:search} analytically:
 the smoothing is exactly quadratic on one side of the threshold and exactly absent on
 the other, with a second-derivative jump of $(\beta(1-p)\kappa)^{2}/\sigma_s$. Part
 (iii) explains why taste shocks are indispensable in this application but not in the
@@ -946,7 +943,7 @@ Let $\Phi$ be convex, nondecreasing and non-affine, as is the case for both
 $\Phi^{\sigma}$ and $\Phi^{S}$. Then $v_t=v_t^{0}+\Phi(\Delta_t)$ is not concave in
 general even when $v_t^{0}$ and $v_t^{1}$ are concave, since $\Phi$ composed with the
 difference of two concave functions need not be concave. Concavity is recovered only in
-the degenerate limits $\sigma_\varepsilon\to\infty$ or $S\to\infty$, in which the
+the degenerate limits $\sigma_\zeta\to\infty$ or $S\to\infty$, in which the
 discrete choice disappears.
 \end{proposition}
 
@@ -979,7 +976,7 @@ deviation of the aggregator from the hard maximum.}
 Aggregator & $\Phi$ class & $v_t$ & $v_{m,t}$ & $c_{t-1}$ & MPC \\
 \midrule
 Hard max & $C^{0}\setminus C^{1}$ & $C^{0}$ & discontinuous & discontinuous & unbounded \\
-EV Type~I, $\sigma_\varepsilon>0$ & analytic & $C^{\infty}$ & $C^{\infty}$ & $C^{\infty}$ & continuous \\
+EV Type~I, $\sigma_\zeta>0$ & analytic & $C^{\infty}$ & $C^{\infty}$ & $C^{\infty}$ & continuous \\
 Log-normal, $K$ nodes & --- & $C^{0}$ & discontinuous & discontinuous & unbounded \\
 Log-normal, exact & --- & $C^{\infty}$ & $C^{\infty}$ & $C^{\infty}$ & continuous \\
 Search, log cost & $C^{1}\setminus C^{2}$ & $C^{1}$ & $C^{0}$ & $C^{0}$ & jumps \\
@@ -988,7 +985,7 @@ Search, power cost $\gamma$ & $C^{\gamma}\setminus C^{\gamma+1}$ & $C^{\gamma}$ 
 & $\|\Phi''\|_\infty$ & bias & clean EGM & one-sided & \\
 \midrule
 Hard max & $+\infty$ & $0$ & never & yes & \\
-EV Type~I, $\sigma_\varepsilon>0$ & $1/(4\sigma_\varepsilon)$ & $\le\sigma_\varepsilon\log 2$ & if $\sigma_\varepsilon>\sigma_\varepsilon^{\ast}$ & no & \\
+EV Type~I, $\sigma_\zeta>0$ & $1/(4\sigma_\zeta)$ & $\le\sigma_\zeta\log 2$ & if $\sigma_\zeta>\sigma_\zeta^{\ast}$ & no & \\
 Search, log cost & $1/S$ & $\le S$ & if $S>S^{\ast}$ & yes & \\
 Search, power cost $\gamma$ & $+\infty$ & $O(A)$ & see text & yes & \\
 \bottomrule
@@ -1024,7 +1021,7 @@ and~\ref{sec:DurableModel}. Each is computable with the existing solver.
 
     \item \textbf{The monotonicity threshold} (Lemma~\ref{lem:egm},
     Proposition~\ref{prop:uniform}). Report $\min_a m_t'(a)$ as a function of $S$ and of
-    $\sigma_\varepsilon$, and locate the value at which it crosses zero. Compare the
+    $\sigma_\zeta$, and locate the value at which it crosses zero. Compare the
     empirical threshold with the analytic $S^{\ast}$ of~\eqref{eq:threshold}. This
     replaces ``the figures look smooth'' with a measured statement, and identifies the
     friction required to justify dropping the envelope step.
@@ -1044,7 +1041,7 @@ and~\ref{sec:DurableModel}. Each is computable with the existing solver.
 
     \item \textbf{The share of dominated-branch adjusters}
     (Proposition~\ref{prop:onesided}). At the $(S,\sigma_\xi)$ or
-    $(S,\sigma_\varepsilon)$ combination that first delivers a clean EGM step, report the
+    $(S,\sigma_\zeta)$ combination that first delivers a clean EGM step, report the
     fraction of adjustments occurring where the adjust branch is strictly dominated.
     Under pure search this is exactly zero; under any admixture of taste shocks it is
     positive. This is the decisive quantitative test of the paper's economic argument

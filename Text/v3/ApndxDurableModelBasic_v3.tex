@@ -1,0 +1,641 @@
+\section{Model Appendix}\label{sec:appdx_model_basic}
+\subsection{Derive Beginning-of-Period Marginal Value Functions}
+
+Problem in Bellman Form:
+The value function is the hard maximum over keeping $d_t = n_t$ and adjusting $d_t \neq n_t$:
+\begin{align}
+	v_t(m_t,n_t) &= \max\Big\{ v_t^{keep}(m_t,n_t),\; v_t^{adj}(\ell_t) \Big\}\\
+	& \text{where:} \nonumber\\
+	\ell_t &= m_t + (1 - \tau) n_t \\
+	a_t &=\ell_t - c_t - d_t \geq 0,\\
+	m_{t+1} &= \mathcal{R} a_t + \theta_{t+1},\\
+	n_{t+1} &= (1-\delta)\,d_t\\
+	u(c_t,d_t) &= \frac{(c_t^\alpha d_t^{1 - \alpha})^{1 - \rho}}{1 - \rho}
+\end{align}
+
+Where we have the Bellman for the keeper:
+\begin{align}
+	v_t^{keep}(m_t,n_t) &= \max_{c_t} u(c_t,n_t) + \beta \mathbb{E}_t \Big(v_{t+1}(m_{t+1}, n_{t+1})\Big)\\
+	& \text{s.t.} \nonumber\\
+	a_t &= m_t- c_t \geq 0,\\
+	m_{t+1} &= \mathcal{R} a_t + \theta_{t+1},\\
+	n_{t+1} &= (1-\delta)\,d_t\\
+	d_t &= n_t \\
+	u(c_t,d_t) &= \frac{(c_t^\alpha d_t^{1 - \alpha})^{1 - \rho}}{1 - \rho}
+\end{align}
+
+And for the adjuster:
+\begin{align}
+	v_t^{adj}(\ell_t) &= \max_{c_t,d_t} u(c_t,d_t) + \beta \mathbb{E}_t \Big(v_{t+1}(m_{t+1}, n_{t+1})\Big)\\
+	& \text{s.t.} \nonumber \\
+	\ell_t &= m_t + (1 - \tau) n_t \\
+	a_t &= \ell_t - c_t - d_t \geq 0,\\
+	m_{t+1} &= \mathcal{R} a_t + \theta_{t+1},\\
+	n_{t+1} &= (1-\delta)\,d_t\\
+	u(c_t,d_t) &= \frac{(c_t^\alpha d_t^{1 - \alpha})^{1 - \rho}}{1 - \rho}
+\end{align}
+
+
+\textbf{Step 1 (chain rule / envelope):} The adjuster value is a function of \(\ell_t\),
+\[
+v_t^{adj} = v_t^{adj}(\ell_t),\qquad \ell_t = m_t + (1-\tau)n_t.
+\]
+By the chain rule
+\begin{align}
+	\frac{\partial v_t^{adj}(\ell_t)}{\partial m_t}
+	&= \frac{\partial v_t^{adj}(\ell_t)}{\partial \ell_t}\cdot\frac{\partial \ell_t}{\partial m_t}, \\
+	\frac{\partial v_t^{adj}(\ell_t)}{\partial n_t}
+	&= \frac{\partial v_t^{adj}(\ell_t)}{\partial \ell_t}\cdot\frac{\partial \ell_t}{\partial n_t}.
+\end{align}
+
+\textbf{Step 2 (derivatives of \(\ell_t\)):}
+\[
+\frac{\partial\ell_t}{\partial m_t} = 1, \qquad
+\frac{\partial\ell_t}{\partial n_t} = 1-\tau.
+\]
+
+\textbf{Step 3 (envelope for \(\partial v^{adj}/\partial \ell_t\)):} The adjuster problem is
+\[
+\max_{c_t,d_t}\; u(c_t,d_t) + \beta\mathbb{E}_t\big[v_{t+1}(m_{t+1},n_{t+1})\big]
+\quad\text{s.t.}\quad a_t = \ell_t - c_t - d_t,
+\]
+with the stated laws of motion. Because \(\ell_t\) enters only through the linear resource constraint \(a_t=\ell_t-c_t-d_t\), the envelope theorem implies that
+\[
+\frac{\partial v_t^{adj}(\ell_t)}{\partial \ell_t} = \lambda_t^{adj},
+\]
+where \(\lambda_t^{adj}\) is the Lagrange multiplier on the resource constraint (i.e. the marginal value of an extra unit of \(\ell_t\)).
+
+\textbf{Step 4 (relation between \(\lambda_t^{adj}\) and marginal utility):} The FOC w.r.t.\ \(c_t\) (ignoring binding additional constraints) sets
+\[
+\lambda_t^{adj} = u_c(c_t^\ast,d_t^\ast).
+\]
+With the specified utility,
+\[
+u_c(c,d) = (c^\alpha d^{1-\alpha})^{-\rho}\,\alpha c^{\alpha-1} d^{1-\alpha}
+= \alpha\, c^{\alpha(1-\rho)-1}\, d^{(1-\alpha)(1-\rho)}.
+\]
+If the borrowing constraint binds and has multiplier \(\mu_t\), then
+\(\lambda_t^{adj}\) equals \(u_c\) plus the relevant shadow price (i.e. \(\lambda_t^{adj}=u_c+\) extra multipliers).
+
+\textbf{Step 5 (combine chain rule and envelope):} Using Steps 1--4,
+\begin{align}
+		\frac{\partial v_t^{adj}}{\partial m_t}
+		= \lambda_t^{adj}
+		= u_c(c_t^\ast,d_t^\ast)
+\label{eq:adj_m_basic}
+\end{align}
+and
+\begin{align}
+		\frac{\partial v_t^{adj}}{\partial n_t}
+		= (1-\tau)\,\lambda_t^{adj}
+		= (1-\tau)\,u_c(c_t^\ast,d_t^\ast)
+\label{eq:adj_n_basic}
+\end{align}
+evaluated at the adjuster optimum \((c_t^\ast,d_t^\ast)\) (and with \(\lambda_t^{adj}\) augmented by constraint multipliers if applicable).
+
+\bigskip
+\hrule
+\bigskip
+
+\paragraph{Keeper: stepwise derivation (same style)}
+
+In the keeper regime we have \(d_t = n_t\) (fixed) and the household chooses only \(c_t\). The state is \((m_t,n_t)\) and
+\[
+a_t = m_t - c_t, \qquad
+m_{t+1} = \mathcal{R}a_t + \theta_{t+1}, \qquad
+n_{t+1} = (1-\delta)\,n_t.
+\]
+
+\textbf{Keeper Step 1 (envelope for \(m_t\)):} Since \(m_t\) enters linearly via \(a_t=m_t-c_t\), the envelope theorem gives
+\begin{align}
+		\frac{\partial v_t^{keep}(m_t,n_t)}{\partial m_t}
+		= \lambda_t^{keep}
+		= u_c(c_t^\ast,n_t)
+\label{eq:keep_m_basic}
+\end{align}
+where again \(\lambda_t^{keep}\) is the Lagrange multiplier on the budget and \(u_c\) is as above (add constraint multipliers if the borrowing constraint binds).
+
+\textbf{Keeper Step 2 (envelope for \(n_t\)):} The durable stock \(n_t\) affects the keeper value through two channels:
+\begin{enumerate}
+	\item Directly in current utility because \(d_t=n_t\): marginal contribution \(u_d(c_t^\ast,n_t)\).
+	\item Indirectly via \(n_{t+1} = (1-\delta)\,n_t\), which affects \(v_{n,t+1}\).
+\end{enumerate}
+Applying the envelope theorem and the chain rule,
+\begin{align}
+	\frac{\partial v_t^{keep}}{\partial n_t}
+	&= u_d(c_t^\ast,n_t)
+	+ \beta\,\mathbb{E}_t\Bigg[ v_{n,t+1}\cdot\frac{\partial n_{t+1}}{\partial n_t}\Bigg] \\
+	&= u_d(c_t^\ast,n_t)
+	+ \beta\,\mathbb{E}_t\Bigg[ v_{n,t+1}\,(1-\delta)\Bigg].
+\end{align}
+Thus
+\begin{align}
+		\frac{\partial v_t^{keep}(m_t,n_t)}{\partial n_t}
+		= u_d(c_t^\ast,n_t)
+		+ \beta (1-\delta)\, \mathbb{E}_t\big[ v_{n,t+1}\big]
+\label{eq:keep_n_basic}
+\end{align}
+with
+\[
+u_d(c,d) = (1-\alpha)\, c^{\alpha(1-\rho)}\, d^{(1-\alpha)(1-\rho)-1}.
+\]
+
+\bigskip
+\hrule
+\bigskip
+
+\paragraph{Combined expression with adjust / keep indicator}
+
+Let \(\mathcal{I}_t\) be the indicator for \emph{adjusting} at time \(t\) (\(\mathcal{I}_t=1\) if adjust, $0$ if keep). Then the beginning-of-period partials of the value function can be summarized as
+\begin{align}
+	\frac{\partial v_t(m_t,n_t)}{\partial m_t}
+	&= \mathcal{I}_t \frac{\partial v_t^{adj}}{\partial m_t}
+	+ (1-\mathcal{I}_t) \frac{\partial v_t^{keep}}{\partial m_t} \\
+	&= \mathcal{I}_t \lambda_t^{adj} + (1-\mathcal{I}_t) \lambda_t^{keep}
+	= \frac{\partial u(c_t,d_t)}{\partial c_t}
+	\label{eq:combined_m_basic}
+\end{align}
+(the final equality holds when \(\lambda\)'s equal marginal utility of consumption; add constraint multipliers if necessary).
+
+Similarly,
+\begin{align}
+	\frac{\partial v_t(m_t,n_t)}{\partial n_t}
+	&= \mathcal{I}_t \frac{\partial v_t^{adj}}{\partial n_t}
+	+ (1-\mathcal{I}_t) \frac{\partial v_t^{keep}}{\partial n_t} \\
+	&= \mathcal{I}_t (1-\tau)\lambda_t^{adj}
+	+ (1-\mathcal{I}_t)\Bigg\{ u_d(c_t,n_t)
+	+ \beta (1-\delta)\, \mathbb{E}_t\big[v_{n,t+1}\big]\Bigg\}.
+	\label{eq:combined_n_basic}
+\end{align}
+
+If \(\lambda_t^{adj}=u_c(c_t^\ast,d_t^\ast)\) and \(\lambda_t^{keep}=u_c(c_t^\ast,n_t)\), you may substitute the explicit formulas for \(u_c\) and \(u_d\) given above to obtain fully expanded expressions.
+
+
+\paragraph{Last period}
+This terminal-period solution serves as the initial condition for the backward induction used to find the infinite-horizon fixed point; it is not a true end-of-life period but rather a starting guess from which the backward recursion is iterated until convergence. We set the continuation value to zero, $v_{t+1}\equiv 0$. Since there is no future utility cost of debt and borrowing is prohibited ($LTV=0$, $\underline{a}=0$), both the keeper and the adjuster optimally set end-of-period assets to $a = 0$. For the keeper ($d_t = n_t$), this gives $c^{keep} = m_t$.
+
+For the adjuster problem, the binding borrowing constraint is simply:
+\begin{align}
+	a = 0
+\end{align}
+
+Hence, the budget constraint:
+\begin{align}
+	\ell &= c + d + a = c + d
+\end{align}
+
+Meaning we solve:
+\begin{align}
+	\mathscr{L} &= u(c,d) + \lambda\bigl(\ell - c - d\bigr)\\
+	\frac{\partial \mathscr{L}}{\partial c} &= u_c(c,d) = \lambda\\
+	\frac{\partial \mathscr{L}}{\partial d} &= u_d(c,d) = \lambda
+\end{align}
+
+Setting both first-order conditions equal and using CRRA utility $u(c,d) = \dfrac{(c^{\alpha} d^{1-\alpha})^{1-\rho}}{1-\rho}$:
+
+\begin{align}
+	u_c(c,d) &= u_d(c,d) \\
+	\frac{\alpha (c^\alpha d^{1-\alpha})^{-\rho}}{c} &= \frac{(1-\alpha)(c^\alpha d^{1-\alpha})^{-\rho}}{d} \\
+	\frac{c}{d} &= \frac{\alpha}{1-\alpha}\\
+	c &= d\,\frac{\alpha}{1-\alpha}
+\end{align}
+
+Plugging this into the budget constraint:
+\begin{align}
+	\ell &= c + d = d\,\frac{\alpha}{1-\alpha} + d = d\,\frac{1}{1-\alpha}
+\end{align}
+
+Therefore, we have the solutions:
+\begin{align}
+	d^{*} &= (1-\alpha)\,\ell \\
+	c^{*} &= \alpha\,\ell
+\end{align}
+Note that $c^* = \alpha\ell$ is a consequence of the Cobb-Douglas aggregator, which fixes budget-share $\alpha$ for nondurables.
+
+
+\paragraph{Calculate End-Of-Period Functions}
+
+The standard approach is to discretize the stochastic variables with a limited amount of discrete points such as in Tauchen and others. The arising problem with a discrete choice problem is that policy functions become discontinuous and the value function is non-smooth. As a result, evaluating the next period's (marginal) value function on a few points can lead to \textit{phantom} secondary non-concavities; that is large point masses are distributed at a few points instead of using all points in the surrounding area. The most straightforward solution is to increase the number of points with which a distribution is discretized.
+
+Instead, I use a method of \textit{transition matrix} or \textit{lotteries} often used to receive model solutions\footnote{This method was developed by Matthew White for this particular purpose}. That is, splitting up the transitory shock $\theta$ such that the difference between beginning of period
+\begin{align}
+	b_t &= \mathcal{R}\, a_{t-1}\\
+	m_t - b_t &= \theta_t
+\end{align}
+
+The algorithm is as follows:
+\begin{enumerate}
+	\item Pre-solution step
+	\begin{enumerate}
+		\item Specify a fairly dense grid of beginning-of-period market resources and bank balances $m$ and $b$
+		\item Calculate the pdf of $\theta: f_{\theta t}(m - b)$ and create a matrix with probabilities with $b$ values by row and $m$ values by column.
+		\item Create a Markov transition matrix by taking the row-wise sum and divide the row by it.
+	\end{enumerate}
+	\item Solution step
+	\begin{enumerate}
+		\item Evaluate $v_{t+1}(m_{t+1}, n_{t+1})$ on the cross product of the dense m-grid and some grid of $n$.
+		\item Pre-multiply the Markov matrix by the created matrix. The resulting matrix is $b$ row-wise and $n$ column wise.
+		\item Construct a linear interpolation function.
+		\item Create the end-of-period (marginal) functions over the end-of-period variables $a$ (assets) and $d$ (durable stock) by evaluating the interim function denoted by $\mathfrak{v}(d_t, a_t)$, $\mathfrak{v}^{'}_c(d_t, a_t)$, and $\mathfrak{v}^{'}_d(d_t, a_t)$
+	\end{enumerate}
+\end{enumerate}
+
+
+\paragraph{Solve Keeper}
+The keeper solution specifies that the beginning-of-period durable stock $n_t$ is equal to the end-of-period durable stock $d_t$. Therefore, we only have to calculate optimal level of $c_t$ and $a_t$ which we can do by EGM and an upper-envelope algorithm to deal with non-concavities.
+
+\begin{enumerate}
+	\item Loop over each point of the end-of-period durable stock $d_t$
+	\item Invert the end-of-period marginal value function to obtain $c_t$. From $u_c(c_t,n_t)=\mathfrak{v}^{'}_c(n_t,a_t)$ with $d_t=n_t$ fixed:\\
+	\begin{align*}
+		c_t = \left[\frac{\mathfrak{v}^{'}_c(n_t,a_t)}{\alpha\,n_t^{(1-\alpha)(1-\rho)}}\right]^{\frac{1}{\alpha(1-\rho)-1}}
+	\end{align*}
+	\item Calculate the endogenous beginning-of-period market resources using the budget constraint
+	\begin{align*}
+		m_t &= c_t + a_t
+	\end{align*}
+	\item Use the upper envelope algorithm
+	\item Construct a function over $n$ and $m$
+\end{enumerate}
+
+
+
+\paragraph{Solve Adjuster}
+Solving the adjuster problem follows the paper by \cite{Dobrescu2022-ii}:
+\begin{enumerate}
+	\item Loop over each end of period durable stock $d_t$
+	\item Calculate $c_t$ over a dense grid of $a_t$ using the EGM step. Setting the first-order condition $u_c(c_t,d_t)=\mathfrak{v}^{'}_c(d_t,a_t)$ and inverting with respect to $c_t$ (holding $d_t$ fixed) yields\\
+	\begin{align}
+		c_t &= \left[\frac{\mathfrak{v}^{'}_c(d_t,a_t)}{\alpha\,d_t^{(1-\alpha)(1-\rho)}}\right]^{\frac{1}{\alpha(1-\rho)-1}}
+	\end{align}
+	\item Find all roots of $a_t$ which obey the first order conditions
+	\begin{align}
+		0 &= u^{'}_d(c, d) - \mathfrak{v}^{'}_c(d_t, a_t) + \mathfrak{v}^{'}_d(d_t, a_t)
+	\end{align}
+	\item Calculate $\ell_t$ with the budget constraint
+	\begin{align}
+		\ell_t &= c_t + d_t + a_t
+	\end{align}
+	\item Calculate the value:
+	\begin{align}
+		v_t &= u(c_t, d_t) + \mathfrak{v}(d_t, a_t)
+	\end{align}
+	\item Apply FUES
+	\item Create functions over $(\ell)$
+\end{enumerate}
+
+
+\paragraph{Discrete Choice}
+To solve the discrete choice between adjusting and keeping, take the hard maximum of the two conditional value functions:
+\begin{align}
+	v_t(m_t,n_t) &= \max\Big\{ v_t^{keep}(m_t,n_t),\; v_t^{adj}\big(m_t + (1-\tau)n_t\big) \Big\}.
+\end{align}
+Define the indicator $\mathcal{I}_t = 1$ if $v_t^{adj}(\ell_t) \ge v_t^{keep}(m_t,n_t)$ and $\mathcal{I}_t = 0$ otherwise. The combined policy functions are then
+\begin{align}
+	c_t &= (1-\mathcal{I}_t)\, c_t^{keep} + \mathcal{I}_t\, c_t^{adj}, \qquad
+	d_t = (1-\mathcal{I}_t)\, n_t + \mathcal{I}_t\, d_t^{adj},
+\end{align}
+and the combined (marginal) value functions follow equations~\eqref{eq:combined_m_basic}--\eqref{eq:combined_n_basic}. When computing (marginal) value functions, note that a positive probability of an infinite conditional value implies that the combined function also takes the value infinity. To facilitate the evaluation of functions involving infinities, I store and assess their inverse representations, and subsequently invert them again when the arrays are used.
+
+
+\subsection{Derivations: Extreme Value Type I Taste Shocks (Section~\ref{subsec:ModelBasicTaste})}\label{subsec:appdx_taste_basic}
+
+This subsection derives the envelope conditions, the Euler equations, and the EGM algorithm for the EV Type I taste-shock extension of Section~\ref{subsec:ModelBasicTaste}. Throughout, $v_t^{keep}(m_t,n_t)$ and $v_t^{adj}(\ell_t)$ are exactly as defined in Section~\ref{sec:appdx_model_basic}, so the within-branch first-order conditions~\eqref{eq:FOC_c_basic}--\eqref{eq:FOC_d_basic}, the Step 1--5 envelope derivation for the adjuster (equations~\eqref{eq:adj_m_basic}--\eqref{eq:adj_n_basic}), and the keeper envelope derivation (equations~\eqref{eq:keep_m_basic}--\eqref{eq:keep_n_basic}) carry over unchanged. What changes is how the two branches are combined and, consequently, what continuation value enters the Euler equations one period back.
+
+\paragraph{Log-sum inclusive value and logit probabilities}
+Recall the EV Type I discrete choice from equations~\eqref{eq:taste_discrete_EV}--\eqref{eq:taste_logit}. The inclusive (ex-ante) value is the closed-form log-sum
+\begin{align}
+	v_t(m_t,n_t)
+	&= \sigma_\varepsilon \log\Big(
+		\exp\big(v_t^{keep}(m_t,n_t)/\sigma_\varepsilon\big)
+		+ \exp\big(v_t^{adj}(\ell_t)/\sigma_\varepsilon\big)
+	\Big), \label{eq:taste_logsum_app}
+\end{align}
+with logit choice probabilities $P_t^{adj}(m_t,n_t)$ and $P_t^{keep}=1-P_t^{adj}$ as in~\eqref{eq:taste_logit}. The taste shocks do not enter the inner maximizations defining $v_t^{keep}$ and $v_t^{adj}(\ell_t)$, so those maximizations---and hence $c_t^{keep,\ast}$, $c_t^{adj,\ast}$, and $d_t^{adj,\ast}$---are independent of $(\varepsilon_t^{keep},\varepsilon_t^{adj})$. Differentiating the log-sum~\eqref{eq:taste_logsum_app} and using the envelope results $\partial v_t^{keep}/\partial m_t = u_c(c_t^{keep,\ast},n_t)$ and $\partial v_t^{adj}/\partial m_t = u_c(c_t^{adj,\ast},d_t^{adj,\ast})$ from~\eqref{eq:keep_m_basic} and~\eqref{eq:adj_m_basic} yields the probability-weighted combined marginal values
+\begin{align}
+	\frac{\partial v_t(m_t,n_t)}{\partial m_t}
+	&= P_t^{keep}\, u_c(c_t^{keep,\ast},n_t) + P_t^{adj}\, u_c(c_t^{adj,\ast},d_t^{adj,\ast}), \label{eq:taste_vm}\\
+	\frac{\partial v_t(m_t,n_t)}{\partial n_t}
+	&= P_t^{keep}\Big[u_d(c_t^{keep,\ast},n_t) + \beta(1-\delta)\,\mathbb{E}_t\big[v_{n,t+1}\big]\Big]
+	+ P_t^{adj}\,(1-\tau)\, u_c(c_t^{adj,\ast},d_t^{adj,\ast}), \label{eq:taste_vn}
+\end{align}
+where the $n$-derivative of the adjuster branch uses $\partial \ell_t/\partial n_t=(1-\tau)$ as in~\eqref{eq:adj_n_basic}. Unlike the multiplicative mean-one log-normal taste shock used in the retirement application, there is no additional scaling factor on the adjuster's marginal contribution: the EV shocks enter only through the logit weights $P_t^{keep}$ and $P_t^{adj}$. As $\sigma_\varepsilon\to 0$, $P_t^{adj}\to\mathcal{I}_t$ and~\eqref{eq:taste_vm}--\eqref{eq:taste_vn} collapse to the hard-maximum combined envelopes~\eqref{eq:combined_m_basic}--\eqref{eq:combined_n_basic}.
+
+\paragraph{Expected policies}
+The ex-ante (probability-weighted) policy functions are
+\begin{align}
+	c_t(m_t,n_t) &= P_t^{keep}\, c_t^{keep,\ast}(m_t,n_t) + P_t^{adj}\, c_t^{adj,\ast}(\ell_t), \label{eq:taste_c_app}\\
+	d_t(m_t,n_t) &= P_t^{keep}\, n_t + P_t^{adj}\, d_t^{adj,\ast}(\ell_t), \label{eq:taste_d_app}
+\end{align}
+which restates~\eqref{eq:taste_c_combined}--\eqref{eq:taste_d_combined}. Because the inclusive value~\eqref{eq:taste_logsum_app} already integrates out the Gumbel shocks in closed form, no quadrature over taste nodes is required: $v_t$, $\partial v_t/\partial m_t$, $\partial v_t/\partial n_t$, $c_t$, and $d_t$ are evaluated directly from the two conditional branches and the logit probabilities.
+
+\paragraph{Euler equations}
+The within-branch first-order conditions are unchanged in form, but the continuation value is now the EV-smoothed inclusive value $v_{t+1}$ from~\eqref{eq:taste_logsum_app} rather than the hard maximum:
+\begin{align}
+	u_c(c_t^{adj,\ast},d_t^{adj,\ast}) &\ge \beta \mathcal{R}\, \mathbb{E}_t\big[v_{m,t+1}\big], \\
+	u_d(c_t^{adj,\ast},d_t^{adj,\ast}) &\ge \beta \mathcal{R}\, \mathbb{E}_t\big[v_{m,t+1}\big] - \beta(1-\delta)\,\mathbb{E}_t\big[v_{n,t+1}\big],
+\end{align}
+and analogously for the keeper with $d_t = n_t$ fixed, where $v_{m,t+1}=\partial v_{t+1}/\partial m_{t+1}$ and $v_{n,t+1}=\partial v_{t+1}/\partial n_{t+1}$ are given by~\eqref{eq:taste_vm}--\eqref{eq:taste_vn} one period ahead. Writing $\mathbb{E}_t[\cdot]$ as the expectation over $\theta_{t+1}$ and substituting~\eqref{eq:taste_vm} makes explicit that the right-hand side averages next period's income \emph{and} the logit-weighted keep/adjust margins, e.g.
+\begin{align}
+	u_c(c_t^{adj,\ast},d_t^{adj,\ast}) = \beta \mathcal{R}\, \mathbb{E}_{\theta_{t+1}}\Big[
+		P_{t+1}^{keep}\, u_c(c_{t+1}^{keep,\ast},n_{t+1})
+		+ P_{t+1}^{adj}\, u_c(c_{t+1}^{adj,\ast},d_{t+1}^{adj,\ast})
+	\Big]
+\end{align}
+when the no-borrowing constraint does not bind.
+
+\paragraph{Terminal period}
+The within-branch terminal solutions are unaffected by the taste shocks, since $(\varepsilon_T^{keep},\varepsilon_T^{adj})$ do not enter the inner maximizations: $c_T^{keep}=m_T$ for the keeper, and $c_T^{adj\ast}=\alpha \ell_T$, $d_T^{adj\ast}=(1-\alpha)\ell_T$ for the adjuster, exactly as derived in the ``Last period'' paragraph of Section~\ref{sec:appdx_model_basic}. Only the discrete resolution changes: the terminal inclusive value is the log-sum~\eqref{eq:taste_logsum_app} at $T$, and the terminal expected policies follow~\eqref{eq:taste_c_app}--\eqref{eq:taste_d_app}.
+
+\paragraph{EGM algorithm with EV Type I taste shocks}
+No taste-shock quadrature grid is needed. In addition to the income-shock integration already used to build the end-of-period functions $\mathfrak{v}(d_t,a_t)$, $\mathfrak{v}_c'(d_t,a_t)$, and $\mathfrak{v}_d'(d_t,a_t)$ (Section~\ref{sec:appdx_model_basic}, ``Calculate End-Of-Period Functions''), the algorithm proceeds as follows:
+\begin{enumerate}
+	\item \textbf{Solve the within-branch problems unchanged.} Solve the keeper by EGM and upper envelope, and the adjuster by root-finding and FUES, exactly as in the ``Solve Keeper'' and ``Solve Adjuster'' paragraphs above. This yields $c_{t}^{keep}(m_t,n_t)$, $v_t^{keep}(m_t,n_t)$, $c_t^{adj}(\ell_t)$, $d_t^{adj}(\ell_t)$, and $v_t^{adj}(\ell_t)$.
+	\item \textbf{Combine with the log-sum / logit formulas on a grid of $(m_t,n_t)$.} For each grid point, evaluate $v_t^{keep}(m_t,n_t)$ and $v_t^{adj}(\ell_t)$, form $P_t^{adj}$ and $P_t^{keep}$ from~\eqref{eq:taste_logit}, and set
+	\begin{align}
+		v_t(m_t,n_t) &= \sigma_\varepsilon \log\Big(
+			\exp\big(v_t^{keep}/\sigma_\varepsilon\big)
+			+ \exp\big(v_t^{adj}/\sigma_\varepsilon\big)
+		\Big), \\
+		v_{m,t}(m_t,n_t) &= P_t^{keep}\, u_c(c_t^{keep,\ast},n_t) + P_t^{adj}\, u_c(c_t^{adj,\ast},d_t^{adj,\ast}), \\
+		v_{n,t}(m_t,n_t) &= P_t^{keep}\, v_{n,t}^{keep}(m_t,n_t) + P_t^{adj}\,(1-\tau)\, u_c(c_t^{adj,\ast},d_t^{adj,\ast}),
+	\end{align}
+	together with the expected policies~\eqref{eq:taste_c_app}--\eqref{eq:taste_d_app}. Numerically, evaluate the log-sum in the numerically stable form $\max\{v^{keep},v^{adj}\}+\sigma_\varepsilon\log\big(\sum_j \exp((v^j-\max)/\sigma_\varepsilon)\big)$ (as in \texttt{calcLogSumChoiceProbs} with \texttt{smoothtype='type1'}).
+	\item \textbf{Feed $v_t$, $v_{m,t}$, $v_{n,t}$ into the period-$(t-1)$ end-of-period step,} in place of the hard-maximum objects used in the baseline model, so that the transition-matrix income integration described above operates on the EV-smoothed functions.
+\end{enumerate}
+As $\sigma_\varepsilon\to 0$, step~2 collapses to the hard-maximum combine of the baseline algorithm. For $\sigma_\varepsilon>0$, the inclusive value and probability-weighted policies are smooth in $(m_t,n_t)$, which is precisely what reduces the propagation of kinks through the backward recursion.
+
+
+\subsection{Derivations: Search Frictions (Section~\ref{subsec:ModelBasicSearch})}\label{subsec:appdx_search_basic}
+
+This subsection derives the optimal search-effort rule and the smooth combined (marginal) value functions for the search extension of Section~\ref{subsec:ModelBasicSearch}, and states the resulting EGM algorithm. As in the taste-shock extension, the within-branch Bellman problems for $v_t^{keep}(m_t,n_t)$ and $v_t^{adj}(\ell_t)$, and hence the first-order conditions~\eqref{eq:FOC_c_basic}--\eqref{eq:FOC_d_basic} and the envelope results~\eqref{eq:adj_m_basic}--\eqref{eq:keep_n_basic}, are unchanged; only the way the two branches are combined, and the continuation value that results, is different.
+
+\paragraph{Optimal search effort}
+Recall the search problem from equation~\eqref{eq:search_discrete_basic},
+\begin{align}
+	v_t(m_t,n_t) = \max_{\varepsilon_t \in [0,1]} \underbrace{\Big[(1-\varepsilon_t)\, v_t^{keep}(m_t,n_t) + \varepsilon_t\, v_t^{adj}(\ell_t) - \sigma(\varepsilon_t)\Big]}_{\equiv\, g(\varepsilon_t;\,m_t,n_t)}.
+\end{align}
+The cost function's derivative is
+\begin{align}
+	\sigma(\varepsilon_t) &= S\big[\varepsilon_t + (1-\varepsilon_t)\log(1-\varepsilon_t)\big] \nonumber\\
+	\sigma'(\varepsilon_t) &= S\Big[1 + \big(-\log(1-\varepsilon_t)\big) + (1-\varepsilon_t)\cdot\Big(\!-\frac{1}{1-\varepsilon_t}\Big)\cdot(-1)\Big] = S\big[1 - \log(1-\varepsilon_t) - 1\big] = -S\log(1-\varepsilon_t), \label{eq:sigma_prime}
+\end{align}
+and $\sigma''(\varepsilon_t) = S/(1-\varepsilon_t) > 0$ for $\varepsilon_t \in [0,1)$, so $\sigma$ is strictly convex and $g(\cdot;m_t,n_t)$ is strictly concave in $\varepsilon_t$ (linear minus convex). The first-order condition for an interior optimum is
+\begin{align}
+	\frac{\partial g}{\partial \varepsilon_t} = v_t^{adj}(\ell_t) - v_t^{keep}(m_t,n_t) - \sigma'(\varepsilon_t^\ast) = 0
+	\quad\Longleftrightarrow\quad
+	v_t^{adj}(\ell_t) - v_t^{keep}(m_t,n_t) = -S\log(1-\varepsilon_t^\ast),
+\end{align}
+which, solving for $\varepsilon_t^\ast$, gives the closed-form optimal search-effort rule
+\begin{align}
+	\varepsilon_t^\ast(m_t,n_t) = \max\left\{0,\; 1 - \exp\left(-\frac{v_t^{adj}(\ell_t) - v_t^{keep}(m_t,n_t)}{S}\right)\right\}. \label{eq:eps_star_basic}
+\end{align}
+The $\max\{0,\cdot\}$ reflects the constraint $\varepsilon_t \ge 0$: when $v_t^{adj}(\ell_t) \le v_t^{keep}(m_t,n_t)$, the unconstrained formula would return a non-positive number, but exerting effort to increase the weight on an inferior branch is never optimal, so the constraint binds at $\varepsilon_t^\ast=0$. Because $\sigma'(\varepsilon_t)\to\infty$ as $\varepsilon_t\to 1^-$, the upper constraint $\varepsilon_t\le 1$ never binds for finite $v_t^{adj}-v_t^{keep}$, consistent with search never delivering the adjustment opportunity with certainty. As $S \to 0$, $\varepsilon_t^\ast \to \mathbb{1}\{v_t^{adj}(\ell_t) > v_t^{keep}(m_t,n_t)\}$, the hard indicator $\mathcal{I}_t$ of the baseline model.
+
+\paragraph{Envelope theorem and combined marginal value functions}
+Because $\varepsilon_t^\ast(m_t,n_t)$ is chosen to satisfy the first-order (or Karush-Kuhn-Tucker) condition above, the envelope theorem implies that the indirect effect of $m_t$ or $n_t$ operating through $\varepsilon_t^\ast$ vanishes when differentiating $v_t(m_t,n_t) = g(\varepsilon_t^\ast(m_t,n_t);m_t,n_t)$, leaving only the direct effects through $v_t^{keep}$ and $v_t^{adj}(\ell_t)$:
+\begin{align}
+	\frac{\partial v_t(m_t,n_t)}{\partial m_t}
+	&= (1-\varepsilon_t^\ast)\,\frac{\partial v_t^{keep}}{\partial m_t} + \varepsilon_t^\ast\,\frac{\partial v_t^{adj}}{\partial \ell_t}\cdot\frac{\partial \ell_t}{\partial m_t}
+	= (1-\varepsilon_t^\ast)\,\lambda_t^{keep} + \varepsilon_t^\ast\,\lambda_t^{adj}, \label{eq:search_vm}\\
+	\frac{\partial v_t(m_t,n_t)}{\partial n_t}
+	&= (1-\varepsilon_t^\ast)\,\frac{\partial v_t^{keep}}{\partial n_t} + \varepsilon_t^\ast\,(1-\tau)\,\lambda_t^{adj}
+	= (1-\varepsilon_t^\ast)\Big[u_d(c_t^{keep,\ast},n_t) + \beta(1-\delta)\,\mathbb{E}_t[v_{n,t+1}]\Big] + \varepsilon_t^\ast\,(1-\tau)\,\lambda_t^{adj}, \label{eq:search_vn}
+\end{align}
+using $\lambda_t^{adj}=u_c(c_t^{adj,\ast},d_t^{adj,\ast})$, $\lambda_t^{keep}=u_c(c_t^{keep,\ast},n_t)$, and the keeper's $\partial v_t^{keep}/\partial n_t$ from~\eqref{eq:keep_n_basic}. Equations~\eqref{eq:search_vm}--\eqref{eq:search_vn} are the smooth, search-weighted analogues of the hard-indicator combined value functions~\eqref{eq:combined_m_basic}--\eqref{eq:combined_n_basic}, with $\varepsilon_t^\ast$ in place of $\mathcal{I}_t$; as $S\to0$ they coincide exactly, since $\varepsilon_t^\ast\to\mathcal{I}_t$.
+
+\paragraph{Terminal period}
+The within-branch terminal solutions are unaffected by search: $c_T^{keep}=m_T$ for the keeper and $c_T^{adj\ast}=\alpha\ell_T$, $d_T^{adj\ast}=(1-\alpha)\ell_T$ for the adjuster, exactly as in the ``Last period'' paragraph of Section~\ref{sec:appdx_model_basic}. The terminal discrete choice instead resolves through the optimal terminal search effort $\varepsilon_T^\ast(m_T,n_T) = \max\{0,\,1-\exp(-(v_T^{adj}(\ell_T)-v_T^{keep}(m_T,n_T))/S)\}$, and the smoothed terminal value and marginal-value functions follow~\eqref{eq:search_discrete_basic} and~\eqref{eq:search_vm}--\eqref{eq:search_vn} evaluated at $T$; these are the objects handed to period $T-1$.
+
+\paragraph{EGM algorithm with search}
+The algorithm follows the same outline as in the ``Discrete Choice'' paragraph above, with the hard maximum replaced by the smooth combination:
+\begin{enumerate}
+	\item Solve the keeper (EGM plus upper envelope) and the adjuster (root-finding plus FUES) exactly as in Section~\ref{sec:appdx_model_basic}, yielding $v_t^{keep}(m_t,n_t)$, $\lambda_t^{keep}(m_t,n_t)$, $v_t^{adj}(\ell_t)$, and $\lambda_t^{adj}(\ell_t)$ on a grid of $(m_t,n_t)$.
+	\item Compute the optimal search effort $\varepsilon_t^\ast(m_t,n_t)$ from the closed form~\eqref{eq:eps_star_basic} at every grid point. As in the full model, this closed form can be evaluated directly, or, for robustness when either conditional value is infinite (e.g.\ an infeasible branch), effort can instead be selected by a fine grid search over $[0,1]$ that maximizes $g(\varepsilon_t;m_t,n_t)$; the two approaches coincide whenever both conditional values are finite.
+	\item Form the combined value function $v_t(m_t,n_t)$ from~\eqref{eq:search_discrete_basic} and the combined marginal-value functions $v_{m,t}(m_t,n_t)$, $v_{n,t}(m_t,n_t)$ from~\eqref{eq:search_vm}--\eqref{eq:search_vn}.
+	\item Feed $v_t$, $v_{m,t}$, $v_{n,t}$ into the period-$(t-1)$ end-of-period step in place of the hard-maximum objects used in the baseline model.
+\end{enumerate}
+When a conditional value is infinite (for example because a branch is infeasible), the combined value in step 3 is also infinite; as in the baseline model's discrete-choice paragraph, I store and evaluate inverse representations of the (marginal) value functions and invert them back only when the arrays are used, so that these infinities do not propagate into numerical errors during interpolation.
+
+
+\subsection{Derivations: Stochastic Durable Prices (Section~\ref{subsec:ModelBasicPrice})}\label{subsec:appdx_price_basic}
+
+This subsection derives the envelope conditions, the terminal-period solution, and the EGM algorithm for the stochastic-price extension of Section~\ref{subsec:ModelBasicPrice}. The keeper's Bellman problem, first-order condition, and envelope results, equations~\eqref{eq:keep_m_basic}--\eqref{eq:keep_n_basic}, carry over unchanged, since the keeper never transacts in the durable market. What changes is the adjuster's budget constraint, its first-order condition with respect to $d_t$ (equations~\eqref{eq:price_foc_c}--\eqref{eq:price_foc_d} in the main text), and, consequently, how the two branches are combined.
+
+\paragraph{Adjuster first-order conditions with a stochastic price}
+The price-modified first-order conditions~\eqref{eq:price_foc_c}--\eqref{eq:price_foc_d} are stated in the main text (Section~\ref{subsec:ModelBasicPrice}). Equation~\eqref{eq:price_foc_c} is identical in form to the baseline first-order condition~\eqref{eq:FOC_c_basic}: because $p_t$ multiplies only $d_t$ in the budget constraint, it does not appear in the $c_t$ first-order condition, so $c_t^{adj,\ast}$ solves the same equation as in the baseline model \emph{given} $d_t$. Equation~\eqref{eq:price_foc_d} is the price-modified analogue of the baseline condition~\eqref{eq:FOC_d_basic}: the marginal cost of an extra unit of durables is now $p_t\lambda_t^{adj}$ rather than $\lambda_t^{adj}$, since each unit of $d_t$ now costs $p_t$ units of $\ell_t$ instead of one. As KKT conditions, equality in~\eqref{eq:price_foc_c}--\eqref{eq:price_foc_d} holds whenever the borrowing constraint does not bind, and the left-hand side exceeds the right-hand side otherwise.
+
+\paragraph{Envelope conditions}
+Because $\ell_t$ still enters the adjuster's problem only through the linear resource constraint~\eqref{eq:price_budget}, and $p_t$ is a scalar parameter rather than a function of $\ell_t$, the envelope argument of Steps 1--5 above goes through unchanged with $p_t$ held fixed:
+\begin{align}
+	\frac{\partial v_t^{adj}(\ell_t,p_t)}{\partial m_t} = \frac{\partial v_t^{adj}}{\partial \ell_t} = \lambda_t^{adj} = u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big), \label{eq:price_adj_m}\\
+	\frac{\partial v_t^{adj}(\ell_t,p_t)}{\partial n_t} = (1-\tau)\,\frac{\partial v_t^{adj}}{\partial \ell_t} = (1-\tau)\,u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big), \label{eq:price_adj_n}
+\end{align}
+which are formally identical to the baseline expressions~\eqref{eq:adj_m_basic}--\eqref{eq:adj_n_basic}: the price shock changes \emph{which} $(c_t^{adj,\ast},d_t^{adj,\ast})$ pair is optimal, but not the mapping from the marginal unit of $\ell_t$ to marginal utility once evaluated at that optimum. Note that $p_t$ does not enter equation~\eqref{eq:price_adj_n} directly, because the recovery value $(1-\tau)n_t$ embedded in $\ell_t$ is, by assumption, insulated from the current-period purchase price.
+
+\paragraph{Discrete choice with a stochastic price}
+Recall the price-contingent discrete choice from equation~\eqref{eq:price_discrete},
+\begin{align}
+	v_t(m_t,n_t,p_t) = \max\Big\{v_t^{keep}(m_t,n_t),\; v_t^{adj}(\ell_t,p_t)\Big\}.
+\end{align}
+Define the state- and price-contingent indicators $\mathbb{1}_t^{keep}(m_t,n_t,p_t)$ and $\mathbb{1}_t^{adj}(m_t,n_t,p_t)=1-\mathbb{1}_t^{keep}(m_t,n_t,p_t)$ analogously to the hard-maximum baseline, with $\mathbb{1}_t^{adj}=1$ iff $v_t^{adj}(\ell_t,p_t)\ge v_t^{keep}(m_t,n_t)$. Applying the envelope theorem to the outer maximum exactly as in equations~\eqref{eq:combined_m_basic}--\eqref{eq:combined_n_basic}, but now with the price-contingent adjuster policies $c_t^{adj,\ast}(p_t)$, $d_t^{adj,\ast}(p_t)$ from~\eqref{eq:price_foc_c}--\eqref{eq:price_foc_d},
+\begin{align}
+	\frac{\partial v_t(m_t,n_t,p_t)}{\partial m_t}
+	&= \mathbb{1}_t^{keep}\, u_c(c_t^{keep,\ast},n_t) + \mathbb{1}_t^{adj}\, u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big), \label{eq:price_vm}\\
+	\frac{\partial v_t(m_t,n_t,p_t)}{\partial n_t}
+	&= \mathbb{1}_t^{keep}\Big[u_d(c_t^{keep,\ast},n_t) + \beta(1-\delta)\,\mathbb{E}_t\big[\bar v_{n,t+1}\big]\Big]
+	+ \mathbb{1}_t^{adj}\,(1-\tau)\, u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big). \label{eq:price_vn}
+\end{align}
+Unlike the EV Type I taste shocks of Section~\ref{subsec:appdx_taste_basic}, which reweight the two branches through logit probabilities without changing the adjuster's continuous choices, the price shock affects these marginal values only indirectly, through its effect on the optimal $(c_t^{adj,\ast},d_t^{adj,\ast})$ pair and on the indicator functions themselves.
+
+\paragraph{Integrating out the price shock}
+As in the taste-shock case, the object that enters the time-$(t-1)$ Euler equations is the price-integrated value and marginal-value functions,
+\begin{align}
+	\bar v_t(m_t,n_t) &\equiv \mathbb{E}_{p_t}\big[v_t(m_t,n_t,p_t)\big], \label{eq:price_barv_defn}\\
+	\bar v_{m,t}(m_t,n_t) &\equiv \mathbb{E}_{p_t}\Big[\mathbb{1}_t^{keep}\, u_c(c_t^{keep,\ast},n_t) + \mathbb{1}_t^{adj}\, u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big)\Big], \label{eq:price_barvm}\\
+	\bar v_{n,t}(m_t,n_t) &\equiv \mathbb{E}_{p_t}\Big[\mathbb{1}_t^{keep}\Big(u_d(c_t^{keep,\ast},n_t) + \beta(1-\delta)\,\mathbb{E}_t\big[\bar v_{n,t+1}\big]\Big) + \mathbb{1}_t^{adj}\,(1-\tau)\, u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big)\Big], \label{eq:price_barvn}
+\end{align}
+where $\bar v_{m,t+1}$ and $\bar v_{n,t+1}$ on the right-hand side of~\eqref{eq:price_foc_a}--\eqref{eq:price_foc_d} one period ahead are themselves defined by the analogous expressions one period later; equation~\eqref{eq:price_barv_defn} restates equation~\eqref{eq:price_barv} from the main text. As $\sigma_p \to 0$, $p_t \to 1$ a.s., $\mathbb{1}_t^{adj} \to \mathcal{I}_t$, and equations~\eqref{eq:price_barvm}--\eqref{eq:price_barvn} collapse to the hard-maximum combined marginal-value functions~\eqref{eq:combined_m_basic}--\eqref{eq:combined_n_basic}.
+
+The model's ex-ante (price-weighted) policy functions follow the same logic. Because the household observes $p_t$ before choosing, the realized policy for a given draw is a hard 0/1 choice, $c_t = \mathbb{1}_t^{keep}\,c_t^{keep} + \mathbb{1}_t^{adj}\,c_t^{adj}(p_t)$ and $d_t = \mathbb{1}_t^{keep}\,n_t + \mathbb{1}_t^{adj}\,d_t^{adj}(p_t)$, while the ex-ante policy functions reported for simulation and plotting are
+\begin{align}
+	\bar c_t(m_t,n_t) &\equiv \mathbb{E}_{p_t}\Big[\mathbb{1}_t^{keep}\, c_t^{keep} + \mathbb{1}_t^{adj}\, c_t^{adj}(p_t)\Big], \label{eq:price_barc}\\
+	\bar d_t(m_t,n_t) &\equiv \mathbb{E}_{p_t}\Big[\mathbb{1}_t^{keep}\, n_t + \mathbb{1}_t^{adj}\, d_t^{adj}(p_t)\Big]. \label{eq:price_bard}
+\end{align}
+
+\paragraph{Euler equations}
+The within-branch first-order conditions~\eqref{eq:price_foc_c}--\eqref{eq:price_foc_d} are unchanged in form, but, since $p_{t+1}$ is drawn afresh next period, the continuation value entering them is the price-integrated $\bar v_{t+1}$ rather than $v_{t+1}$:
+\begin{align}
+	u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big) &\ge \beta \mathcal{R}\, \mathbb{E}_t\big[\bar v_{m,t+1}\big], \\
+	u_d\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big) &\ge p_t\,\beta \mathcal{R}\, \mathbb{E}_t\big[\bar v_{m,t+1}\big] - \beta(1-\delta)\,\mathbb{E}_t\big[\bar v_{n,t+1}\big],
+\end{align}
+and analogously for the keeper with $d_t=n_t$ fixed and no price term, since the keeper does not purchase durables. Relative to the baseline Euler equation~\eqref{eq:FOC_d_basic}, the only change is the multiplication of the discounted marginal value of assets by the current-period price $p_t$ on the right-hand side of the durable first-order condition.
+
+\paragraph{Terminal period}
+The keeper's terminal solution is unaffected by the price shock: $c_T^{keep}=m_T$, exactly as in the ``Last period'' paragraph above. For the adjuster, since $v_{T+1}\equiv 0$ and borrowing is prohibited, the terminal problem is
+\begin{align}
+	\max_{c,d}\ u(c,d) \qquad \text{s.t.}\qquad \ell_T = c + p_T\, d.
+\end{align}
+The Lagrangian $\mathscr{L}=u(c,d)+\lambda(\ell_T - c - p_T d)$ gives $u_c(c,d)=\lambda$ and $u_d(c,d)=p_T\lambda$, so
+\begin{align}
+	\frac{u_d(c,d)}{u_c(c,d)} = p_T
+	\quad\Longleftrightarrow\quad
+	\frac{1-\alpha}{\alpha}\cdot\frac{c}{d} = p_T
+	\quad\Longleftrightarrow\quad
+	c = \frac{\alpha}{1-\alpha}\, p_T\, d.
+\end{align}
+Substituting into the budget constraint,
+\begin{align}
+	\ell_T = c + p_T d = p_T d\Big(\frac{\alpha}{1-\alpha}+1\Big) = \frac{p_T\, d}{1-\alpha}
+	\quad\Longrightarrow\quad
+	d_T^{adj,\ast} = \frac{(1-\alpha)\,\ell_T}{p_T}, \qquad c_T^{adj,\ast} = \alpha\,\ell_T. \label{eq:price_terminal}
+\end{align}
+As in the baseline model, $c_T^{adj,\ast}=\alpha\ell_T$ retains the fixed Cobb-Douglas expenditure share on nondurables regardless of the price, since a proportional increase in $p_T$ raises the cost per unit of $d_T$ without altering the optimal \emph{expenditure} share $(1-\alpha)\ell_T$ devoted to durables; the corresponding physical quantity purchased, $d_T^{adj,\ast}=(1-\alpha)\ell_T/p_T$, falls one-for-one with the price. The terminal discrete choice is $v_T(m_T,n_T,p_T)=\max\{v_T^{keep}(m_T,n_T),\,v_T^{adj}(\ell_T,p_T)\}$, and $\bar v_T(m_T,n_T)=\mathbb{E}_{p_T}[v_T(m_T,n_T,p_T)]$ is the continuation value handed to period $T-1$.
+
+\paragraph{EGM algorithm with stochastic durable prices}
+Let $\vec p = \{p_1,\dots,p_K\}$ be quadrature nodes for the log-normal price density with weights $\vec\mu=\{\mu_1,\dots,\mu_K\}$, in addition to the income-shock integration used to build the end-of-period functions $\mathfrak{v}(d_t,a_t)$, $\mathfrak{v}_c'(d_t,a_t)$, and $\mathfrak{v}_d'(d_t,a_t)$ (Section~\ref{sec:appdx_model_basic}, ``Calculate End-Of-Period Functions''). Crucially, because the price shock alters the adjuster's own first-order condition~\eqref{eq:price_foc_d} rather than merely reweighting an already-computed value, the adjuster problem must be re-solved at every price node, in contrast to the EV Type I taste-shock extension of Section~\ref{subsec:appdx_taste_basic}, where a single adjuster solve and a closed-form log-sum combine suffice. The algorithm proceeds as follows:
+\begin{enumerate}
+	\item \textbf{Solve the keeper once,} by EGM and upper envelope exactly as in the ``Solve Keeper'' paragraph above; the keeper's solution does not depend on $p_t$.
+	\item \textbf{Solve the adjuster once per price node.} For each $p_k$, loop over the end-of-period durable grid $d_t$ and, for each $d_t$, over the grid of $a_t$:
+	\begin{enumerate}
+		\item Invert $u_c(c_t,d_t)=\mathfrak{v}_c'(d_t,a_t)$ for $c_t$ exactly as in the baseline model; equation~\eqref{eq:price_foc_c} confirms this step does not involve $p_k$.
+		\item Find the roots of the price-modified first-order condition implied by~\eqref{eq:price_foc_d},
+		\begin{align}
+			0 = u_d(c_t,d_t) - p_k\,\mathfrak{v}_c'(d_t,a_t) + \mathfrak{v}_d'(d_t,a_t),
+		\end{align}
+		in place of $0=u_d(c_t,d_t)-\mathfrak{v}_c'(d_t,a_t)+\mathfrak{v}_d'(d_t,a_t)$ used in the baseline model.
+		\item Compute the price-contingent liquidity $\ell_t^{(k)} = c_t + p_k\, d_t + a_t$ and the value $v_t = u(c_t,d_t)+\mathfrak{v}(d_t,a_t)$ (unchanged in form).
+		\item Apply FUES over $\ell_t^{(k)}$ to obtain $c_t^{adj}(\ell_t;p_k)$, $d_t^{adj}(\ell_t;p_k)$, and $v_t^{adj}(\ell_t;p_k)$.
+	\end{enumerate}
+	\item \textbf{Combine on a grid of $(m_t,n_t)$.} For each grid point, compute $\ell_t=m_t+(1-\tau)n_t$ (independent of $p_k$) and $v_t^{keep}(m_t,n_t)$, then for each node $p_k$ evaluate $v_t^{adj}(\ell_t;p_k)$, form the indicators $\mathbb{1}^{keep}(m_t,n_t,p_k)$, $\mathbb{1}^{adj}(m_t,n_t,p_k)$, and integrate as in equations~\eqref{eq:price_barv_defn}--\eqref{eq:price_barvn} (and, for reporting, equations~\eqref{eq:price_barc}--\eqref{eq:price_bard}).
+	\item \textbf{Feed $\bar v_t$, $\bar v_{m,t}$, $\bar v_{n,t}$ into the period-$(t-1)$ end-of-period step,} in place of the hard-maximum $v_t$, $v_{m,t}$, $v_{n,t}$ used in the baseline model.
+\end{enumerate}
+As in the baseline and taste-shock algorithms, I store and evaluate inverse representations of the (marginal) value functions so that any infinite conditional values (e.g.\ from an infeasible branch) do not propagate into numerical errors during interpolation.
+
+
+\subsection{Derivations: Search and Stochastic Prices (Section~\ref{subsec:ModelBasicFull})}\label{subsec:appdx_full_basic}
+
+This subsection derives the optimal search-effort rule, the combined envelope conditions, the Euler equations, the terminal-period solution, and the EGM algorithm for the nested search-and-price environment of Section~\ref{subsec:ModelBasicFull}. The within-branch building blocks are taken from the standalone extensions: the keeper is exactly as in Section~\ref{sec:appdx_model_basic}; the adjuster inherits the price-contingent first-order conditions~\eqref{eq:price_foc_c}--\eqref{eq:price_foc_d} and envelope results~\eqref{eq:price_adj_m}--\eqref{eq:price_adj_n}; and the search cost $\sigma(\varepsilon_t)$ and its derivative $\sigma'(\varepsilon_t)=-S\log(1-\varepsilon_t)$ are those of equations~\eqref{eq:search_cost_basic} and~\eqref{eq:sigma_prime}. What is new is the joint combination of search with price risk (without an additional EV Type I or multiplicative taste shock).
+
+\paragraph{Adjuster first-order conditions}
+Holding $p_t$ fixed, the adjuster's Lagrangian is identical to the stochastic-price case,
+\begin{align}
+	\mathscr{L} = u(c_t,d_t) + \beta \mathbb{E}_t\big[\bar v_{t+1}(m_{t+1},n_{t+1})\big] + \lambda_t^{adj}\big(\ell_t - c_t - p_t\, d_t - a_t\big),
+\end{align}
+where the continuation value is now the price-integrated $\bar v_{t+1}$ from equation~\eqref{eq:full_barv} one period ahead (rather than the price-only integral of Section~\ref{subsec:appdx_price_basic}, which used a hard maximum rather than search). The first-order conditions are therefore
+\begin{align}
+	\lambda_t^{adj} &= u_c(c_t,d_t) = \beta \mathcal{R}\, \mathbb{E}_t\big[\bar v_{m,t+1}\big], \label{eq:full_foc_c}\\
+	u_d(c_t,d_t) &= p_t\,\lambda_t^{adj} - \beta(1-\delta)\,\mathbb{E}_t\big[\bar v_{n,t+1}\big], \label{eq:full_foc_d}
+\end{align}
+with equality when the borrowing constraint does not bind. The price $p_t$ enters only through the durable first-order condition~\eqref{eq:full_foc_d}, exactly as in~\eqref{eq:price_foc_d}. The keeper's first-order condition is likewise unchanged relative to the baseline, with $d_t=n_t$ fixed and no price term.
+
+\paragraph{Optimal search effort}
+Recall the nested discrete problem~\eqref{eq:full_discrete},
+\begin{align}
+	v_t(m_t,n_t,p_t)
+	&= \max_{\varepsilon_t\in[0,1]}
+	\underbrace{\Big[(1-\varepsilon_t)\, v_t^{keep}(m_t,n_t)
+	+ \varepsilon_t\, v_t^{adj}(\ell_t,p_t)
+	- \sigma(\varepsilon_t)\Big]}_{\equiv\, g(\varepsilon_t;\,m_t,n_t,p_t)}.
+\end{align}
+Because $\sigma$ is strictly convex, $g$ is strictly concave in $\varepsilon_t$. The interior first-order condition is
+\begin{align}
+	v_t^{adj}(\ell_t,p_t) - v_t^{keep}(m_t,n_t) - \sigma'(\varepsilon_t^\ast) = 0
+	\quad\Longleftrightarrow\quad
+	v_t^{adj}(\ell_t,p_t) - v_t^{keep}(m_t,n_t) = -S\log(1-\varepsilon_t^\ast),
+\end{align}
+which yields the closed-form, state- and price-contingent optimal search effort
+\begin{align}
+	\varepsilon_t^\ast(m_t,n_t,p_t)
+	= \max\left\{0,\;
+	1 - \exp\left(-\frac{v_t^{adj}(\ell_t,p_t) - v_t^{keep}(m_t,n_t)}{S}\right)
+	\right\}. \label{eq:full_eps_star}
+\end{align}
+Relative to the search-only rule~\eqref{eq:eps_star_basic}, the gap that drives effort is now $v_t^{adj}(\ell_t,p_t)-v_t^{keep}$: a low durable price (which raises $v_t^{adj}$) increases $\varepsilon_t^\ast$, while a high price reduces it. As in the search-only case, $\varepsilon_t^\ast=0$ whenever $v_t^{adj}\le v_t^{keep}$, and the upper constraint $\varepsilon_t\le 1$ never binds for finite $S$. Special cases recover the earlier extensions: with $p_t\equiv 1$, equation~\eqref{eq:full_eps_star} reduces to~\eqref{eq:eps_star_basic}; with $S\to 0$, $\varepsilon_t^\ast\to\mathbb{1}\{v_t^{adj}(\ell_t,p_t)>v_t^{keep}\}$, the hard indicator of the price-contingent hard maximum.
+
+\paragraph{Envelope conditions and combined marginal values}
+Because $\varepsilon_t^\ast$ is chosen optimally, the envelope theorem eliminates indirect effects through search effort. Differentiating $v_t=g(\varepsilon_t^\ast;m_t,n_t,p_t)$ and using the adjuster envelopes~\eqref{eq:price_adj_m}--\eqref{eq:price_adj_n} together with the keeper envelopes~\eqref{eq:keep_m_basic}--\eqref{eq:keep_n_basic} gives
+\begin{align}
+	\frac{\partial v_t(m_t,n_t,p_t)}{\partial m_t}
+	&= (1-\varepsilon_t^\ast)\, u_c(c_t^{keep,\ast},n_t)
+	+ \varepsilon_t^\ast\, u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big), \label{eq:full_vm}\\
+	\frac{\partial v_t(m_t,n_t,p_t)}{\partial n_t}
+	&= (1-\varepsilon_t^\ast)\Big[u_d(c_t^{keep,\ast},n_t) + \beta(1-\delta)\,\mathbb{E}_t\big[\bar v_{n,t+1}\big]\Big]
+	+ \varepsilon_t^\ast\,(1-\tau)\, u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big). \label{eq:full_vn}
+\end{align}
+Equations~\eqref{eq:full_vm}--\eqref{eq:full_vn} nest the earlier combined marginal-value formulas: with $\varepsilon_t^\ast\in\{0,1\}$ they collapse to the price-only indicators~\eqref{eq:price_vm}--\eqref{eq:price_vn}; with $p_t\equiv 1$ they collapse to the search-only envelopes~\eqref{eq:search_vm}--\eqref{eq:search_vn}. The price $p_t$ enters only indirectly through $(c_t^{adj,\ast},d_t^{adj,\ast})$ and through $\varepsilon_t^\ast$ itself.
+
+\paragraph{Integrating out price shocks}
+The objects that enter the time-$(t-1)$ Euler equations are the price-integrated value and marginal-value functions
+\begin{align}
+	\bar v_t(m_t,n_t)
+	&\equiv \mathbb{E}_{p_t}\big[v_t(m_t,n_t,p_t)\big], \label{eq:full_barv_defn}\\
+	\bar v_{m,t}(m_t,n_t)
+	&\equiv \mathbb{E}_{p_t}\Big[
+	(1-\varepsilon_t^\ast)\, u_c(c_t^{keep,\ast},n_t)
+	+ \varepsilon_t^\ast\, u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big)
+	\Big], \label{eq:full_barvm}\\
+	\bar v_{n,t}(m_t,n_t)
+	&\equiv \mathbb{E}_{p_t}\Big[
+	(1-\varepsilon_t^\ast)\Big(u_d(c_t^{keep,\ast},n_t) + \beta(1-\delta)\,\mathbb{E}_t\big[\bar v_{n,t+1}\big]\Big)
+	+ \varepsilon_t^\ast\,(1-\tau)\, u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big)
+	\Big], \label{eq:full_barvn}
+\end{align}
+where $\varepsilon_t^\ast=\varepsilon_t^\ast(m_t,n_t,p_t)$ from~\eqref{eq:full_eps_star}, and equation~\eqref{eq:full_barv_defn} restates~\eqref{eq:full_barv} from the main text. The model's ex-ante (price-weighted) policy functions are
+\begin{align}
+	\bar c_t(m_t,n_t)
+	&\equiv \mathbb{E}_{p_t}\Big[
+	(1-\varepsilon_t^\ast)\, c_t^{keep} + \varepsilon_t^\ast\, c_t^{adj}(p_t)
+	\Big], \label{eq:full_barc}\\
+	\bar d_t(m_t,n_t)
+	&\equiv \mathbb{E}_{p_t}\Big[
+	(1-\varepsilon_t^\ast)\, n_t + \varepsilon_t^\ast\, d_t^{adj}(p_t)
+	\Big], \label{eq:full_bard}\\
+	\bar\varepsilon_t(m_t,n_t)
+	&\equiv \mathbb{E}_{p_t}\big[\varepsilon_t^\ast(m_t,n_t,p_t)\big]. \label{eq:full_bareps}
+\end{align}
+Because the household observes $p_t$ before choosing $\varepsilon_t$, the \emph{realized} policy for a given draw is the search-weighted mix of keep and adjust at that price; equations~\eqref{eq:full_barc}--\eqref{eq:full_bareps} are the objects reported for simulation and plotting.
+
+\paragraph{Euler equations}
+Combining~\eqref{eq:full_foc_c}--\eqref{eq:full_foc_d} with the integrated continuation values~\eqref{eq:full_barvm}--\eqref{eq:full_barvn} yields the within-branch Euler equations
+\begin{align}
+	u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big)
+	&\ge \beta \mathcal{R}\, \mathbb{E}_t\big[\bar v_{m,t+1}\big], \\
+	u_d\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big)
+	&\ge p_t\,\beta \mathcal{R}\, \mathbb{E}_t\big[\bar v_{m,t+1}\big]
+	- \beta(1-\delta)\,\mathbb{E}_t\big[\bar v_{n,t+1}\big],
+\end{align}
+and analogously for the keeper with $d_t=n_t$ fixed and no price term. Relative to the baseline, the only structural change inside the adjuster's durable Euler equation is the factor $p_t$ on the opportunity-cost term; relative to the price-only extension, the continuation values $\bar v_{m,t+1}$ and $\bar v_{n,t+1}$ additionally average over next period's search effort.
+
+\paragraph{Terminal period}
+The within-branch terminal solutions are those of the price extension: $c_T^{keep}=m_T$ for the keeper, and
+\begin{align}
+	c_T^{adj,\ast}=\alpha\,\ell_T, \qquad d_T^{adj,\ast}=\frac{(1-\alpha)\,\ell_T}{p_T},
+\end{align}
+from equation~\eqref{eq:price_terminal}. The terminal discrete problem then resolves through the optimal terminal search effort
+\begin{align}
+	\varepsilon_T^\ast(m_T,n_T,p_T)
+	= \max\left\{0,\;
+	1 - \exp\left(-\frac{v_T^{adj}(\ell_T,p_T) - v_T^{keep}(m_T,n_T)}{S}\right)
+	\right\},
+\end{align}
+the terminal value follows~\eqref{eq:full_discrete} evaluated at $T$, and $\bar v_T(m_T,n_T)=\mathbb{E}_{p_T}[v_T(m_T,n_T,p_T)]$ is the continuation value handed to period $T-1$.
+
+\paragraph{EGM algorithm with search and stochastic prices}
+Let $\vec p=\{p_1,\dots,p_{K_p}\}$ be quadrature nodes for the log-normal price density with weights $\vec\mu^p$, in addition to the income-shock integration used to build $\mathfrak{v}(d_t,a_t)$, $\mathfrak{v}_c'(d_t,a_t)$, and $\mathfrak{v}_d'(d_t,a_t)$. The algorithm nests the standalone price and search steps:
+\begin{enumerate}
+	\item \textbf{Solve the keeper once,} by EGM and upper envelope exactly as in the ``Solve Keeper'' paragraph of Section~\ref{sec:appdx_model_basic}; the keeper does not depend on $p_t$.
+	\item \textbf{Solve the adjuster once per price node.} For each $p_k$, proceed exactly as in the price-only algorithm of Section~\ref{subsec:appdx_price_basic}: invert $u_c=\mathfrak{v}_c'$ for $c_t$, find roots of
+	\begin{align}
+		0 = u_d(c_t,d_t) - p_k\,\mathfrak{v}_c'(d_t,a_t) + \mathfrak{v}_d'(d_t,a_t),
+	\end{align}
+	form $\ell_t^{(k)}=c_t+p_k\,d_t+a_t$, and apply FUES to obtain $c_t^{adj}(\ell_t;p_k)$, $d_t^{adj}(\ell_t;p_k)$, and $v_t^{adj}(\ell_t;p_k)$.
+	\item \textbf{Combine on a grid of $(m_t,n_t)$, integrating over $p_k$.} For each grid point, compute $\ell_t=m_t+(1-\tau)n_t$ and $v_t^{keep}(m_t,n_t)$. Then for each $p_k$:
+	\begin{enumerate}
+		\item Evaluate $v_t^{adj}(\ell_t;p_k)$ and form the optimal search effort $\varepsilon^\ast(m_t,n_t,p_k)$ from~\eqref{eq:full_eps_star} (or, for robustness when a conditional value is infinite, by a fine grid search over $[0,1]$ maximizing $g$).
+		\item Form the price-contingent value and marginal values from~\eqref{eq:full_discrete} and~\eqref{eq:full_vm}--\eqref{eq:full_vn}.
+	\end{enumerate}
+	Integrate with weights $\mu_k^p$ to obtain $\bar v_t$, $\bar v_{m,t}$, $\bar v_{n,t}$ as in~\eqref{eq:full_barv_defn}--\eqref{eq:full_barvn} (and, for reporting, $\bar c_t$, $\bar d_t$, $\bar\varepsilon_t$ from~\eqref{eq:full_barc}--\eqref{eq:full_bareps}).
+	\item \textbf{Feed $\bar v_t$, $\bar v_{m,t}$, $\bar v_{n,t}$ into the period-$(t-1)$ end-of-period step,} in place of the hard-maximum objects used in the baseline model.
+\end{enumerate}
+As in the earlier algorithms, I store and evaluate inverse representations of the (marginal) value functions so that infinite conditional values do not propagate into numerical errors during interpolation. Computational cost scales with $K_p$ for both the adjuster solve and the combine step.

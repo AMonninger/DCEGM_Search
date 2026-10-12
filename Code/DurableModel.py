@@ -6,8 +6,10 @@ Port of the one-period notebook suite into a self-contained class API:
     from DurableModel import DurableConsumer
     # Search + stochastic prices (Combined notebook):
     model = DurableConsumer(cycles=1, SearchCost=0.1, sigma_eps=0.0, PriceShkStd=0.1)
-    # EV Type I taste only (TasteShock notebook):
+    # EV Type I taste only (TasteShock notebook; kappa=0 is the symmetric logit):
     model = DurableConsumer(cycles=1, SearchCost=0.0, sigma_eps=0.05, PriceShkStd=0.0)
+    # Zorzi–Beraja taste: same logit with a utility cost kappa of adjusting:
+    model = DurableConsumer(cycles=1, SearchCost=0.0, sigma_eps=0.05, kappa=0.1, PriceShkStd=0.0)
     model.solve()
     sol = model.solution[0]   # first period; solution[-1] is terminal
     sol.cFunc(n, m), sol.dFunc(n, m), sol.adjusting(n, m)
@@ -15,7 +17,8 @@ Port of the one-period notebook suite into a self-contained class API:
 Channels (turn off with zeros):
   - Directed search: SearchCost (mutually exclusive with EV taste);
     search_method="closed" (default, conjugate ε*) or "grid" (101-point argmax)
-  - EV Type I taste shocks: sigma_eps (closed-form logit / log-sum; no xi grid)
+  - EV Type I taste shocks: sigma_eps (closed-form logit / log-sum; no xi grid).
+    kappa is an optional utility cost of adjusting; kappa=0 keeps the symmetric logit.
   - Stochastic prices: PriceShkStd
 
 Supports the four pedagogical cases: taste only, search only, price only, search+price.
@@ -111,22 +114,29 @@ def combine_ev_taste_price(
     cAdj, dAdj, aAdj, inv_vAdj, vPAdj, vPDAdj,
     cKeep, dKeep, aKeep, inv_vKeep, vPKeep, vPDKeep,
     sigma, CRRA_,
+    kappa=0.0,
 ):
     """
     EV Type I (or hard-max) combine over keep vs adjust, then integrate over prices.
 
-    For each price node p_k:
-      v = sigma * log(exp(vKeep/sigma) + exp(vAdj(p_k)/sigma)),
-      P^adj = logit weight on adjust,
-    then average with price weights mu_p. ``sigma=0`` collapses to hard max.
+    For each price node p_k the adjuster level value is shifted by a utility
+    cost ``kappa`` (Zorzi–Beraja location) and then
+      v = sigma * log(exp(vKeep/sigma) + exp((vAdj(p_k) - kappa)/sigma)),
+      P^adj = logit weight on the shifted adjuster.
+    ``kappa=0`` is the symmetric log-sum. ``sigma=0`` collapses to
+    max{vKeep, vAdj - kappa}. Results are then averaged with price weights.
     Adjuster arrays: (n_price, n_n, n_m). Keeper: (n_n, n_m).
     ``adjusting`` returned is E_p[P^adj].
+    Marginal values use those probabilities and the unshifted branch
+    derivatives: kappa does not depend on the state.
     """
     n_price = cAdj.shape[0]
     keep_shape = cKeep.shape
 
     vKeep_level = utility(inv_vKeep, CRRA_)
     vAdj_level = utility(inv_vAdj, CRRA_)
+    if kappa != 0.0:
+        vAdj_level = np.where(np.isfinite(vAdj_level), vAdj_level - kappa, vAdj_level)
 
     barC = np.zeros(keep_shape)
     barD = np.zeros(keep_shape)
@@ -428,8 +438,11 @@ durable_defaults = dict(
     taxrate=0.0,
     labor=1.0,
     wage=1.0,
-    # Channels (EV taste sigma_eps vs search are mutually exclusive)
+    # Channels (EV taste sigma_eps vs search are mutually exclusive).
+    # kappa is a utility cost of adjusting inside the logit (Zorzi–Beraja).
+    # kappa=0 keeps the symmetric EV Type I log-sum.
     sigma_eps=0.0,
+    kappa=0.0,
     SearchCost=0.1,
     ScaleBool=False,
     e_grid_count=101,
@@ -497,8 +510,10 @@ class DurableConsumer:
       - Directed search when ``SearchCost > 0`` (Combined / Search notebooks).
         ``search_method="closed"`` uses the conjugate ε*; ``"grid"`` keeps the
         original 101-point argmax over ``e_grid``.
-      - EV Type I taste shocks when ``sigma_eps > 0`` and ``SearchCost == 0``
-      - Hard max when both are zero
+      - EV Type I taste shocks when ``SearchCost == 0``. ``sigma_eps`` is the
+        scale (0 is a hard max). ``kappa`` is a utility cost subtracted from
+        the adjuster value before the log-sum; ``kappa=0`` is the symmetric logit.
+      - Hard max when ``sigma_eps``, ``kappa``, and ``SearchCost`` are zero
 
     Stochastic prices (``PriceShkStd``) nest with either smoother.
 
@@ -557,10 +572,11 @@ class DurableConsumer:
             raise NotImplementedError("Simplified DurableConsumer requires LTV=0.")
         if not (bool(self.use_expected) ^ bool(self.use_TransitionMatrix)):
             raise ValueError("Set exactly one of use_expected / use_TransitionMatrix.")
-        if self.SearchCost > 0.0 and self.sigma_eps > 0.0:
+        if self.SearchCost > 0.0 and (self.sigma_eps > 0.0 or self.kappa != 0.0):
             raise ValueError(
-                "Search and EV Type I taste shocks are alternative discrete smoothers; "
-                "set either SearchCost=0 or sigma_eps=0."
+                "Search and EV taste shocks (including a utility cost kappa) are "
+                "alternative discrete smoothers; set SearchCost=0, or set "
+                "sigma_eps=0 and kappa=0."
             )
         if self.search_method not in ("grid", "closed"):
             raise ValueError("search_method must be 'grid' or 'closed'.")
@@ -794,11 +810,18 @@ class DurableConsumer:
         self._updated = True
         discrete = (
             "search" if self.SearchCost > 0
-            else ("EV taste" if self.sigma_eps > 0 else "hard max")
+            else (
+                "EV taste" if self.sigma_eps > 0
+                else ("hard max + utility cost" if self.kappa != 0.0 else "hard max")
+            )
         )
         self._log(
             f"Updated. Discrete: {discrete}"
-            + (f" (sigma_eps={self.sigma_eps})" if self.sigma_eps > 0 and self.SearchCost == 0 else "")
+            + (
+                f" (sigma_eps={self.sigma_eps}, kappa={self.kappa})"
+                if self.SearchCost == 0 and (self.sigma_eps > 0 or self.kappa != 0.0)
+                else ""
+            )
             + (
                 f" (S={self.SearchCost}, search_method={self.search_method})"
                 if self.SearchCost > 0
@@ -817,7 +840,8 @@ class DurableConsumer:
         Discrete combine + price integration.
 
         Uses directed search when SearchCost > 0 (Combined notebook); otherwise
-        EV Type I / hard-max via sigma_eps (TasteShock / Price / baseline notebooks).
+        EV Type I / hard-max via sigma_eps, with optional utility cost kappa
+        (TasteShock / Price / baseline notebooks). kappa=0 is the symmetric logit.
         """
         if self.SearchCost > 0.0:
             return combine_search_price(
@@ -832,6 +856,7 @@ class DurableConsumer:
             cAdj, dAdj, aAdj, inv_vAdj, vPAdj, vPDAdj,
             cKeep, dKeep, aKeep, inv_vKeep, vPKeep, vPDKeep,
             self.sigma_eps, self.CRRA,
+            kappa=self.kappa,
         )
 
     # ----------------------------------------------------------- terminal

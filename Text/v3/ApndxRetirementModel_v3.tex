@@ -1,0 +1,442 @@
+%============================================================
+\section{Retirement-model appendix}\label{sec:appdx_retirement}
+%============================================================
+This appendix derives the objects used in Sections~\ref{sec:RetirementModel} and~\ref{sec:RetirementModelPrices}. Section~\ref{subsec:appdx_ret_baseline} records the baseline envelopes and Euler equations (no account-value risk). Section~\ref{subsec:appdx_ret_price} introduces stochastic retirement-account realizations in isolation. Section~\ref{subsec:appdx_ret_full} nests those realizations with directed search.
+
+%------------------------------------------------------------
+\subsection{Baseline envelopes and Euler equations}\label{subsec:appdx_ret_baseline}
+%------------------------------------------------------------
+The environment is that of Section~\ref{sec:RetirementModel}: log utility, disutility of work $\delta$, convex search cost $\theta(\eff_t)=\sigma_s\bigl(\eff_t+(1-\eff_t)\log(1-\eff_t)\bigr)$, option probabilities $P_1(\eff_t)=(1-\eff_t)p+\eff_t$ and $P_2(\eff_t)=(1-\eff_t)(1-p)$, and $M_{t+1}=A_t R+y_{t+1}d_t$ with $y_{t+1}=y\eta_{t+1}$. Claiming delivers book resources one-for-one, so both branches use $A_t=M_t-c_t$.
+
+\paragraph{Retiree.}
+Retirement is self-absorbing. The Bellman equation is
+\begin{align}
+	V_t^{\Ret}(M_t)
+	&= \max_{0\le c_t\le M_t}
+	\left\{
+		\log(c_t)+\beta V_{t+1}^{\Ret}(A_t R)
+	\right\},
+	\qquad A_t=M_t-c_t.
+\end{align}
+The Lagrangian $\mathscr{L}=\log(c_t)+\beta V_{t+1}^{\Ret}(A_t R)+\lambda_t^{\Ret}(M_t-c_t-A_t)$ yields
+\begin{align}
+	\lambda_t^{\Ret} = \frac{1}{c_t}
+	= \beta R\,\frac{\partial V_{t+1}^{\Ret}(A_t R)}{\partial M_{t+1}}.
+\end{align}
+The envelope theorem gives $\partial V_t^{\Ret}/\partial M_t=\lambda_t^{\Ret}=1/c_t^{\Ret}$, which iterated forward is $\partial V_{t+1}^{\Ret}/\partial M_{t+1}=1/c_{t+1}^{\Ret}$. Substituting produces the baseline retiree Euler equation
+\begin{align}
+	\frac{1}{c_t}
+	= R\beta\,\frac{1}{c_{t+1}^{\Ret}(A_t R)},
+	\label{eq:ret_baseline_euler}
+\end{align}
+or $c_t^{\Ret}=\bigl(R\beta(c_{t+1}^{\Ret}(A_t R))^{-1}\bigr)^{-1}$, as in the main text. The gothic retiree value is $\goth{V}_t^{\Ret}(A_t)\equiv V_{t+1}^{\Ret}(A_t R)$. This retiree problem is an input to Sections~\ref{subsec:appdx_ret_price}--\ref{subsec:appdx_ret_full}: a claimed account $\tilde M=\phi M$ is just a different starting point for the same functions $V_t^{\Ret}$ and $c_t^{\Ret}$.
+
+\paragraph{Worker who must work.}
+With the taste shock $\xi_t$ outside the inner maximum, as in Section~\ref{sec:RetirementModel},
+\begin{align}
+	V_t^{W}(M_t,\xi_t)
+	&= \xi_t\max_{\substack{0\le c_t\le M_t\\ 0\le\eff_t\le 1}}
+	\left\{
+		\log(c_t)-\delta-\theta(\eff_t)
+		+\beta P_1(\eff_t)\,\goth{V}_t^{1}(A_t)
+		+\beta P_2(\eff_t)\,\goth{V}_t^{2}(A_t)
+	\right\}.
+	\label{eq:ret_baseline_VW}
+\end{align}
+Splitting consumption and effort into sequential sub-periods, the effort first-order condition is
+\begin{align}
+	\theta'(\eff_t^{\ast})
+	&= \beta(1-p)\bigl(\goth{V}_t^{1}(A_t)-\goth{V}_t^{2}(A_t)\bigr),
+\end{align}
+and since $\theta'(\eff)=-\sigma_s\log(1-\eff)$,
+\begin{align}
+	\eff_t^{\ast}(A_t)
+	&= 1-\exp\left(
+		-\frac{\beta(1-p)}{\sigma_s}
+		\bigl(\goth{V}_t^{1}(A_t)-\goth{V}_t^{2}(A_t)\bigr)
+	\right).
+	\label{eq:ret_baseline_effort}
+\end{align}
+The consumption first-order condition, evaluated at $\eff_t^{\ast}$, is
+\begin{align}
+	\frac{1}{c_t}
+	&= \beta\left[
+		P_1(\eff_t^{\ast})\,\frac{\partial\goth{V}_t^{1}}{\partial A_t}
+		+P_2(\eff_t^{\ast})\,\frac{\partial\goth{V}_t^{2}}{\partial A_t}
+	\right].
+	\label{eq:ret_baseline_foc_c}
+\end{align}
+Differentiating the gothic values,
+\begin{align}
+	\frac{\partial\goth{V}_t^{1}}{\partial A_t}
+	&= R\,\mathbb{E}_t\left[
+		\frac{\partial V_{t+1}^{R,W}(M_{t+1},\xi_{t+1})}{\partial M_{t+1}}
+	\right],
+	\\
+	\frac{\partial\goth{V}_t^{2}}{\partial A_t}
+	&= R\,\mathbb{E}_t\left[
+		\frac{\partial V_{t+1}^{W}(M_{t+1},\xi_{t+1})}{\partial M_{t+1}}
+	\right],
+\end{align}
+where the expectation is over $(y_{t+1},\xi_{t+1})$. The envelope theorem applied to~\eqref{eq:ret_baseline_VW}, using that $\eff_t^{\ast}$ is already optimal so its indirect effect vanishes, gives
+\begin{align}
+	\frac{\partial V_t^{W}(M_t,\xi_t)}{\partial M_t}
+	&= \xi_t\cdot\frac{1}{c_t^{W}}
+	= \xi_t\,u'(c_t^{W},1,\eff_t^{\ast}).
+	\label{eq:ret_baseline_env_W}
+\end{align}
+For the worker who has the option,
+\begin{align}
+	V_t^{R,W}(M_t,\xi_t)
+	&= \max\big\{V_t^{\Ret}(M_t),\; V_t^{W}(M_t,\xi_t)\big\},
+\end{align}
+so
+\begin{align}
+	\frac{\partial V_{t+1}^{R,W}}{\partial M_{t+1}}
+	&= \mathbbm{1}_{t+1}^{0}\cdot\frac{1}{c_{t+1}^{\Ret}}
+	+\mathbbm{1}_{t+1}^{1}\cdot\xi_{t+1}\cdot\frac{1}{c_{t+1}^{W}},
+	\label{eq:ret_baseline_env_RW}
+\end{align}
+with $\mathbbm{1}_{t+1}^{0}=1$ iff $V_{t+1}^{\Ret}\ge V_{t+1}^{W}$ and $\mathbbm{1}_{t+1}^{1}=1-\mathbbm{1}_{t+1}^{0}$. Substituting~\eqref{eq:ret_baseline_env_W}--\eqref{eq:ret_baseline_env_RW} into~\eqref{eq:ret_baseline_foc_c} recovers the worker consumption function in the main text.
+
+\paragraph{Terminal period.}
+With $V_{T+1}\equiv 0$ and no borrowing, both branches set $A_T=0$. The retiree consumes $c_T^{\Ret}=M_T$ and $V_T^{\Ret}=\log(M_T)$. The worker consumes $c_T^{W}=M_T$ and $V_T^{W}(M_T,\xi_T)=\xi_T\bigl(\log(M_T)-\delta\bigr)$ (effort is irrelevant because there is no $T+1$). The option-contingent value is the hard maximum of the two.
+
+%------------------------------------------------------------
+\subsection{Derivations: Stochastic retirement wealth (Section~\ref{subsec:RetirementPrices})}\label{subsec:appdx_ret_price}
+%------------------------------------------------------------
+This subsection derives the envelope conditions, the Euler equations, the terminal-period solution, and the EGM algorithm for the account-realization extension of Section~\ref{subsec:RetirementPrices}. Taste shocks and search are shut down ($p=1$, $\sigma_\xi=0$, $\eff_t\equiv 0$). The retiree's Bellman problem, first-order condition, and envelope of Section~\ref{subsec:appdx_ret_baseline} carry over unchanged: once a draw has been accepted, the agent is an ordinary retiree starting from $\tilde M_t=\phi_t M_t$. The worker's budget remains $A_t=M_t-c_t$. What changes is the discrete comparison and, through that comparison, the continuation that enters the worker's Euler equation.
+
+\paragraph{Claiming maps into the baseline retiree.}
+Define claimed wealth by~\eqref{eq:ret_price_Mtilde}, $\tilde M_t=\phi_t M_t$. The value of accepting the draw is the baseline retiree value evaluated at that point,
+\begin{align}
+	V_t^{\mathrm{claim}}(M_t,\phi_t)
+	&\equiv V_t^{\Ret}(\phi_t M_t),
+	\label{eq:ret_price_Vclaim}
+\end{align}
+with claiming-period consumption $c_t^{\mathrm{claim}}(M_t,\phi_t)=c_t^{\Ret}(\phi_t M_t)$. The retiree Euler equation remains~\eqref{eq:ret_baseline_euler}; $\phi_t$ does not appear in it. After claiming, $A_t=\phi_t M_t-c_t^{\Ret}(\phi_t M_t)$ and $M_{t+1}=A_t R$, with no further account draws.
+
+\paragraph{Envelope conditions.}
+By the chain rule, the derivative of claiming value with respect to \emph{book} resources $M_t$, holding $\phi_t$ fixed, is
+\begin{align}
+	\frac{\partial V_t^{\mathrm{claim}}(M_t,\phi_t)}{\partial M_t}
+	&= \phi_t\cdot\frac{\partial V_t^{\Ret}(\tilde M_t)}{\partial\tilde M_t}
+	= \phi_t\cdot\frac{1}{c_t^{\Ret}(\phi_t M_t)}.
+	\label{eq:ret_price_env_Ret}
+\end{align}
+An extra unit of book wealth is worth $\phi_t$ units of retirement wealth, each of which has marginal value $1/c_t^{\Ret}(\tilde M_t)$. Relative to the baseline envelope $\partial V_t^{\Ret}/\partial M_t=1/c_t^{\Ret}$, the right-hand side is scaled by $\phi_t$ and the consumption function is evaluated at $\phi_t M_t$ rather than at $M_t$. This is the analog of the durable-price envelope in which $p_t$ changes the adjuster's optimum: here $\phi_t$ changes the state at which that optimum is evaluated, not the first-order condition itself.
+
+The worker never claims, so
+\begin{align}
+	\frac{\partial V_t^{W}(M_t)}{\partial M_t}
+	&= \frac{1}{c_t^{W}(M_t)},
+	\label{eq:ret_price_env_W}
+\end{align}
+exactly as in the baseline without taste shocks.
+
+\paragraph{Discrete choice with a stochastic account.}
+Recall the realization-contingent discrete choice~\eqref{eq:ret_price_discrete},
+\begin{align}
+	V_t(M_t,\phi_t)
+	&= \max\Big\{V_t^{\Ret}(\phi_t M_t),\; V_t^{W}(M_t)\Big\}.
+\end{align}
+Define the state- and draw-contingent indicators $\mathbbm{1}_t^{0}(M_t,\phi_t)=1$ iff $V_t^{\Ret}(\phi_t M_t)\ge V_t^{W}(M_t)$ and $\mathbbm{1}_t^{1}(M_t,\phi_t)=1-\mathbbm{1}_t^{0}(M_t,\phi_t)$. Applying the envelope theorem to the outer maximum,
+\begin{align}
+	\frac{\partial V_t(M_t,\phi_t)}{\partial M_t}
+	&= \mathbbm{1}_t^{0}\cdot\phi_t\cdot\frac{1}{c_t^{\Ret}(\phi_t M_t)}
+	+\mathbbm{1}_t^{1}\cdot\frac{1}{c_t^{W}(M_t)}.
+	\label{eq:ret_price_env_RW}
+\end{align}
+Unlike the multiplicative taste shock of Section~\ref{sec:RetirementModel}, which reweights the two branches without changing either continuous policy, $\phi_t$ affects~\eqref{eq:ret_price_env_RW} both through the indicator (the extensive margin) and through the argument of $c_t^{\Ret}$ and the factor $\phi_t$ (the intensive margin and the mark-to-market of book wealth).
+
+\paragraph{Integrating out the account draw.}
+The objects that enter the time-$(t-1)$ Euler equations are the $\phi$-integrated value and marginal-value functions
+\begin{align}
+	\bar V_t(M_t)
+	&\equiv \mathbb{E}_{\phi_t}\big[V_t(M_t,\phi_t)\big],
+	\label{eq:ret_price_barV_defn}\\
+	\bar V_{M,t}(M_t)
+	&\equiv \mathbb{E}_{\phi_t}\left[
+		\mathbbm{1}_t^{0}\cdot\phi_t\cdot\frac{1}{c_t^{\Ret}(\phi_t M_t)}
+		+\mathbbm{1}_t^{1}\cdot\frac{1}{c_t^{W}(M_t)}
+	\right].
+	\label{eq:ret_price_barVM}
+\end{align}
+Equation~\eqref{eq:ret_price_barV_defn} restates~\eqref{eq:ret_price_barV}. With $p=1$, the gothic value of a worker is $\goth{V}_{t-1}^{1}(A_{t-1})=\mathbb{E}_{\eta_t}[\bar V_t(R A_{t-1}+y_t)]$. The gothic retiree value is unchanged: $\goth{V}_{t-1}^{\Ret}(A_{t-1})=V_t^{\Ret}(R A_{t-1})$, because a household that has already claimed no longer faces $\phi$. As $\sigma_\phi\to 0$, $\phi_t\to 1$ a.s., $\mathbbm{1}_t^{0}\to\mathbbm{1}\{V_t^{\Ret}(M_t)\ge V_t^{W}(M_t)\}$, and~\eqref{eq:ret_price_barVM} collapses to the baseline hard-maximum envelope~\eqref{eq:ret_baseline_env_RW} without taste shocks.
+
+The model's ex-ante ($\phi$-weighted) consumption function follows the same logic. Because the household observes $\phi_t$ before choosing, the realized policy for a given draw is a hard 0/1 choice,
+\begin{align}
+	c_t(M_t,\phi_t)
+	&= \mathbbm{1}_t^{0}\,c_t^{\Ret}(\phi_t M_t)
+	+\mathbbm{1}_t^{1}\,c_t^{W}(M_t),
+\end{align}
+while the ex-ante policy reported for plotting is
+\begin{align}
+	\bar c_t(M_t)
+	&\equiv \mathbb{E}_{\phi_t}\big[c_t(M_t,\phi_t)\big]
+	= \mathbb{E}_{\phi_t}\Big[
+		\mathbbm{1}_t^{0}\,c_t^{\Ret}(\phi_t M_t)
+		+\mathbbm{1}_t^{1}\,c_t^{W}(M_t)
+	\Big].
+	\label{eq:ret_price_barc}
+\end{align}
+
+\paragraph{Euler equations.}
+The retiree's Euler equation is the baseline~\eqref{eq:ret_baseline_euler}, evaluated at whatever claimed wealth the household accepted. For the worker, with $p=1$ so that $P_1=1$ and $P_2=0$,
+\begin{align}
+	\frac{1}{c_t^{W}(A_t)}
+	&= R\beta\,\mathbb{E}_t\big[\bar V_{M,t+1}(M_{t+1})\big]
+	= R\beta\int_{y_{t+1}}\int_{\phi_{t+1}}
+	\left[
+		\mathbbm{1}_{t+1}^{0}\cdot\phi_{t+1}\cdot\frac{1}{c_{t+1}^{\Ret}(\phi_{t+1} M_{t+1})}
+		+\mathbbm{1}_{t+1}^{1}\cdot\frac{1}{c_{t+1}^{W}(M_{t+1})}
+	\right]
+	dF(y_{t+1})\,dF(\phi_{t+1}),
+	\label{eq:ret_price_euler_W}
+\end{align}
+where $\mathbbm{1}_{t+1}^{0}=\mathbbm{1}_{t+1}^{0}(M_{t+1},\phi_{t+1})$, $c_{t+1}^{W}=c_{t+1}^{W}(M_{t+1})$, and $M_{t+1}=A_t R+y_{t+1}$. Relative to the baseline worker Euler, the only structural change is that the retiree-branch contribution to next period's marginal value is $\phi_{t+1}/c_{t+1}^{\Ret}(\phi_{t+1} M_{t+1})$ rather than $1/c_{t+1}^{\Ret}(M_{t+1})$, and the indicator is $\phi_{t+1}$-contingent.
+
+\paragraph{Terminal period.}
+With $V_{T+1}\equiv 0$ and borrowing prohibited, both branches set $A_T=0$. The worker's terminal solution is unaffected by the account draw: $c_T^{W}=M_T$ and $V_T^{W}=\log(M_T)-\delta$. For a claimant, $c_T^{\Ret}(\phi_T M_T)=\phi_T M_T$ and
+\begin{align}
+	V_T^{\Ret}(\phi_T M_T) = \log(\phi_T M_T) = \log(M_T)+\log(\phi_T).
+	\label{eq:ret_price_terminal}
+\end{align}
+The terminal discrete choice is $V_T(M_T,\phi_T)=\max\{V_T^{\Ret}(\phi_T M_T),\,V_T^{W}(M_T)\}$. Substituting the closed forms, the household claims iff
+\begin{align}
+	\log(M_T)+\log(\phi_T)
+	\ge \log(M_T)-\delta
+	\quad\Longleftrightarrow\quad
+	\phi_T \ge e^{-\delta}.
+	\label{eq:ret_price_terminal_threshold}
+\end{align}
+The terminal extensive margin is independent of wealth: both branches consume all resources, so $M_T$ cancels and the comparison reduces to whether the log account realization exceeds the (negative of) work disutility. High $\phi_T$ favors claiming; low $\phi_T$ is denied. (In earlier periods wealth matters, because remaining at work preserves a claim on future labor income \emph{and} on future draws.) The continuation handed to period $T-1$ is $\bar V_T(M_T)=\mathbb{E}_{\phi_T}[V_T(M_T,\phi_T)]$.
+
+\paragraph{EGM algorithm with stochastic retirement wealth.}
+Let $\vec\phi=\{\phi_1,\dots,\phi_K\}$ be quadrature nodes for the log-normal account density with weights $\vec\mu=\{\mu_1,\dots,\mu_K\}$, and let $\vec\eta=\{\eta_1,\dots,\eta_J\}$ be quadrature nodes for the transitory income shock with weights $\vec\omega$, as in Algorithm~1 of Section~\ref{sec:RetirementModel}. Because $\phi_t$ rescales the state at which the baseline retiree is evaluated rather than the retiree's first-order condition, the retiree is solved \emph{once}---in contrast to the durable-price algorithm of Appendix~\ref{subsec:appdx_price_basic}, which re-solves the adjuster at every $p_k$. The algorithm for one recursive period, starting from a given next-period solution $(c_{t+1}^{\Ret},\,c_{t+1}^{W},\,V_{t+1}^{\Ret},\,V_{t+1}^{W})$, proceeds as follows.
+
+\begin{enumerate}
+	\item \textbf{Solve the retiree once,} by EGM on $A_t=\tilde M_t-c_t$ exactly as in Section~\ref{subsec:appdx_ret_baseline}, yielding $c_t^{\Ret}(\tilde M)$ and $V_t^{\Ret}(\tilde M)$ on a grid that extends to at least $\phi_{\max}M_{\max}$ so that every claiming evaluation $\phi_k M$ lies in range.
+	\item \textbf{Solve the worker once.} The worker does not depend on current $\phi_t$. For each $A_i$ on a grid $\vec A_t$, compute $M_{t+1}^{j}=R A_i+y\eta_j$ and, for each $(j,k)$,
+	\begin{align}
+		V_{t+1}(M_{t+1}^{j},\phi_k)
+		&= \max\big\{
+			V_{t+1}^{\Ret}(\phi_k M_{t+1}^{j}),\;
+			V_{t+1}^{W}(M_{t+1}^{j})
+		\big\},
+		\\
+		\mathrm{RHS}^{\mathrm{pre}}(M_{t+1}^{j},\phi_k)
+		&= \mathbbm{1}_{t+1}^{0}\cdot\phi_k\cdot\frac{1}{c_{t+1}^{\Ret}(\phi_k M_{t+1}^{j})}
+		+\mathbbm{1}_{t+1}^{1}\cdot\frac{1}{c_{t+1}^{W}(M_{t+1}^{j})}.
+	\end{align}
+	Then
+	\begin{align}
+		\goth{V}_t^{1}(A_i)
+		&= \sum_{j=1}^{J}\sum_{k=1}^{K}\omega_j\mu_k\,V_{t+1}(M_{t+1}^{j},\phi_k),
+		\\
+		\mathrm{RHS}(A_i)
+		&= R\beta\sum_{j=1}^{J}\sum_{k=1}^{K}\omega_j\mu_k\,\mathrm{RHS}^{\mathrm{pre}}(M_{t+1}^{j},\phi_k),
+		\\
+		c_t^{W}(A_i)
+		&= \mathrm{RHS}(A_i)^{-1},
+	\end{align}
+	with endogenous grid $M_t^{W}(A_i)=A_i+c_t^{W}(A_i)$ and
+	$V_t^{W}(M_t^{W}(A_i))=\log(c_t^{W}(A_i))-\delta+\beta\,\goth{V}_t^{1}(A_i)$. Interpolate onto a common $M$-grid.
+	\item \textbf{Combine on the $M$-grid, integrating over $\phi_k$.} For each $M$ and each node $\phi_k$, form $\mathbbm{1}^{0}(M,\phi_k)$ from $V_t^{\Ret}(\phi_k M)\ge V_t^{W}(M)$, then integrate as in~\eqref{eq:ret_price_barV_defn}--\eqref{eq:ret_price_barVM} (and, for reporting,~\eqref{eq:ret_price_barc}). Feed $\bar V_t$ and $\bar V_{M,t}$ into the period-$(t-1)$ gothic step; feed $V_t^{\Ret}$ and $c_t^{\Ret}$ forward unchanged.
+\end{enumerate}
+Computational cost scales with $K$ only in the combine step and in the $J\times K$ sum that builds $\goth{V}_t^{1}$; the retiree and worker EGM inversions remain single passes. As $\sigma_\phi\to 0$, $K=1$ with $\phi_1=1$ recovers the hard-maximum baseline with $p=1$.
+
+%------------------------------------------------------------
+\subsection{Derivations: Search and stochastic retirement wealth (Section~\ref{subsec:RetirementSearchPrices})}\label{subsec:appdx_ret_full}
+%------------------------------------------------------------
+This subsection derives the optimal search-effort rule, the combined envelope conditions, the Euler equations, the terminal-period solution, and the EGM algorithm for the nested environment of Section~\ref{subsec:RetirementSearchPrices}. The within-branch building blocks are taken from the standalone extensions: the retiree is exactly the baseline of Section~\ref{subsec:appdx_ret_baseline}, evaluated at claimed wealth $\phi_t M_t$; the search cost $\theta(\eff_t)$ and its derivative $\theta'(\eff_t)=-\sigma_s\log(1-\eff_t)$ are those of Section~\ref{sec:RetirementModel}; and the worker's budget remains $A_t=M_t-c_t$. Taste shocks are shut down. What is new is that a successful search delivers a rejectable account draw rather than a sure claim at book value.
+
+\paragraph{Claiming first-order conditions.}
+Holding $\phi_t$ fixed and accepting the draw, the retiree's problem is the baseline problem at $\tilde M_t=\phi_t M_t$. The Euler equation is~\eqref{eq:ret_baseline_euler} and the chain-rule envelope is~\eqref{eq:ret_price_env_Ret}. No search takes place after claiming.
+
+\paragraph{Optimal search effort.}
+Search is chosen only on the working branch, after consumption, and current $\phi_t$ does not enter the worker's problem. Splitting~\eqref{eq:ret_full_VW} into sequential sub-periods as in the main text,
+\begin{align}
+	\goth{V}_t(A_t)
+	&= \max_{0\le\eff_t\le 1}
+	\left\{
+		\log(c_t)-\delta-\theta(\eff_t)
+		+\beta P_1(\eff_t)\,\goth{V}_t^{1}(A_t)
+		+\beta P_2(\eff_t)\,\goth{V}_t^{2}(A_t)
+	\right\},
+	\label{eq:ret_full_gothV}
+\end{align}
+with $\goth{V}_t^{1}$ and $\goth{V}_t^{2}$ given by~\eqref{eq:ret_full_gothV1}--\eqref{eq:ret_full_gothV2}. Because $\theta$ is strictly convex, the objective is strictly concave in $\eff_t$. The interior first-order condition is
+\begin{align}
+	-\theta'(\eff_t^{\ast})
+	&= \beta(1-p)\bigl(\goth{V}_t^{1}(A_t)-\goth{V}_t^{2}(A_t)\bigr)
+	\nonumber\\
+	-\sigma_s\log(1-\eff_t^{\ast})
+	&= \beta(1-p)\bigl(\goth{V}_t^{1}(A_t)-\goth{V}_t^{2}(A_t)\bigr),
+\end{align}
+which yields the closed form~\eqref{eq:ret_full_effort}. The formula is identical to the baseline~\eqref{eq:ret_baseline_effort}; what changes is the content of $\goth{V}_t^{1}$. A mean-preserving spread in $\phi_{t+1}$ raises $\goth{V}_t^{1}$ because $V_{t+1}(M,\{R,W\},\phi)=\max\{V_{t+1}^{\Ret}(\phi M),V_{t+1}^{W}(M)\}$ is convex in the claimed value and the household can reject bad draws. The excess value $\goth{V}_t^{1}-\goth{V}_t^{2}$ therefore rises with $\sigma_\phi$, and so does $\eff_t^{\ast}$. As in the baseline, $\eff_t^{\ast}=0$ whenever $\goth{V}_t^{1}\le\goth{V}_t^{2}$, and $\eff_t\le 1$ never binds for finite $\sigma_s$ because $\theta'(\eff)\to\infty$ as $\eff\to 1^{-}$. Special cases recover the earlier extensions: with $\phi_t\equiv 1$,~\eqref{eq:ret_full_effort} reduces to~\eqref{eq:ret_baseline_effort} without taste shocks; with $p=1$, $P_1=1$ independently of effort and $\eff_t^{\ast}=0$, which is the account-only problem of Section~\ref{subsec:appdx_ret_price}.
+
+\paragraph{Envelope conditions and combined marginal values.}
+Because $\eff_t^{\ast}$ is chosen optimally, the envelope theorem eliminates indirect effects through search effort when differentiating the worker's value. On the working branch,
+\begin{align}
+	\frac{\partial V_t^{W}(M_t)}{\partial M_t}
+	&= \frac{1}{c_t^{W}(M_t)},
+	\label{eq:ret_full_env_W}
+\end{align}
+as in~\eqref{eq:ret_price_env_W}: current $\phi_t$ does not appear. For a worker who has the option, the envelope of the outer maximum~\eqref{eq:ret_full_discrete} is
+\begin{align}
+	\frac{\partial V_t(M_t,\{R,W\},\phi_t)}{\partial M_t}
+	&= \mathbbm{1}_t^{0}(M_t,\phi_t)\cdot\phi_t\cdot\frac{1}{c_t^{\Ret}(\phi_t M_t)}
+	+\mathbbm{1}_t^{1}(M_t,\phi_t)\cdot\frac{1}{c_t^{W}(M_t)},
+	\label{eq:ret_full_env_RW}
+\end{align}
+which is~\eqref{eq:ret_price_env_RW} (the discrete comparison is still a hard maximum; search operates one period ahead). Differentiating the gothic values~\eqref{eq:ret_full_gothV1}--\eqref{eq:ret_full_gothV2},
+\begin{align}
+	\frac{\partial\goth{V}_t^{1}}{\partial A_t}
+	&= R\int_{y_{t+1}}\int_{\phi_{t+1}}
+	\frac{\partial V_{t+1}(M_{t+1},\{R,W\},\phi_{t+1})}{\partial M_{t+1}}
+	\,dF(y_{t+1})\,dF(\phi_{t+1}),
+	\label{eq:ret_full_dV1}\\
+	\frac{\partial\goth{V}_t^{2}}{\partial A_t}
+	&= R\int_{y_{t+1}}
+	\frac{\partial V_{t+1}^{W}(M_{t+1})}{\partial M_{t+1}}
+	\,dF(y_{t+1}),
+	\label{eq:ret_full_dV2}
+\end{align}
+with $M_{t+1}=A_t R+y_{t+1}$ and the integrands given by~\eqref{eq:ret_full_env_RW} and~\eqref{eq:ret_full_env_W} one period ahead.
+
+\paragraph{Integrating out account draws.}
+The beginning-of-period objects that enter time-$(t-1)$ gothic values are
+\begin{align}
+	\bar V_t^{R,W}(M_t)
+	&\equiv \mathbb{E}_{\phi_t}\Big[
+		\max\big\{V_t^{\Ret}(\phi_t M_t),\; V_t^{W}(M_t)\big\}
+	\Big],
+	\label{eq:ret_full_barVRW_defn}\\
+	\bar V_{M,t}^{R,W}(M_t)
+	&\equiv \mathbb{E}_{\phi_t}\left[
+		\mathbbm{1}_t^{0}\cdot\phi_t\cdot\frac{1}{c_t^{\Ret}(\phi_t M_t)}
+		+\mathbbm{1}_t^{1}\cdot\frac{1}{c_t^{W}}
+	\right].
+	\label{eq:ret_full_barVMRW}
+\end{align}
+Equation~\eqref{eq:ret_full_barVRW_defn} restates~\eqref{eq:ret_full_barVRW}. The worker who must work is not integrated over current $\phi_t$. The ex-ante ($\phi$-weighted) consumption of an agent who has the option is
+\begin{align}
+	\bar c_t^{R,W}(M_t)
+	&\equiv \mathbb{E}_{\phi_t}\Big[
+		\mathbbm{1}_t^{0}\,c_t^{\Ret}(\phi_t M_t)
+		+\mathbbm{1}_t^{1}\,c_t^{W}(M_t)
+	\Big],
+	\label{eq:ret_full_barc}
+\end{align}
+while the working-branch consumption $c_t^{W}(M_t)$ and effort $\eff_t^{\ast}(A_t)$ are not functions of current $\phi_t$. Because the household observes $\phi_t$ before the discrete choice, the \emph{realized} policy for a given draw is the hard choice at that realization;~\eqref{eq:ret_full_barc} is the object reported for plotting.
+
+\paragraph{Euler equations.}
+The retiree's Euler equation remains~\eqref{eq:ret_baseline_euler}. For the worker, the consumption first-order condition of~\eqref{eq:ret_full_VW} at $\eff_t^{\ast}$ is
+\begin{align}
+	\frac{1}{c_t^{W}}
+	&= \beta\left[
+		P_1(\eff_t^{\ast})\,\frac{\partial\goth{V}_t^{1}}{\partial A_t}
+		+P_2(\eff_t^{\ast})\,\frac{\partial\goth{V}_t^{2}}{\partial A_t}
+	\right].
+	\label{eq:ret_full_foc_c}
+\end{align}
+Substituting~\eqref{eq:ret_full_dV1}--\eqref{eq:ret_full_dV2} and the envelopes~\eqref{eq:ret_full_env_W}--\eqref{eq:ret_full_env_RW} one period ahead,
+\begin{equation}
+\begin{aligned}
+	\frac{1}{c_t^{W}}
+	&= R\beta\Bigg[
+		P_1(\eff_t^{\ast})
+		\int_{y_{t+1}}\int_{\phi_{t+1}}
+		\left(
+			\mathbbm{1}_{t+1}^{0}\cdot\phi_{t+1}\cdot\frac{1}{c_{t+1}^{\Ret}(\phi_{t+1} M_{t+1})}
+			+\mathbbm{1}_{t+1}^{1}\cdot\frac{1}{c_{t+1}^{W}}
+		\right)
+		dF(y_{t+1})\,dF(\phi_{t+1})
+		\\
+		&\qquad
+		+P_2(\eff_t^{\ast})
+		\int_{y_{t+1}}
+		\frac{1}{c_{t+1}^{W}}
+		\,dF(y_{t+1})
+	\Bigg].
+	\label{eq:ret_full_euler_W}
+\end{aligned}
+\end{equation}
+Relative to the baseline worker Euler in Section~\ref{sec:RetirementModel}, three things change: the taste shock $\xi_{t+1}$ is absent; the retiree-branch marginal utility is $\phi_{t+1}/c_{t+1}^{\Ret}(\phi_{t+1} M_{t+1})$ rather than $1/c_{t+1}^{\Ret}(M_{t+1})$; and $\mathbbm{1}_{t+1}^{0}$ depends on $\phi_{t+1}$. Relative to the account-only Euler~\eqref{eq:ret_price_euler_W}, the continuation additionally mixes over next period's arrival of the option through $P_1(\eff_t^{\ast})$ and $P_2(\eff_t^{\ast})$.
+
+\paragraph{Terminal period.}
+The within-branch terminal solutions are those of the account-only extension: $c_T^{W}=M_T$, $V_T^{W}=\log(M_T)-\delta$, and $V_T^{\Ret}(\phi_T M_T)=\log(\phi_T M_T)$ from~\eqref{eq:ret_price_terminal}. Search effort is irrelevant at $T$ because there is no $T+1$. The terminal discrete problem of a worker who has the option is the hard maximum~\eqref{eq:ret_price_terminal_threshold}, and $\bar V_T^{R,W}(M_T)=\mathbb{E}_{\phi_T}[V_T(M_T,\phi_T)]$ is the continuation handed to period $T-1$ through $\goth{V}_{T-1}^{1}$. A worker who does not have the option at $T$ must work, so $\goth{V}_{T-1}^{2}$ is the expected value of $V_T^{W}(R A_{T-1}+y_T)$.
+
+\paragraph{EGM algorithm with search and stochastic retirement wealth.}
+Let $\vec\phi=\{\phi_1,\dots,\phi_{K}\}$ and $\vec\eta=\{\eta_1,\dots,\eta_J\}$ be quadrature nodes with weights $\vec\mu$ and $\vec\omega$, as above. The algorithm nests the standalone account and search steps of Section~\ref{subsec:appdx_ret_price} and Algorithm~1 in the main text.
+
+\begin{enumerate}
+	\item \textbf{Solve the retiree once,} by EGM exactly as in Section~\ref{subsec:appdx_ret_baseline}, on a $\tilde M$-grid that covers $\phi_{\max}M_{\max}$. The retiree does not search and does not depend on $\phi$ except through the starting state.
+	\item \textbf{Form gothic values on $\vec A_t$.} For each $A_i$ and each income node $\eta_j$, set $M_{t+1}^{j}=R A_i+y\eta_j$. Interpolate the period-$(t+1)$ worker solution to obtain $V_{t+1}^{W}(M_{t+1}^{j})$ and $c_{t+1}^{W}(M_{t+1}^{j})$, and interpolate the retiree solution at each claimed wealth $\phi_k M_{t+1}^{j}$. Then
+	\begin{align}
+		V_{t+1}(M_{t+1}^{j},\phi_k)
+		&= \max\big\{
+			V_{t+1}^{\Ret}(\phi_k M_{t+1}^{j}),\;
+			V_{t+1}^{W}(M_{t+1}^{j})
+		\big\},
+		\\
+		\mathrm{RHS}_1^{\mathrm{pre}}(M_{t+1}^{j},\phi_k)
+		&= \mathbbm{1}_{t+1}^{0}\cdot\phi_k\cdot\frac{1}{c_{t+1}^{\Ret}(\phi_k M_{t+1}^{j})}
+		+\mathbbm{1}_{t+1}^{1}\cdot\frac{1}{c_{t+1}^{W}(M_{t+1}^{j})},
+		\\
+		\mathrm{RHS}_2^{\mathrm{pre}}(M_{t+1}^{j})
+		&= \frac{1}{c_{t+1}^{W}(M_{t+1}^{j})}.
+	\end{align}
+	Integrate
+	\begin{align}
+		\goth{V}_t^{1}(A_i)
+		&= \sum_{j=1}^{J}\sum_{k=1}^{K}\omega_j\mu_k\,V_{t+1}(M_{t+1}^{j},\phi_k),
+		\\
+		\goth{V}_t^{2}(A_i)
+		&= \sum_{j=1}^{J}\omega_j\,V_{t+1}^{W}(M_{t+1}^{j}),
+		\\
+		\mathrm{RHS}_1(A_i)
+		&= \sum_{j=1}^{J}\sum_{k=1}^{K}\omega_j\mu_k\,\mathrm{RHS}_1^{\mathrm{pre}}(M_{t+1}^{j},\phi_k),
+		\\
+		\mathrm{RHS}_2(A_i)
+		&= \sum_{j=1}^{J}\omega_j\,\mathrm{RHS}_2^{\mathrm{pre}}(M_{t+1}^{j}).
+	\end{align}
+	\item \textbf{Effort, probabilities, and worker EGM.} Compute
+	\begin{align}
+		\eff_t(A_i)
+		&= 1-\exp\bigl(-\beta(1-p)(\goth{V}_t^{1}(A_i)-\goth{V}_t^{2}(A_i))/\sigma_s\bigr),
+		\\
+		\theta(\eff_t(A_i))
+		&= \sigma_s\bigl(\eff_t(A_i)+(1-\eff_t(A_i))\log(1-\eff_t(A_i))\bigr),
+		\\
+		P_1(\eff_t(A_i))
+		&= (1-\eff_t(A_i))p+\eff_t(A_i),
+		\\
+		P_2(\eff_t(A_i))
+		&= (1-\eff_t(A_i))(1-p),
+		\\
+		\mathrm{RHS}(A_i)
+		&= R\beta\bigl(
+			P_1(\eff_t(A_i))\,\mathrm{RHS}_1(A_i)
+			+P_2(\eff_t(A_i))\,\mathrm{RHS}_2(A_i)
+		\bigr),
+		\\
+		c_t^{W}(A_i)
+		&= \mathrm{RHS}(A_i)^{-1},
+		\\
+		\mathbb{E}V_{t+1}(A_i)
+		&= P_1(\eff_t(A_i))\,\goth{V}_t^{1}(A_i)
+		+P_2(\eff_t(A_i))\,\goth{V}_t^{2}(A_i),
+		\\
+		V_t^{W}(M_t(A_i))
+		&= \log(c_t^{W}(A_i))-\delta-\theta(\eff_t(A_i))
+		+\beta\,\mathbb{E}V_{t+1}(A_i),
+		\\
+		M_t(A_i)
+		&= c_t^{W}(A_i)+A_i.
+	\end{align}
+	Interpolate $c_t^{W}$ and $V_t^{W}$ onto the common $M$-grid. If there is not enough smoothness, apply an upper-envelope refinement as in Algorithm~1 of the main text.
+	\item \textbf{Combine on the $M$-grid, integrating over $\phi_k$.} For each $M$ and each $\phi_k$, form $\mathbbm{1}^{0}(M,\phi_k)$ from $V_t^{\Ret}(\phi_k M)\ge V_t^{W}(M)$ and integrate as in~\eqref{eq:ret_full_barVRW_defn}--\eqref{eq:ret_full_barVMRW} (and, for reporting,~\eqref{eq:ret_full_barc}). Feed $\bar V_t^{R,W}$, $\bar V_{M,t}^{R,W}$, $V_t^{W}$, $\partial V_t^{W}/\partial M_t$, $V_t^{\Ret}$, and $c_t^{\Ret}$ into the period-$(t-1)$ gothic step.
+\end{enumerate}
+As in the earlier algorithms, inverse representations of the (marginal) value functions may be stored so that infinite conditional values do not propagate into interpolation error. Computational cost scales with $K$ only through evaluations of the already-solved retiree at $\phi_k M$ and through the $J\times K$ sum for $\goth{V}_t^{1}$; the retiree EGM itself is not repeated.

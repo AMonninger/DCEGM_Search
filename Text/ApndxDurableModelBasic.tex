@@ -306,12 +306,12 @@ This subsection derives the envelope conditions, the Euler equations, and the EG
 Recall the EV Type I discrete choice from equations~\eqref{eq:taste_discrete_EV}--\eqref{eq:taste_logit}. The inclusive (ex-ante) value is the closed-form log-sum
 \begin{align}
 	v_t(m_t,n_t)
-	&= \sigma_\varepsilon \log\Big(
-		\exp\big(v_t^{keep}(m_t,n_t)/\sigma_\varepsilon\big)
-		+ \exp\big(v_t^{adj}(\ell_t)/\sigma_\varepsilon\big)
+	&= \sigma_\zeta \log\Big(
+		\exp\big(v_t^{keep}(m_t,n_t)/\sigma_\zeta\big)
+		+ \exp\big(v_t^{adj}(\ell_t)/\sigma_\zeta\big)
 	\Big), \label{eq:taste_logsum_app}
 \end{align}
-with logit choice probabilities $P_t^{adj}(m_t,n_t)$ and $P_t^{keep}=1-P_t^{adj}$ as in~\eqref{eq:taste_logit}. The taste shocks do not enter the inner maximizations defining $v_t^{keep}$ and $v_t^{adj}(\ell_t)$, so those maximizations---and hence $c_t^{keep,\ast}$, $c_t^{adj,\ast}$, and $d_t^{adj,\ast}$---are independent of $(\varepsilon_t^{keep},\varepsilon_t^{adj})$. Differentiating the log-sum~\eqref{eq:taste_logsum_app} and using the envelope results $\partial v_t^{keep}/\partial m_t = u_c(c_t^{keep,\ast},n_t)$ and $\partial v_t^{adj}/\partial m_t = u_c(c_t^{adj,\ast},d_t^{adj,\ast})$ from~\eqref{eq:keep_m_basic} and~\eqref{eq:adj_m_basic} yields the probability-weighted combined marginal values
+with logit choice probabilities $P_t^{adj}(m_t,n_t)$ and $P_t^{keep}=1-P_t^{adj}$ as in~\eqref{eq:taste_logit}. The taste shocks do not enter the inner maximizations defining $v_t^{keep}$ and $v_t^{adj}(\ell_t)$, so those maximizations---and hence $c_t^{keep,\ast}$, $c_t^{adj,\ast}$, and $d_t^{adj,\ast}$---are independent of $(\zeta_t^{keep},\zeta_t^{adj})$. Differentiating the log-sum~\eqref{eq:taste_logsum_app} and using the envelope results $\partial v_t^{keep}/\partial m_t = u_c(c_t^{keep,\ast},n_t)$ and $\partial v_t^{adj}/\partial m_t = u_c(c_t^{adj,\ast},d_t^{adj,\ast})$ from~\eqref{eq:keep_m_basic} and~\eqref{eq:adj_m_basic} yields the probability-weighted combined marginal values
 \begin{align}
 	\frac{\partial v_t(m_t,n_t)}{\partial m_t}
 	&= P_t^{keep}\, u_c(c_t^{keep,\ast},n_t) + P_t^{adj}\, u_c(c_t^{adj,\ast},d_t^{adj,\ast}), \label{eq:taste_vm}\\
@@ -319,7 +319,7 @@ with logit choice probabilities $P_t^{adj}(m_t,n_t)$ and $P_t^{keep}=1-P_t^{adj}
 	&= P_t^{keep}\Big[u_d(c_t^{keep,\ast},n_t) + \beta(1-\delta)\,\mathbb{E}_t\big[v_{n,t+1}\big]\Big]
 	+ P_t^{adj}\,(1-\tau)\, u_c(c_t^{adj,\ast},d_t^{adj,\ast}), \label{eq:taste_vn}
 \end{align}
-where the $n$-derivative of the adjuster branch uses $\partial \ell_t/\partial n_t=(1-\tau)$ as in~\eqref{eq:adj_n_basic}. Unlike the multiplicative mean-one log-normal taste shock used in the retirement application, there is no additional scaling factor on the adjuster's marginal contribution: the EV shocks enter only through the logit weights $P_t^{keep}$ and $P_t^{adj}$. As $\sigma_\varepsilon\to 0$, $P_t^{adj}\to\mathcal{I}_t$ and~\eqref{eq:taste_vm}--\eqref{eq:taste_vn} collapse to the hard-maximum combined envelopes~\eqref{eq:combined_m_basic}--\eqref{eq:combined_n_basic}.
+where the $n$-derivative of the adjuster branch uses $\partial \ell_t/\partial n_t=(1-\tau)$ as in~\eqref{eq:adj_n_basic}. Unlike the multiplicative mean-one log-normal taste shock used in the retirement application, there is no additional scaling factor on the adjuster's marginal contribution: the EV shocks enter only through the logit weights $P_t^{keep}$ and $P_t^{adj}$. As $\sigma_\zeta\to 0$, $P_t^{adj}\to\mathcal{I}_t$ and~\eqref{eq:taste_vm}--\eqref{eq:taste_vn} collapse to the hard-maximum combined envelopes~\eqref{eq:combined_m_basic}--\eqref{eq:combined_n_basic}.
 
 \paragraph{Expected policies}
 The ex-ante (probability-weighted) policy functions are
@@ -345,7 +345,7 @@ and analogously for the keeper with $d_t = n_t$ fixed, where $v_{m,t+1}=\partial
 when the no-borrowing constraint does not bind.
 
 \paragraph{Terminal period}
-The within-branch terminal solutions are unaffected by the taste shocks, since $(\varepsilon_T^{keep},\varepsilon_T^{adj})$ do not enter the inner maximizations: $c_T^{keep}=m_T$ for the keeper, and $c_T^{adj\ast}=\alpha \ell_T$, $d_T^{adj\ast}=(1-\alpha)\ell_T$ for the adjuster, exactly as derived in the ``Last period'' paragraph of Section~\ref{sec:appdx_model_basic}. Only the discrete resolution changes: the terminal inclusive value is the log-sum~\eqref{eq:taste_logsum_app} at $T$, and the terminal expected policies follow~\eqref{eq:taste_c_app}--\eqref{eq:taste_d_app}.
+The within-branch terminal solutions are unaffected by the taste shocks, since $(\zeta_T^{keep},\zeta_T^{adj})$ do not enter the inner maximizations: $c_T^{keep}=m_T$ for the keeper, and $c_T^{adj\ast}=\alpha \ell_T$, $d_T^{adj\ast}=(1-\alpha)\ell_T$ for the adjuster, exactly as derived in the ``Last period'' paragraph of Section~\ref{sec:appdx_model_basic}. Only the discrete resolution changes: the terminal inclusive value is the log-sum~\eqref{eq:taste_logsum_app} at $T$, and the terminal expected policies follow~\eqref{eq:taste_c_app}--\eqref{eq:taste_d_app}.
 
 \paragraph{EGM algorithm with EV Type I taste shocks}
 No taste-shock quadrature grid is needed. In addition to the income-shock integration already used to build the end-of-period functions $\mathfrak{v}(d_t,a_t)$, $\mathfrak{v}_c'(d_t,a_t)$, and $\mathfrak{v}_d'(d_t,a_t)$ (Section~\ref{sec:appdx_model_basic}, ``Calculate End-Of-Period Functions''), the algorithm proceeds as follows:
@@ -353,17 +353,17 @@ No taste-shock quadrature grid is needed. In addition to the income-shock integr
 	\item \textbf{Solve the within-branch problems unchanged.} Solve the keeper by EGM and upper envelope, and the adjuster by root-finding and FUES, exactly as in the ``Solve Keeper'' and ``Solve Adjuster'' paragraphs above. This yields $c_{t}^{keep}(m_t,n_t)$, $v_t^{keep}(m_t,n_t)$, $c_t^{adj}(\ell_t)$, $d_t^{adj}(\ell_t)$, and $v_t^{adj}(\ell_t)$.
 	\item \textbf{Combine with the log-sum / logit formulas on a grid of $(m_t,n_t)$.} For each grid point, evaluate $v_t^{keep}(m_t,n_t)$ and $v_t^{adj}(\ell_t)$, form $P_t^{adj}$ and $P_t^{keep}$ from~\eqref{eq:taste_logit}, and set
 	\begin{align}
-		v_t(m_t,n_t) &= \sigma_\varepsilon \log\Big(
-			\exp\big(v_t^{keep}/\sigma_\varepsilon\big)
-			+ \exp\big(v_t^{adj}/\sigma_\varepsilon\big)
+		v_t(m_t,n_t) &= \sigma_\zeta \log\Big(
+			\exp\big(v_t^{keep}/\sigma_\zeta\big)
+			+ \exp\big(v_t^{adj}/\sigma_\zeta\big)
 		\Big), \\
 		v_{m,t}(m_t,n_t) &= P_t^{keep}\, u_c(c_t^{keep,\ast},n_t) + P_t^{adj}\, u_c(c_t^{adj,\ast},d_t^{adj,\ast}), \\
 		v_{n,t}(m_t,n_t) &= P_t^{keep}\, v_{n,t}^{keep}(m_t,n_t) + P_t^{adj}\,(1-\tau)\, u_c(c_t^{adj,\ast},d_t^{adj,\ast}),
 	\end{align}
-	together with the expected policies~\eqref{eq:taste_c_app}--\eqref{eq:taste_d_app}. Numerically, evaluate the log-sum in the numerically stable form $\max\{v^{keep},v^{adj}\}+\sigma_\varepsilon\log\big(\sum_j \exp((v^j-\max)/\sigma_\varepsilon)\big)$ (as in \texttt{calcLogSumChoiceProbs} with \texttt{smoothtype='type1'}).
+	together with the expected policies~\eqref{eq:taste_c_app}--\eqref{eq:taste_d_app}. Numerically, evaluate the log-sum in the numerically stable form $\max\{v^{keep},v^{adj}\}+\sigma_\zeta\log\big(\sum_j \exp((v^j-\max)/\sigma_\zeta)\big)$ (as in \texttt{calcLogSumChoiceProbs} with \texttt{smoothtype='type1'}).
 	\item \textbf{Feed $v_t$, $v_{m,t}$, $v_{n,t}$ into the period-$(t-1)$ end-of-period step,} in place of the hard-maximum objects used in the baseline model, so that the transition-matrix income integration described above operates on the EV-smoothed functions.
 \end{enumerate}
-As $\sigma_\varepsilon\to 0$, step~2 collapses to the hard-maximum combine of the baseline algorithm. For $\sigma_\varepsilon>0$, the inclusive value and probability-weighted policies are smooth in $(m_t,n_t)$, which is precisely what reduces the propagation of kinks through the backward recursion.
+As $\sigma_\zeta\to 0$, step~2 collapses to the hard-maximum combine of the baseline algorithm. For $\sigma_\zeta>0$, the inclusive value and probability-weighted policies are smooth in $(m_t,n_t)$, which is precisely what reduces the propagation of kinks through the backward recursion.
 
 
 \subsection{Derivations: Search Frictions (Section~\ref{subsec:ModelBasicSearch})}\label{subsec:appdx_search_basic}

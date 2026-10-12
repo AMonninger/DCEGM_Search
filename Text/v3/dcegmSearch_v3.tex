@@ -1,0 +1,62 @@
+\documentclass[11pt]{article}
+
+%============================================================
+% Packages
+%============================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsfonts,mathtools}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+\usepackage{stmaryrd}   % provides \llbracket and \rrbracket
+\usepackage{bbm}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage[margin=1in]{geometry}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+\graphicspath{{../../Figures/Figures_v3/}{../../Figures/Figures_Retirement/}{../../Figures/DurableModel/}}
+
+%============================================================
+% Convenience macros
+%============================================================
+\newcommand{\Ret}{\mathrm{Ret}}
+\newcommand{\eff}{\varepsilon}
+\newcommand{\goth}[1]{\mathcal{#1}}   % gothic-script value of ending period with assets
+\newcommand{\E}{\mathbb{E}}
+
+%============================================================
+\begin{document}
+
+\input{Title_v3}
+\clearpage
+\input{Introduction_v3}
+\input{RetirementModel_v3}
+\input{RetirementModel_Prices_v3}
+\input{DurableModel_v3}
+\input{Conclusion_v3}
+
+%============================================================
+% References
+%============================================================
+\bibliographystyle{plainnat}
+\bibliography{References_v3}
+
+\clearpage
+\input{Appendix_v3}
+
+\end{document}

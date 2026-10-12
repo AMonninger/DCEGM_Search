@@ -1,0 +1,630 @@
+%============================================================
+\section{Retirement Model}\label{sec:RetirementModel}
+%============================================================
+In this section, we build a consumption-saving model and extend it to include the option
+to retire and search frictions. Agents in this model derive utility from consuming non-
+durable goods $c_t$ and get disutility from working. The disutility parameter is denoted by
+$\delta$. Each period, there is a possibility for the agents to receive an `option' to retire. The
+likelihood of receiving the option depends on the amount of search effort $\eff_{t-1}$ that the
+agent exerted in the previous period. Search effort, however, is costly and we assume
+that the search cost is a convex function of effort, with a functional form given by
+$\theta(\eff_t) = \sigma_s \left(\eff_t + (1 - \eff_t) \log (1 - \eff_t)\right)$. This cost function implies that the initial marginal
+effort is cheap; however, greater effort that increases the likelihood of receiving the option
+to switch the discrete state leads to increasingly larger costs. Assuming logarithmic
+utility from consumption, and denoting the choice to retire and the choice to work by
+$d_t = 0$ and $d_t = 1$, respectively, the utility function for the agent is given by
+\begin{equation}
+u(c_t, d_t, \eff_t) = \log(c_t) - \delta d_t - \theta(\eff_t).
+\end{equation}
+At the end of each period, households can save their end-of-period liquid assets $A_t$ at a
+risk free rate $R$. Working in the current period determines whether the agent receives
+income $y_t$ in the following period. Therefore, the beginning-of-period assets are given by
+$M_t = R A_t + y_t d_{t-1}$. Furthermore, we assume that $y_t = y \eta_t$, where $\eta_t$ follows a mean-one
+log-normal distribution, $\eta_t \sim \mathcal{N}(-\sigma_\eta^2/2, \sigma_\eta^2)$.
+
+%------------------------------------------------------------
+\subsection{Retiree's sub-problem}
+%------------------------------------------------------------
+Retirement is assumed to be self-absorbing, so the problem reduces to the simple
+consumption-saving problem, which in Bellman form is given by:
+\begin{equation}
+V_t^{\Ret}(M_t) = \max_{0 \le c_t \le M_t}
+\left\{ u(c_t, 0, 0) + \beta V_{t+1}^{\Ret}(M_{t+1}) \right\},
+\end{equation}
+where $M_{t+1} = A_t R$ and the end-of-period assets $A_t = M_t - c_t$. Using the gothic script
+$V$ ($\goth{V}$) to represent the value of ending the period with assets $A_t$, the end-of-period
+value for a retired agent is, by definition
+\begin{equation}
+\goth{V}_t^{\Ret}(A_t) \equiv V_{t+1}^{\Ret}(M_{t+1}(A_t)) = V_{t+1}^{\Ret}(A_t R).
+\end{equation}
+Thus, the problem in terms of the end-of-period assets can be restated as
+\begin{equation}
+\goth{V}_{t-1}^{\Ret}(A_{t-1}) = \max_{0 \le c_t \le A_{t-1} R}
+\left\{ \log(c_t) + \beta \goth{V}_t^{\Ret}(A_t) \right\}.
+\end{equation}
+
+%------------------------------------------------------------
+\subsection{Worker's sub-problem}
+%------------------------------------------------------------
+Each period, a worker either receives the option to retire or has to continue working.
+There is an exogenous probability $p$ of receiving the option to retire. In addition, a worker
+can increase the likelihood of receiving the option to retire by exerting search effort.
+The search effort is made at the end of a period and affects the likelihood of receiving
+the option to retire in the following period. When period $t$ starts, an income shock is
+realized. This is followed by the realization of a taste shock, $\xi_t$, which is a multiplicative
+shock that affects the utility that a worker derives from working. The taste shocks are
+assumed to follow a mean-one log-normal distribution, i.e.\ $\xi_t \sim \mathcal{N}(-\sigma_\xi^2/2, \sigma_\xi^2)$. These
+taste shocks are different from the Extreme Value Type I shocks in \citet{Iskhakov2017-jb}
+in two major ways. Firstly, the assumption of log-normal
+taste shocks means that these shocks can take up multiple distinct values in the discrete
+approximation of the distribution. Secondly, these shocks are not the purely behavioral
+shocks that randomize the discrete choice outcome. Instead, these taste shocks affect the
+likelihood of the discrete outcome by determining the search effort that the agent exerts.
+
+Based on the search effort made in the previous period, if the agent receives the
+option to switch, the agent decides whether to retire or continue working. If the agent
+does not receive the option to switch, then they continue to work. Having made the
+discrete choice, the agent makes a consumption decision. If the agent chooses to retire,
+they stay as a retiree, because the assumption that retirement is self-absorbing. If the
+agent chooses to continue working, they exert search effort, which then determines
+the likelihood of receiving the option to switch in the next period. Fig.~\ref{fig:timing_RetirementModel} outlines the
+timeline of the realization of various shocks and the decisions in the worker's problem.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{timeline_RetirementModel.pdf}
+	\caption{Timeline of the worker's problem}
+	\label{fig:timing_RetirementModel}
+\end{figure}
+
+Let the set of possible choice sets for the worker's discrete choice be given by
+$\mathcal{D}_t \in \{\{\text{Retire}, \text{Work}\}, \{\text{Work}\}\}$
+$\equiv \{\{d_t = 0, d_t = 1\}, \{d_t = 1\}\}$. The first element of
+this set is the case when the agent has the option to switch and the second element is
+the case when the agent does not have the option to switch and must continue working.
+For the case when $\mathcal{D}_t = \{W\}$, i.e.\ the worker does not have the option to switch, the
+Bellman equation is given by:
+\begin{equation}
+V_t(M_t, \{W\}, \xi_t) = \xi_t \cdot \max_{\substack{0 \le c_t \le M_t \\ 0 \le \eff_t \le 1}}
+\left\{ u(c_t, 1, \eff_t) + \beta P_1(\eff_t) \goth{V}_t^1(A_t) + \beta P_2(\eff_t) \goth{V}_t^2(A_t) \right\}
+\end{equation}
+where $\goth{V}_t^1(A_t)$ is the expected value of saving $A_t$ when having the option to retire in
+$t + 1$, $P_1(\eff_t) = (1 - \eff_t)p + \eff_t$ is the probability of receiving the option to retire in $t + 1$, given
+the search effort $\eff_t$ in the current period, $\goth{V}_t^2(A_t)$ is the expected value of saving $A_t$ when
+not having the option to retire in $t + 1$, and $P_2(\eff_t) = (1 - \eff_t)(1 - p)$ is the probability
+of not receiving the option to retire in $t+1$, given the search effort $\eff_t$ in the current period.
+
+For the case when $\mathcal{D}_t = \{R, W\}$, i.e.\ the case when the worker has the option to
+switch, the Bellman equation is given by:
+\begin{equation}
+V_t(M_t, \{R, W\}, \xi_t) = \max_{d_t \in \{0,1\}}
+\left[ V_t^{\Ret}(M_t);\ V_t(M_t, \{W\}, \xi_t) \right],
+\end{equation}
+or
+\begin{equation}
+\begin{aligned}
+V_t(M_t, \{R, W\}, \xi_t) = \max_{d_t \in \{0,1\}}
+\Bigg[
+&\max_{0 \le c_t \le M_t} \left\{ u(c_t, 0, 0) + \beta \goth{V}_t^{\Ret}(A_t) \right\};\\
+&\xi_t \cdot \max_{\substack{0 \le c_t \le M_t \\ 0 \le \eff_t \le 1}}
+\left\{ u(c_t, 1, \eff_t) + \beta P_1(\eff_t) \goth{V}_t^1(A_t) + \beta P_2(\eff_t) \goth{V}_t^2(A_t) \right\}
+\Bigg].
+\end{aligned}
+\end{equation}
+The expected value of saving $A_t$ when having the option to retire in $t + 1$, i.e.\ $\goth{V}_t^1(A_t)$,
+is given by
+\begin{equation}
+\goth{V}_t^1(A_t) = \int_{y_{t+1}} \int_{\xi_{t+1}}
+V_{t+1}(M_{t+1}(A_t), \{R, W\}, \xi_{t+1})\, dF(y_{t+1})\, dF(\xi_{t+1}),
+\end{equation}
+where $M_{t+1} = A_t R + d_t y$. Similarly, the expected value of saving $A_t$ when not having
+the option to retire in $t + 1$, i.e.\ $\goth{V}_t^2(A_t)$, is given by
+\begin{equation}
+\goth{V}_t^2(A_t) = \int_{y_{t+1}} \int_{\xi_{t+1}}
+V_{t+1}(M_{t+1}(A_t), \{W\}, \xi_{t+1})\, dF(y_{t+1})\, dF(\xi_{t+1}).
+\end{equation}
+
+%------------------------------------------------------------
+\subsection{Optimal effort and consumption functions}
+%------------------------------------------------------------
+Since we assume that the consumption decision is made before the effort decision, (5)
+can be split into two sequential sub-period problems and rewritten as:
+\begin{equation}
+V_t(M_t, \{W\}, \xi_t) = \xi_t \max_{0 \le c_t \le M_t} \left[ \goth{V}_t(A_t) \right]
+\end{equation}
+where
+\begin{equation}
+\goth{V}_t(A_t) = \max_{0 \le \eff_t \le 1}
+\left\{ u(c_t, 1, \eff_t) + \beta P_1(\eff_t) \goth{V}_t^1(A_t) + \beta P_2(\eff_t) \goth{V}_t^2(A_t) \right\}
+\end{equation}
+Thus, the first order condition of (11) gives the optimal effort as a function of the
+end-of-period assets that are determined after the optimal consumption decision has
+been made in the previous sub-period. The optimal effort is given by
+\begin{align}
+\frac{\partial \theta(\eff_t)}{\partial \eff_t}
+&= \beta \goth{V}_t^1(A_t) \frac{\partial P_1(\eff_t)}{\partial \eff_t}
++ \beta \goth{V}_t^2(A_t) \frac{\partial P_2(\eff_t)}{\partial \eff_t} \\
+-\sigma_s \log(1 - \eff_t^*)
+&= \beta (1 - p) \goth{V}_t^1(A_t) - \beta (1 - p) \goth{V}_t^2(A_t) \\
+\eff_t^* &= 1 - \exp\left( -\frac{\beta (1 - p)}{\sigma_s}
+\left( \goth{V}_t^1(A_t) - \goth{V}_t^2(A_t) \right) \right).
+\end{align}
+This expression states that optimal effort is an increasing function of the excess value
+of receiving the option to switch in the next period over not receiving the option to
+switch.
+
+Next, we derive the expressions for the optimal consumption functions for the retiree
+and the worker. Since retirement is self-absorbing, the retiree's consumption function
+is relatively straightforward to derive and is given by:
+\begin{equation}
+u'(c_t, 0, 0) = R \beta u'(c_{t+1}, 0, 0)
+\end{equation}
+or
+\begin{equation}
+c_t^{\Ret} = \left( R \beta \left( c_{t+1}^{\Ret}(A_t R) \right)^{-1} \right)^{-1}.
+\end{equation}
+To derive the consumption function for the worker, we start with the solution to the
+problem of a worker who does not have the option to retire, i.e.\ $\mathcal{D}_t = \{W\}$. The
+first-order-condition for problem (10), with respect to $c_t$, is given by
+\begin{equation}
+u'(c_t, 1, \eff_t^*) = \beta \left[
+P_1(\eff_t^*) \frac{\partial \goth{V}_t^1(A_t)}{\partial A_t}
++ P_2(\eff_t^*) \frac{\partial \goth{V}_t^2(A_t)}{\partial A_t}
+\right],
+\end{equation}
+where $\eff_t^*$ is the optimal effort function, which is determined in (14), and the derivatives
+of the end-of-period values are given by
+\begin{equation}
+\frac{\partial \goth{V}_t^1(A_t)}{\partial A_t}
+= \E_t \left\{ \frac{\partial V_{t+1}^{R,W}(M_{t+1}, \xi_{t+1})}{\partial M_{t+1}}
+\frac{\partial M_{t+1}}{\partial A_t} \right\}
+= R\, \E_t \left\{ \frac{\partial V_{t+1}^{R,W}(M_{t+1}, \xi_{t+1})}{\partial M_{t+1}} \right\}
+\end{equation}
+and
+\begin{equation}
+\frac{\partial \goth{V}_t^2(A_t)}{\partial A_t}
+= R\, \E_t \left\{ \frac{\partial V_{t+1}^{W}(M_{t+1}, \xi_{t+1})}{\partial M_{t+1}} \right\},
+\end{equation}
+where the expectation is over next period income and taste shocks, and $V_{t+1}^{W}(M_{t+1}, \xi_{t+1})$
+and $V_{t+1}^{R,W}(M_{t+1}, \xi_{t+1})$, are shorthands for $V_{t+1}(M_{t+1}, \{W\}, \xi_{t+1})$ and $V_{t+1}(M_{t+1}, \{R, W\}, \xi_{t+1})$,
+respectively. Substituting these expressions into (17) yields
+\begin{equation}
+u'(c_t, 1, \eff_t^*) = R \beta \left[
+P_1(\eff_t^*) \E_t \left\{ \frac{\partial V_{t+1}^{R,W}(M_{t+1}, \xi_{t+1})}{\partial M_{t+1}} \right\}
++ P_2(\eff_t^*) \E_t \left\{ \frac{\partial V_{t+1}^{W}(M_{t+1}, \xi_{t+1})}{\partial M_{t+1}} \right\}
+\right].
+\end{equation}
+The Envelope Condition for (10) is given by
+\begin{equation}
+\frac{\partial V_t^{W}(M_t, \xi_t)}{\partial M_t}
+= \xi_t \beta \left[
+P_1(\eff_t^*) \frac{\partial \goth{V}_t^1(A_t)}{\partial A_t}
++ P_2(\eff_t^*) \frac{\partial \goth{V}_t^2(A_t)}{\partial A_t}
+\right]
+\end{equation}
+or
+\begin{equation}
+\frac{\partial V_t^{W}(M_t, \xi_t)}{\partial M_t} = \xi_t u'(c_t, 1, \eff_t^*)
+\end{equation}
+which can be iterated forward to yield
+\begin{equation}
+\frac{\partial V_{t+1}^{W}(M_{t+1}, \xi_{t+1})}{\partial M_{t+1}}
+= \xi_{t+1} u'(c_{t+1}, 1, \eff_{t+1}^*).
+\end{equation}
+To derive a similar expression for the derivative of $V_{t+1}^{R,W}$, we note that for the worker
+who has the option to retire, i.e.\ $\mathcal{D}_t = \{R, W\}$, the value function is simply the
+maximum of the value function of the retiree and the value function of the worker who
+continues to work
+\begin{equation}
+V_t^{R,W}(M_t, \xi_t) = \max \left\{ V_t^{\Ret}(M_t);\ V_t^{W}(M_t, \xi_t) \right\}.
+\end{equation}
+Therefore, it can be shown that
+\begin{equation}
+\frac{\partial V_{t+1}^{R,W}(M_{t+1}, \xi_{t+1})}{\partial M_{t+1}}
+= \mathbbm{1}_{t+1}^0 \cdot u'(c_{t+1}, 0, 0)
++ \mathbbm{1}_{t+1}^1 \cdot \xi_{t+1} u'(c_{t+1}, 1, \eff_{t+1}^*),
+\end{equation}
+where $\mathbbm{1}_{t+1}^0 \equiv \mathbbm{1}_{t+1}^0(M_{t+1}, \xi_{t+1}) = 1$ if $V_{t+1}^{\Ret}(M_{t+1}) \ge V_{t+1}^{W}(M_{t+1}, \xi_{t+1})$ and $0$ otherwise,
+and $\mathbbm{1}_{t+1}^1 \equiv \mathbbm{1}_{t+1}^1(M_{t+1}, \xi_{t+1}) = 1$ if $V_{t+1}^{\Ret}(M_{t+1}) < V_{t+1}^{W}(M_{t+1}, \xi_{t+1})$ and $0$ otherwise.
+Substituting (23) and (25) into (20) yields the consumption function for the worker
+who continues to work
+\begin{equation}
+\begin{aligned}
+u'(c_t, 1, \eff_t^*) = R \beta \Big[
+&P_1(\eff_t^*) \int_{y_{t+1}} \int_{\xi_{t+1}}
+\left[ \mathbbm{1}_{t+1}^0 \cdot u'(c_{t+1}, 0, 0)
++ \mathbbm{1}_{t+1}^1 \cdot \xi_{t+1} u'(c_{t+1}, 1, \eff_{t+1}^*) \right]
+dF(y_{t+1})\, dF(\xi_{t+1}) \\
+&+ P_2(\eff_t^*) \int_{y_{t+1}} \int_{\xi_{t+1}}
+\left[ \xi_{t+1} u'(c_{t+1}, 1, \eff_{t+1}^*) \right]
+dF(y_{t+1})\, dF(\xi_{t+1})
+\Big]
+\end{aligned}
+\end{equation}
+or
+\begin{equation}
+\begin{aligned}
+c_t^{W} = \Bigg( R \beta \Big[
+&P_1(\eff_t^*) \int_{y_{t+1}} \int_{\xi_{t+1}}
+\left[ \mathbbm{1}_{t+1}^0 \left( c_{t+1}^{\Ret}(A_t R) \right)^{-1}
++ \mathbbm{1}_{t+1}^1 \xi_{t+1} \left( c_{t+1}^{W}(A_t R + y_{t+1}) \right)^{-1} \right]
+dF(y_{t+1})\, dF(\xi_{t+1}) \\
+&+ P_2(\eff_t^*) \int_{y_{t+1}} \int_{\xi_{t+1}}
+\left[ \xi_{t+1} \left( c_{t+1}^{W}(A_t R + y_{t+1}) \right)^{-1} \right]
+dF(y_{t+1})\, dF(\xi_{t+1})
+\Big] \Bigg)^{-1}.
+\end{aligned}
+\end{equation}
+
+%------------------------------------------------------------
+\subsection{Results}
+%------------------------------------------------------------
+Having established the solution of the retirement problem, we demonstrate how varying
+the different smoothness parameters affects the solution of the problem. Fig.~\ref{fig:fig2}(a) shows
+the optimal consumption rule of the worker who continues to work in period $T - 5$, for
+the case in which $p = 1.0$. The plot shows the consumption rule for a set of search cost
+scales, in the absence of income uncertainty and taste shocks. In this scenario, there
+is no smoothing and the discontinuities that arise from discrete choices being made in
+periods $T - 4$ through $T - 1$ are distinctly visible. This is because when $p = 1.0$, the
+worker receives the option to switch with certainty. In such a case the worker does not
+exert any search effort, regardless of the search frictions. Consequently, in the case with
+$p = 1.0$, for all levels of search frictions, we get the same optimal consumption rule,
+without any smoothing.
+
+%---- Figure 2 ----
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{p1_xi0_eta0.pdf}
+    \caption{Have switching option with certainty, $p = 1$.}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{p0_xi0_eta0.pdf}
+    \caption{Stay as worker with certainty without search effort, $p = 0$.}
+\end{subfigure}
+\caption{The plots show optimal consumption rules of the workers who decides to continue working in period
+$t = T - 5$ for a set of search cost scales $\sigma_s$ in the absence of income uncertainty or taste shocks, for the
+case with $p = 1.0$ (left panel) with $p = 0.0$ (right panel). The rest of the model parameters are $R = 1$,
+$\beta = 0.98$, $y = 20$.}
+\label{fig:fig2}
+\end{figure}
+
+In contrast, when $p = 0.0$ (Fig.~\ref{fig:fig2}(b)), the worker who does not exert search effort,
+continues to stay as a worker with certainty. This gives the worker a motive to exert
+search effort, which determines the likelihood of receiving the option to switch. For a
+given level of search frictions, decreasing $p$ increases the smoothness of the solution.
+Moreover, for a given level of $p$, increasing the search frictions (higher value of $\sigma_s$) also
+increases smoothness. Fig.~\ref{fig:fig2}(b) also shows the asymmetric smoothness offered by search,
+when there are no taste or income shocks. The smoothness happens to the right of the
+discontinuities. This is because for low liquid resources, workers optimally choose to
+continue working and hence do not exert any search effort. Workers only exert positive
+effort to receive the option to retire when they have ample liquid resources. Therefore,
+the smoothness from search frictions only happens to the right of the discontinuities.
+
+To address this asymmetric smoothness, we need to introduce taste shocks. Since
+the taste shocks can take a range of different values, there are certain realizations of
+the taste shock that make the worker want to have the option to switch, even at levels
+of liquid assets at which, in the absence of a taste shock, the worker would not want
+to switch. In other words, with the introduction of taste shocks, the range of liquid
+assets around the discontinuities over which the worker exerts search effort expands.
+Fig.~\ref{fig:fig3}(a) shows that with the incorporation of taste shocks, the consumption function now
+smoothes out more uniformly around the discontinuities. Moreover, introducing taste
+shocks allows the search frictions to significantly smooths out most of the discontinuities
+in the optimal consumption function. This holds even for a very small smoothness
+parameter for the taste shocks, $\sigma_\xi = 0.005$. This is because now there is a positive
+likelihood of a worker receiving a taste shock that makes them exert search effort even
+for values of $M_t$ for which the worker would not exert any search effort in the absence
+of taste shocks. Increasing the magnitude of the taste shocks to $\sigma_\xi = 0.02$ (Fig.~\ref{fig:fig3}(b))
+significantly reduces the size of all the discontinuities in the consumption function.
+Moreover, only moderately sized search frictions are needed to virtually completely
+smooth out the consumption function.
+
+%---- Figure 3 ----
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{p0_xi0p005_eta0.pdf}
+    \caption{Small taste shocks, $\sigma_\xi = 0.005$.}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{p0_xi0p02_eta0.pdf}
+    \caption{Large taste shocks, $\sigma_\xi = 0.02$.}
+\end{subfigure}
+\caption{The plots show optimal consumption rules of the workers who decides to continue working in period
+$t = T - 5$ for the case with $p = 0$, in the presence of small taste shocks (left panel) and large taste shocks
+(right panel), without income uncertainty.}
+\label{fig:fig3}
+\end{figure}
+
+The results discussed so far do not include any income uncertainty. Adding
+income uncertainty even into standard consumption-saving models adds curvature and
+smoothness to the consumption rules. We study the impact of incorporating income
+uncertainty to the retirement problem on the smoothness of the decision rules in
+Figs.~\ref{fig:fig4}(a) and~\ref{fig:fig4}(b). These figures show that while income uncertainty adds smoothness, it does
+not play a significant role in reducing the size of the discontinuities. Therefore, search
+frictions and taste shocks play the dominant role in smoothing out the problem. An
+appropriate combination of search frictions, taste shocks, and income uncertainty can
+yield a monotonically increasing outcome-specific consumption function by smoothing
+out the discontinuities that propagate through each period while iterating backwards.
+
+%---- Figure 4 ----
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{p0_xi0p005_etaSqrt0p005.pdf}
+    \caption{Small taste shocks, $\sigma_\xi = 0.005$.}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{p0_xi0p02_etaSqrt0p005.pdf}
+    \caption{Large taste shocks, $\sigma_\xi = 0.02$.}
+\end{subfigure}
+\caption{The plots show optimal consumption rules of the workers who decides to continue working in period
+$t = T - 5$ for the case with $p = 0$, in the presence of small taste shocks (left panel) and large taste shocks
+(right panel), with income uncertainty.}
+\label{fig:fig4}
+\end{figure}
+
+It is important to note that although each of these smoothness mechanisms serve
+to smooth out the solution for the worker's problem, they have different economic
+interpretations and affect the optimal consumption rule differently. While lowering
+the exogenous probability of receiving the option to switch, $p$, and increasing the search
+frictions, $\sigma_s$, shift the consumption function upwards, large taste shocks, $\sigma_\xi$, and income
+shocks, $\sigma_\eta$, shift the consumption function downwards. Ceteris paribus, decreasing
+$p$ or increasing $\sigma_s$, reduce the likelihood of the worker switching their discrete state
+successfully. This means that the likelihood of the worker retiring in a given period
+decreases. As a result, the expected number of years that an agent works increases
+and they save less in a given period. In contrast, when the size of the taste shocks is
+increased, the uncertainty surrounding the likelihood of a worker's retirement decision
+increases. Consequently, the agents save more in a given period, because unexpectedly
+retiring early would limit the resources that the agent can consume for the remainder of
+their life. Similarly, when the size of the income shocks increases, households increase
+their buffer stock savings, and the consumption function shifts down. Therefore,
+although each of the smoothness mechanisms achieve the common goal of `concavifying'
+the solution, they have different interpretations and different impacts on the optimal
+consumption rule.
+
+To illustrate these points graphically, we start from the baseline consumption function
+that has the discontinuities completely smoothed out using smoothness parameters $p =
+0$, $\sigma_\xi = 0.02$, $\sigma_s = 0.5$, and $\sigma_\eta = \sqrt{0.005}$. Fig.~\ref{fig:fig5}(a) shows the impact of lowering $p$ from the
+baseline level to $p = 0.1$ and $p = 0.5$, which decreases smoothness, and Fig.~\ref{fig:fig5}(b) shows the
+impact of increasing the search frictions from the baseline level to $\sigma_s = 1.0$ and $\sigma_s = 2.0$,
+which increases smoothness. As mentioned above, increasing smoothness by adjusting
+either of the two mechanisms shifts the optimal consumption rule upwards. On the
+other hand, Fig.~\ref{fig:fig6}(a) shows the impact of increasing the size of the taste shocks from the
+baseline level to $\sigma_\xi = 0.025$ and $\sigma_\xi = 0.03$, and Fig.~\ref{fig:fig6}(b) shows the impact of increasing the
+size of the income shocks from the baseline level to $\sigma_\eta = 5\sqrt{0.005}$ and $\sigma_\eta = 7.5\sqrt{0.005}$.
+These figures demonstrate that, as expected, increasing the magnitude of the taste or
+income shocks shifts the optimal consumption function downwards. Therefore, while a
+combination of these smoothing mechanisms will smooth out the discontinuities, it is
+also important to note how each of them shift the decision rule differently.
+
+%---- Figure 5 ----
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{VaryP.pdf}
+    \caption{Varying the exogenous probability of receiving the option to switch.}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{VaryS.pdf}
+    \caption{Varying search friction intensity.}
+\end{subfigure}
+\caption{The plots show the impact of increasing the smoothness parameters for the exogenous option probability
+(left panel) and increasing the magnitude of the search frictions (right panel).}
+\label{fig:fig5}
+\end{figure}
+
+%---- Figure 6 ----
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{VaryXi.pdf}
+    \caption{Varying the magnitude of the taste shocks.}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{VaryEta.pdf}
+    \caption{Varying the magnitude of the income shocks.}
+\end{subfigure}
+\caption{The plots show the impact of increasing the smoothness parameters for the taste shocks (left panel) and
+increasing the magnitude of the income shocks (right panel).}
+\label{fig:fig6}
+\end{figure}
+
+%============================================================
+\subsection{Income discretization and phantom kinks}
+\label{sec:incdisc}
+%============================================================
+
+The smoothing mechanisms studied above are \emph{economic}: they reshape the agent's
+decision rule. This subsection instead isolates a \emph{numerical} source of
+non-smoothness that must not be confused with the economic discontinuities from discrete
+retirement. When the continuous transitory income density is replaced by a coarse
+equiprobable grid, the expectation over next-period marginal utility is a sum over a few
+nodes. That discrete approximation injects \emph{phantom kinks} into the outcome-specific
+consumption function---spurious non-monotonicities that have no counterpart in the
+underlying continuous-income problem. The economic kinks associated with the retirement
+option remain part of the true solution; the phantom kinks should not.
+
+\paragraph{Experiment.}
+To isolate income integration, we shut down other smoothing channels: $p = 1$
+(so $\sigma_s = 0$) and no taste shocks ($\sigma_\xi = 0$, one taste node). We set
+$\sigma_\eta = \sqrt{0.005}$, matching the paper's income-shock figures, and compare:
+\begin{enumerate}
+    \item \emph{Discretization} of the mean-one lognormal transitory shock with
+    $N \in \{1,7,31,151\}$ equiprobable nodes;
+    \item the \emph{transition-matrix} method (Section~\ref{sec:tranmatrix}), which
+    integrates the same continuous density via a precomputed $b\to m$ matrix
+    ($500\times 510$ income grids here).
+\end{enumerate}
+Other parameters are $R = 1$, $\beta = 0.98$, $y = 20$. Figure~\ref{fig:incdisc} plots
+the working-state consumption rule over $m \in [15,120]$.
+
+\begin{figure}[htbp]
+\centering
+    \includegraphics[width=0.6\linewidth]{IncomeDiscMethod_Convergence.pdf}
+\caption{Phantom kinks from income discretization. Coarse $N$ produces spurious
+wiggles in $C(m)$; refining $N$ (or using the transition matrix) removes them.
+Held fixed: $\sigma_\eta = \sqrt{0.005}$, $p = 1$, $\sigma_s = 0$, $\sigma_\xi = 0$.
+The remaining curvature is the economically relevant discrete-choice pattern, not a
+discretization artifact.}
+\label{fig:incdisc}
+\end{figure}
+
+\paragraph{What the figure shows.}
+With $N=1$ the consumption rule exhibits large sawtooth phantom kinks. Raising $N$ to
+$7$ and then $31$ damps those artifacts; at $N=151$ they are essentially gone and the
+rule is smooth aside from the economic discrete-choice structure. The transition-matrix
+solution overlays that fine-discretization \emph{smoothness}: it does not reintroduce
+the coarse-$N$ zigzags. That is the sense in which the method ``works''---it targets
+the continuous income integral that the discrete nodes only approximate.
+
+\paragraph{Benchmarking caveat.}
+A natural quantitative check is the pointwise gap between each method and the
+$N=151$ discretization. We report solve times and that gap in Table~\ref{tab:incdisc},
+but with an important caveat: $N=151$ is still a \emph{discrete} income approximation,
+not the continuous-income truth. Small residual differences between the transition
+matrix and $N=151$ therefore need not mean the matrix is ``wrong''; they can reflect
+two different approximations to the same continuous expectation. Moreover, those gaps
+are \emph{horizon-dependent}: near the terminal period the two methods are very close,
+while earlier periods accumulate integration differences, so a max-absolute deviation
+versus $N=151$ can grow even when neither rule displays phantom kinks. The right visual
+benchmark for the paper's claim is therefore Figure~\ref{fig:incdisc} (presence or
+absence of spurious non-monotonicities), not a claim that the matrix is uniformly
+closer to $N=151$ than every coarser $N$ at every $t$.
+
+\begin{table}[htbp]
+\centering
+\caption{Solve time by income-integration method
+($\sigma_\eta = \sqrt{0.005}$, $p=1$, $\sigma_s=0$, $\sigma_\xi=0$).
+Max.\ / mean abs.\ deviation of $C(m)$ vs.\ $N=151$ on $m\in[15,120]$ are reported
+as a diagnostic only (see text); they are not the success criterion for removing
+phantom kinks.}
+\label{tab:incdisc}
+\begin{tabular}{lcccc}
+\toprule
+Method & Gridpoints & Solve time (s) & Max.\ abs.\ vs $151$ & Mean abs.\ vs $151$ \\
+\midrule
+Discretization    & $1$   & $0.50$ & $4.72$ & $0.023$ \\
+Discretization    & $7$   & $0.66$ & $4.68$ & $0.004$ \\
+Discretization    & $31$  & $1.60$ & $0.094$ & $0.001$ \\
+Discretization    & $151$ & $14.3$ & $0$ & $0$ \\
+Transition matrix & ---   & $4.10$ & $0.034$ & $0.0005$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+Table~\ref{tab:incdisc} also makes the cost point: obtaining a kink-free rule by pushing
+discretization to $N=151$ is expensive relative to a moderate transition-matrix grid that
+achieves the same qualitative smoothness in Figure~\ref{fig:incdisc}.
+
+\paragraph{Note on shock size.}
+The illustration uses $\sigma_\eta = \sqrt{0.005}$, as in the paper's other income-shock
+figures. The transition matrix employs a fixed $(b,m)$ support; if $\sigma_\eta$ is
+scaled up substantially (e.g.\ $2\sqrt{0.005}$), more mass sits near the grid edge and
+the same matrix can diverge more from a fine discretization unless the income grids are
+widened and refined (at cost scaling with the product of the grid sizes). The phantom-kink
+lesson---coarse $N$ creates numerical wiggles; continuous integration or fine $N$ removes
+them---is not tied to that particular $\sigma_\eta$, but quantitative gaps versus a
+fixed $N=151$ benchmark are.
+
+%============================================================
+\subsection{Algorithm}
+%------------------------------------------------------------
+This section outlines the algorithm for solving the problem of the worker who continues
+to work in the current period. The problem for the retiree can be pre-solved relatively
+easily. With the solution of the worker who continues to work and the retiree at hand,
+it is straightforward to compute the solution of the worker with the option to switch.
+With ample smoothness, the EGM-step should not produce any suboptimal points.
+However, if there is not enough smoothness, then an additional `upper envelope' step
+is required to remove the suboptimal points. The upper envelope refinement step in
+\citet{Iskhakov2017-jb} is an example of an algorithm that
+can be employed at the end of the EGM-step to achieve this.
+
+\begin{algorithm}[htbp]
+\caption{EGM-step with search for the worker who continues to work}
+\DontPrintSemicolon
+Let $\vec{\eta} = \{\eta_1, \dots, \eta_J\}$ and $\vec{\xi} = \{\xi_1, \dots, \xi_K\}$ be vectors of quadrature points with associated weights
+$\vec{\omega} = \{\omega_1, \dots, \omega_J\}$ and $\vec{\mu} = \{\mu_1, \dots, \mu_K\}$, respectively.\;
+Form an ascending grid over end-of-period wealth, $\vec{A}_t = \{A_t^1, \dots, A_t^I\}$\;
+\For{$i = 1, \dots, I$}{
+    \For{$j = 1, \dots, J$}{
+        Compute $M_{t+1}^j(A_i) = R A_i + y \eta_{t+1}^j$\;
+        \For{$d_{t+1} = 0, 1$}{
+            Compute $c_{t+1}^{\Ret}(M_{t+1}^j(A_i))$ by interpolating $c_{t+1}^{\Ret}(\vec{M}_{t+1})$ at the point $M_{t+1}^j(A_i)$\;
+            Compute $c_{t+1}^{W}(M_{t+1}^j(A_i))$ by interpolating $c_{t+1}^{W}(\vec{M}_{t+1})$ at the point $M_{t+1}^j(A_i)$\;
+            Compute $V_{t+1}^{\Ret}(M_{t+1}^j(A_i))$ by interpolating $V_{t+1}^{\Ret}(\vec{M}_{t+1})$ at the point $M_{t+1}^j(A_i)$\;
+            \For{$k = 1, \dots, K$}{
+                Compute $V_{t+1}^{W}(M_{t+1}^j(A_i), \xi_k)$ by interpolating $V_{t+1}^{W}(\vec{M}_{t+1})$ at the point $M_{t+1}^j(A_i)$ and multiplying it by $\xi_k$\;
+                Compute $V_{t+1}^{RW}(M_{t+1}^j(A_i), \xi_k) = \max\{V_{t+1}^{\Ret}(M_{t+1}^j(A_i)), V_{t+1}^{W}(M_{t+1}^j(A_i), \xi_k)\}$\;
+                Compute $\mathbbm{1}_{t+1}^0(M_{t+1}^j(A_i), \xi_k) = 1$ if $V_{t+1}^{\Ret}(M_{t+1}^j(A_i)) \ge V_{t+1}^{W}(M_{t+1}^j(A_i), \xi_k)$ and $0$ otherwise.\;
+                Compute $\mathbbm{1}_{t+1}^1(M_{t+1}^j(A_i), \xi_k) = 1 - \mathbbm{1}_{t+1}^0(M_{t+1}^j(A_i), \xi_k)$\;
+                Compute $\mathrm{RHS}_1^{\mathrm{pre}}(M_{t+1}^j(A_i), \xi_k) = \mathbbm{1}_{t+1}^0(M_{t+1}^j(A_i), \xi_k) \cdot u'(c_{t+1}^{\Ret}(M_{t+1}^j(A_i))) + \xi_k \cdot \mathbbm{1}_{t+1}^1(M_{t+1}^j(A_i), \xi_k) \cdot u'(c_{t+1}^{W}(M_{t+1}^j(A_i)))$\;
+                Compute $\mathrm{RHS}_2^{\mathrm{pre}}(M_{t+1}^j(A_i), \xi_k) = \xi_k \cdot u'(c_{t+1}^{W}(M_{t+1}^j(A_i)))$\;
+            }
+        }
+    }
+    Compute $\goth{V}_t^1(A_i) = \sum_{j=1}^{J} \sum_{k=1}^{K} \omega_j \mu_k \cdot V_{t+1}^{RW}(M_{t+1}^j(A_i), \xi_k)$\;
+    Compute $\goth{V}_t^2(A_i) = \sum_{j=1}^{J} \sum_{k=1}^{K} \omega_j \mu_k \cdot V_{t+1}^{W}(M_{t+1}^j(A_i), \xi_k)$\;
+    Compute $\eff_t(A_i) = 1 - \exp\left(-\beta(1 - p)(\goth{V}_t^1(A_i) - \goth{V}_t^2(A_i))/\sigma_s\right)$\;
+    Compute $\theta(\eff_t(A_i)) = \sigma_s (\eff_t(A_i) + (1 - \eff_t(A_i)) \log(1 - \eff_t(A_i)))$\;
+    Compute $P_1(\eff_t(A_i)) = (1 - \eff_t(A_i)) \cdot p + \eff_t(A_i)$\;
+    Compute $P_2(\eff_t(A_i)) = (1 - \eff_t(A_i)) \cdot (1 - p)$\;
+    Compute $\mathrm{RHS}_1(A_i) = \sum_{j=1}^{J} \sum_{k=1}^{K} \omega_j \mu_k \cdot \mathrm{RHS}_1^{\mathrm{pre}}(M_{t+1}^j(A_i), \xi_k)$\;
+    Compute $\mathrm{RHS}_2(A_i) = \sum_{j=1}^{J} \sum_{k=1}^{K} \omega_j \mu_k \cdot \mathrm{RHS}_2^{\mathrm{pre}}(M_{t+1}^j(A_i), \xi_k)$\;
+    Compute $\mathrm{RHS}(A_i) = R\beta (P_1(\eff_t(A_i)) \mathrm{RHS}_1(A_i) + P_2(\eff_t(A_i)) \mathrm{RHS}_2(A_i))$\;
+    Compute expected value function $\E V_{t+1}(M_{t+1}(A_i)) = P_1(\eff_t(A_i)) \cdot \goth{V}_t^1(A_i) + P_2(\eff_t(A_i)) \cdot \goth{V}_t^2(A_i)$\;
+    Compute current consumption $c_t^{W}(A_i) = u'^{-1}(\mathrm{RHS}(A_i))$\;
+    Compute value function $V_t^{W}(M_t(A_i)) = u(c_t^{W}(A_i), 1, \eff_t(A_i)) + \beta \E V_{t+1}(M_{t+1}(A_i))$\;
+    Compute endogenous grid point $M_t(A_i) = c_t^{W}(A_i) + A_i$\;
+}
+Collect the points $M_t(A_i)$, $c_t^{W}(A_i)$, and $V_t^{W}(M_t(A_i))$ to form the consumption function, $c_t^{W}(\vec{M}_t)$, and value function, $V_t^{W}(\vec{M}_t)$.\;
+\end{algorithm}
+
+%------------------------------------------------------------
+\subsubsection{Transition-matrix income integration}
+\label{sec:tranmatrix}
+%------------------------------------------------------------
+
+In Algorithm~1, the expectation over the transitory income shock is taken by looping over
+the $J$ quadrature nodes $\vec{\eta}$ and interpolating the next-period functions at each
+implied $M_{t+1}^j(A_i)$. As an alternative, the transitory-income integration can be
+recast as a single (precomputed) linear map, following the transition-matrix approach of
+\citet{White2015-fz}.
+
+\paragraph{Idea.}
+Let $b = R A_t$ denote next-period wealth \emph{before} the income draw, and
+$m = R A_t + y\eta$ next-period market resources \emph{after} it. For a fixed income
+process, the conditional density of $m$ given $b$ is time-invariant, so the mapping from a
+function defined on an $m$-grid to its conditional expectation on a $b$-grid can be encoded
+once as a matrix $\Pi$ with entries $\Pi_{b,m} \approx \Pr(m \mid b)$.
+
+\paragraph{Steps.}
+\begin{enumerate}
+    \item Build dense grids over $b$ and $m$ (exponentially spaced) and construct $\Pi$
+    from the mean-one lognormal transitory density. Because the $m$-grid is non-uniform,
+    each density evaluation is weighted by the local grid spacing $\Delta m$ before
+    row-normalization (so that $\Pi$ approximates $\int f(m)\,g(m-b)\,dm$ rather than an
+    equally weighted sum over columns). Probability mass mapped outside the tabulated
+    $m$-range is dropped and each row is renormalized to sum to one.
+    \item For each next-period quantity of interest (marginal utility and value), evaluate
+    it on the $m$-grid, then obtain its conditional expectation on the $b$-grid by the
+    matrix product $\Pi \, f(\vec{m})$. Expectations are then interpolated onto
+    $b = R\,\vec{A}_t$ in inverse form (CRRA-inverse for marginal utilities;
+    $V_T = -1/V$ for values) before the EGM step.
+    \item The remaining EGM and envelope steps of Algorithm~1 are unchanged.
+\end{enumerate}
+
+\paragraph{Rationale.}
+Because $\Pi$ is assembled once and reused across periods, the per-period cost of the
+income expectation reduces to a matrix multiplication. Relative to a coarse
+equiprobable shock grid, the matrix integrates the continuous density and thereby
+avoids the phantom kinks documented in Section~\ref{sec:incdisc}
+(Figure~\ref{fig:incdisc}), typically at lower cost than pushing discretization to a
+very fine $N$ (Table~\ref{tab:incdisc}). As noted there, a fixed $(b,m)$ grid may need
+widening if $\sigma_\eta$ is scaled up substantially.

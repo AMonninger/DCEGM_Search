@@ -384,7 +384,7 @@ def calcExtraSaves(saveCommon, rs, ws, par, mGrid, tasteGrid, tasteWeights, phiG
                 m_claim = phiGrid[k]*mGrid
                 Crs = LinearInterp(rs.m, rs.C, lower_extrap=True)(m_claim)
                 V_rs = numpy.divide(-1, LinearInterp(rs.m, rs.V_T, lower_extrap=True)(m_claim))
-                V_k, P_k = calcLogSumChoiceProbs(numpy.stack((V_rs, V_ws)), 0.0, 'type1')
+                V_k, P_k = calcLogSumChoiceProbs(numpy.stack((V_rs, V_ws)), par.sigma_t, 'type1')
                 C_k = (P_k*numpy.stack((Crs, Cws))).sum(axis=0)
                 C_baseline = C_baseline + phiWeights[k]*C_k
                 V_baseline = V_baseline + phiWeights[k]*V_k
@@ -420,7 +420,7 @@ def calcExtraSaves(saveCommon, rs, ws, par, mGrid, tasteGrid, tasteWeights, phiG
                 Crs = numpy.matlib.repmat(numpy.vstack(Crs),1,par.TasteShkCount)
                 V_rs = numpy.divide(-1, LinearInterp(rs.m, rs.V_T, lower_extrap=True)(m_claim))
                 V_rs = numpy.matlib.repmat(numpy.vstack(V_rs),1,par.TasteShkCount)
-                V_k, P_k = calcLogSumChoiceProbs(numpy.stack((V_rs, V_ws)), 0.0, 'type1')
+                V_k, P_k = calcLogSumChoiceProbs(numpy.stack((V_rs, V_ws)), par.sigma_t, 'type1')
                 C_k = (P_k*numpy.stack((Crs, Cws))).sum(axis=0)
                 C_baseline = C_baseline + phiWeights[k]*C_k
                 V_baseline = V_baseline + phiWeights[k]*V_k
@@ -533,6 +533,7 @@ class RetiringDeaton(IndShockConsumerType):
         self.time_vary = self.time_vary + ['incomeTranMatrix']
 
         self.par = RetiringDeatonParameters(self.DiscFac, self.CRRA, self.DisUtil, self.Rfree, self.YRet, self.YWork, self.sigma_s, self.sigma_t, self.sigma_xi, self.sigma_phi, self.prob_opt, self.TasteShkCount, self.PhiShkCount, self.smoothtype)
+        self._validate_taste_channels()
         # d == 2 is working
         # - 10.0 moves curve down to improve linear interpolation
         self.Util = lambda c, d: utility(c, self.CRRA) - self.par.DisUtil*(d-1) - 10.0
@@ -541,8 +542,18 @@ class RetiringDeaton(IndShockConsumerType):
 
         self.solve_one_period = solveRetiringDeaton
 
+    def _validate_taste_channels(self):
+        """EV Type I (sigma_t) and multiplicative log-normal xi cannot both be on."""
+        if self.par.sigma_t > 0.0 and (self.par.sigma_xi > 0.0 or self.par.TasteShkCount > 1):
+            raise ValueError(
+                "EV Type I taste shocks (sigma_t) and multiplicative log-normal taste "
+                "shocks (sigma_xi / TasteShkCount) both smooth the claim/deny margin; "
+                "set either sigma_t=0 or (sigma_xi=0 and TasteShkCount=1)."
+            )
+
     def pre_solve(self):
         super().pre_solve()
+        self._validate_taste_channels()
         self._apply_TranShk_support_clip()
         self._setup_income_integration()
         self.updateLast()
@@ -995,7 +1006,7 @@ def solveWorkingDeaton(solution_next, aXtraGrid, mGrid, EGMVector, par, Util, Ut
         
         V_tp1_R = Vs[0]
         V_tp1_W = Vs[1]
-        V_tp1_RW,inds_tp1_RW = calcLogSumChoiceProbs(numpy.stack((V_tp1_R,V_tp1_W)), 0.0, smoothtype='type1')
+        V_tp1_RW,inds_tp1_RW = calcLogSumChoiceProbs(numpy.stack((V_tp1_R,V_tp1_W)), par.sigma_t, smoothtype='type1')
         ind0_tp1 = inds_tp1_RW[0,:]
         ind1_tp1 = inds_tp1_RW[1,:]    
         
@@ -1034,7 +1045,7 @@ def solveWorkingDeaton(solution_next, aXtraGrid, mGrid, EGMVector, par, Util, Ut
                 m_claim = phi_k*m_book
                 C_tp1_R = CFunc_R(m_claim)
                 V_tp1_R = numpy.divide(-1.0, V_TFunc_R(m_claim))
-                V_k, inds_k = calcLogSumChoiceProbs(numpy.stack((V_tp1_R,V_tp1_W)), 0.0, smoothtype='type1')
+                V_k, inds_k = calcLogSumChoiceProbs(numpy.stack((V_tp1_R,V_tp1_W)), par.sigma_t, smoothtype='type1')
                 ind0_k = inds_k[0,:]
                 ind1_k = inds_k[1,:]
                 V_tp1_RW = V_tp1_RW + w_k*V_k
@@ -1058,7 +1069,7 @@ def solveWorkingDeaton(solution_next, aXtraGrid, mGrid, EGMVector, par, Util, Ut
                 V_T_tp1_R_comp = V_TFunc_R(m_claim)
                 C_tp1_R = numpy.repeat(C_tp1_R_comp[:, :, numpy.newaxis], par.TasteShkCount, axis=2)
                 V_tp1_R = numpy.repeat(numpy.divide(-1.0, V_T_tp1_R_comp)[:, :, numpy.newaxis], par.TasteShkCount, axis=2)
-                V_k, inds_k = calcLogSumChoiceProbs(numpy.stack((V_tp1_R,V_tp1_W)), 0.0, smoothtype='type1')
+                V_k, inds_k = calcLogSumChoiceProbs(numpy.stack((V_tp1_R,V_tp1_W)), par.sigma_t, smoothtype='type1')
                 ind0_k = inds_k[0,:]
                 ind1_k = inds_k[1,:]
                 V_tp1_RW = V_tp1_RW + w_k*V_k
@@ -1119,7 +1130,7 @@ def _solveWorkingDeaton_transition(solution_next, aXtraGrid, mGrid, EGMVector, p
             C_R_m = CFunc_R(income_mGrid)
             V_R_m = numpy.divide(-1.0, V_TFunc_R(income_mGrid))
             V_RW_m, inds_m = calcLogSumChoiceProbs(
-                numpy.stack((V_R_m, V_W_m)), 0.0, smoothtype='type1',
+                numpy.stack((V_R_m, V_W_m)), par.sigma_t, smoothtype='type1',
             )
             ind0_m = inds_m[0]
             ind1_m = inds_m[1]
@@ -1134,7 +1145,7 @@ def _solveWorkingDeaton_transition(solution_next, aXtraGrid, mGrid, EGMVector, p
                 C_R_m = CFunc_R(m_claim)
                 V_R_m = numpy.divide(-1.0, V_TFunc_R(m_claim))
                 V_k, inds_k = calcLogSumChoiceProbs(
-                    numpy.stack((V_R_m, V_W_m)), 0.0, smoothtype='type1',
+                    numpy.stack((V_R_m, V_W_m)), par.sigma_t, smoothtype='type1',
                 )
                 ind0_k = inds_k[0]
                 ind1_k = inds_k[1]
@@ -1166,7 +1177,7 @@ def _solveWorkingDeaton_transition(solution_next, aXtraGrid, mGrid, EGMVector, p
             V_R_m = numpy.divide(-1.0, V_TFunc_R(income_mGrid))
             V_R_mt = numpy.broadcast_to(V_R_m[:, numpy.newaxis], V_W_mt.shape)
             V_RW_mt, inds_mt = calcLogSumChoiceProbs(
-                numpy.stack((V_R_mt, V_W_mt)), 0.0, smoothtype='type1',
+                numpy.stack((V_R_mt, V_W_mt)), par.sigma_t, smoothtype='type1',
             )
             ind0_mt = inds_mt[0]
             ind1_mt = inds_mt[1]
@@ -1185,7 +1196,7 @@ def _solveWorkingDeaton_transition(solution_next, aXtraGrid, mGrid, EGMVector, p
                 V_R_m = numpy.divide(-1.0, V_TFunc_R(m_claim))
                 V_R_mt = numpy.broadcast_to(V_R_m[:, numpy.newaxis], V_W_mt.shape)
                 V_k, inds_k = calcLogSumChoiceProbs(
-                    numpy.stack((V_R_mt, V_W_mt)), 0.0, smoothtype='type1',
+                    numpy.stack((V_R_mt, V_W_mt)), par.sigma_t, smoothtype='type1',
                 )
                 ind0_k = inds_k[0]
                 ind1_k = inds_k[1]
