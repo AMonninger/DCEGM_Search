@@ -1,18 +1,43 @@
 %============================================================
 \section{Conclusion}\label{sec:Conclusion}
 %============================================================
-This paper introduces search as a new method for smoothing out discrete-continuous
-choice (DC) problems. While search can significantly reduce the size of the disconti-
-nuities in the decision rule of a DC problem, to get uniform smoothness around the
-discontinuities, we need to incorporate taste shocks as well. Together, search and taste
-shocks offer modelers greater control over the degree of smoothness in DC models, while
-rationalizing the smoothness into the agent's choice problem. With ample smoothness,
-discontinuities in the decision rule can be smoothed out entirely; thus, eliminating the
-need for incorporating an additional, computationally costly, step of identifying and
-removing suboptimal points generated in the EGM step for DC models. This paper
-studies search in the context of a consumption-saving-retirement problem; however, the
-framework can be easily applied to models of housing purchase, lumpy firm investments,
-and a wide array of other DC models.
-We additionally document how a coarse income-shock discretization injects phantom
-kinks into the decision rule, and describe a transition-matrix method that integrates
-the continuous income density and removes those numerical artifacts at moderate cost.
+% Previous conclusion:
+% This paper introduces search as a new method for smoothing out discrete-continuous
+% choice (DC) problems. While search can significantly reduce the size of the disconti-
+% nuities in the decision rule of a DC problem, to get uniform smoothness around the
+% discontinuities, we need to incorporate taste shocks as well. Together, search and taste
+% shocks offer modelers greater control over the degree of smoothness in DC models, while
+% rationalizing the smoothness into the agent's choice problem. With ample smoothness,
+% discontinuities in the decision rule can be smoothed out entirely; thus, eliminating the
+% need for incorporating an additional, computationally costly, step of identifying and
+% removing suboptimal points generated in the EGM step for DC models. This paper
+% studies search in the context of a consumption-saving-retirement problem; however, the
+% framework can be easily applied to models of housing purchase, lumpy firm investments,
+% and a wide array of other DC models.
+% We additionally document how a coarse income-shock discretization injects phantom
+% kinks into the decision rule, and describe a transition-matrix method that integrates
+% the continuous income density and removes those numerical artifacts at moderate cost.
+Directed search and a rejectable price draw can match the smoothness that Extreme
+Value Type~I taste shocks give to a discrete-continuous problem. The agent chooses
+effort in the unit interval at a convex utility cost. Effort raises the probability that
+an option to switch arrives. The draw is the content of that option: an account factor
+in the retirement model, and the purchase price of the new stock in the durable model.
+A bad draw is rejected. Search alone leaves one side of the threshold unsmoothed,
+because effort is zero when the switch is not strictly preferred. The price draw fills
+that side. The option value of the draw raises effort.
+
+The retirement model illustrates this mechanism. The quantitative comparison is the
+keep-versus-adjust model of durables. Taste shocks, price dispersion, and search all
+smooth the $(S,s)$ band. In steady state they move the adjustment probability in
+opposite directions. A larger taste scale raises it, and durables and assets fall.
+Wider price dispersion raises it, because better draws are accepted; durables rise and
+assets fall. A higher search cost lowers it; durables fall and assets rise. Search and
+price dispersion can therefore be disciplined separately. Impulse responses of
+consumption and of the adjustment probability, at a common adjustment frequency,
+are the open exercise.
+
+Search acts near the $(S,s)$ thresholds, so the Euler equation still describes agents
+far from indifference. Optimal effort maps into an expected search duration. A search
+cost specified to scale with permanent income does not add a state to the normalized
+problem. An Extreme Value shock of the same scale for every household does not scale
+in that way.

@@ -1082,7 +1082,9 @@ def solveWorkingDeaton(solution_next, aXtraGrid, mGrid, EGMVector, par, Util, Ut
             RHS2_pre1 = taste_mat*UtilP(C_tp1_W, 2)
     
     # Effort this period that affects the likelihood of receiving the option
-    # next period
+    # next period. The retirement text sets the arrival probability equal to
+    # effort (prob_opt = 0). prob_opt is retained so an exogenous arrival
+    # probability can be turned back on without rewriting the solver.
     effort_all, cost_t = OutcomeProbsCost_Search(numpy.stack((gothV1,gothV2)), par.sigma_s, par.DiscFac, par.prob_opt)
     effort_t = effort_all[0,:]
     P1 = (1-effort_t)*par.prob_opt + effort_t

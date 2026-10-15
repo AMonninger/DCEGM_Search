@@ -497,6 +497,146 @@ def gen_tran_matrix_dur_sparse(dist_nGrid, dist_mGrid, bNext, nNext_unshocked,
     return rows, cols, data, nStates
 
 
+@numba.njit(cache=True)
+def _bracket_grid(x, grid):
+    """
+    Lower/upper index and weights of x on grid, with the boundary rules of jump_to_grid_dur.
+    """
+    nG = len(grid)
+    if x <= grid[0]:
+        return 0, 0, 1.0, 0.0
+    if x >= grid[nG - 1] or x != x:
+        return nG - 1, nG - 1, 1.0, 0.0
+    lo = 0
+    hi = nG - 1
+    while hi - lo > 1:
+        mid = (lo + hi) // 2
+        if grid[mid] <= x:
+            lo = mid
+        else:
+            hi = mid
+    lowerWeight = (grid[hi] - x) / (grid[hi] - grid[lo])
+    return lo, hi, lowerWeight, 1.0 - lowerWeight
+
+
+@numba.njit(parallel=True, cache=True)
+def _lottery_tran_columns(dist_nGrid, dist_mGrid, bNext, nNext_unshocked, weights,
+                          shk_prbs, perm_shks, tran_shks, carcrash_shks, LivPrb, NewBornDist,
+                          nChunks, fill, indptr, indices, data):
+    """
+    Column (origin state) c of sum_b T_b diag(w_b).
+    T_b = LivPrb * jump_to_grid_dur(...) + (1 - LivPrb) * NewBornDist.
+    fill=False writes the nonzero count of column c into indptr[c + 1].
+    fill=True writes sorted row indices and values into indices/data at indptr[c].
+    """
+    nN = len(dist_nGrid)
+    nM = len(dist_mGrid)
+    nStates = nN * nM
+    nB = bNext.shape[0]
+    nShk = len(shk_prbs)
+    nb_idx = np.nonzero(NewBornDist)[0]
+    nNB = len(nb_idx)
+    DeadPrb = 1.0 - LivPrb
+    chunk = (nStates + nChunks - 1) // nChunks
+
+    for ch in numba.prange(nChunks):
+        sb = np.zeros(nStates)
+        mark_b = np.zeros(nStates, dtype=np.bool_)
+        tb = np.empty(4 * nShk, dtype=np.int64)
+        sc = np.zeros(nStates)
+        mark_c = np.zeros(nStates, dtype=np.bool_)
+        tc = np.empty(nB * (4 * nShk + nNB), dtype=np.int64)
+
+        for c in range(ch * chunk, min((ch + 1) * chunk, nStates)):
+            i = c // nM
+            j = c - i * nM
+            nc = 0
+            for b in range(nB):
+                nbt = 0
+                for s in range(nShk):
+                    nNext = carcrash_shks[s] * (nNext_unshocked[b, i, j] / perm_shks[s])
+                    mNext = bNext[b, i, j] / perm_shks[s] + tran_shks[s]
+                    nlo, nup, nlw, nuw = _bracket_grid(nNext, dist_nGrid)
+                    mlo, mup, mlw, muw = _bracket_grid(mNext, dist_mGrid)
+                    p = shk_prbs[s]
+                    for r, v in ((nlo * nM + mlo, p * nlw * mlw), (nlo * nM + mup, p * nlw * muw),
+                                 (nup * nM + mlo, p * nuw * mlw), (nup * nM + mup, p * nuw * muw)):
+                        if not mark_b[r]:
+                            mark_b[r] = True
+                            tb[nbt] = r
+                            nbt += 1
+                        sb[r] += v
+
+                w = weights[b, i, j]
+                for t in range(nbt + nNB):
+                    if t < nbt:
+                        r = tb[t]
+                        v = LivPrb * sb[r] + DeadPrb * NewBornDist[r]
+                    else:
+                        r = nb_idx[t - nbt]
+                        if mark_b[r]:
+                            continue
+                        v = DeadPrb * NewBornDist[r]
+                    if v != 0.0:
+                        if not mark_c[r]:
+                            mark_c[r] = True
+                            tc[nc] = r
+                            nc += 1
+                        sc[r] += v * w
+                for t in range(nbt):
+                    sb[tb[t]] = 0.0
+                    mark_b[tb[t]] = False
+
+            rows = np.sort(tc[:nc])
+            if fill:
+                pos = indptr[c]
+                for r in rows:
+                    if sc[r] != 0.0:
+                        indices[pos] = r
+                        data[pos] = sc[r]
+                        pos += 1
+            else:
+                cnt = 0
+                for r in rows:
+                    if sc[r] != 0.0:
+                        cnt += 1
+                indptr[c + 1] = cnt
+            for r in rows:
+                sc[r] = 0.0
+                mark_c[r] = False
+
+
+def gen_tran_matrix_dur_lottery(dist_nGrid, dist_mGrid, bNext, nNext_unshocked, weights,
+                                shk_prbs, perm_shks, tran_shks, LivPrb, NewBornDist, carcrash_shks=None):
+    """
+    Lottery transition matrix sum_b T_b diag(w_b) in one pass, origin states in columns.
+    Same matrix as summing gen_tran_matrix_dur_sparse over branches.
+
+    bNext, nNext_unshocked, weights have shape (nBranch, len(dist_nGrid), len(dist_mGrid)).
+    carcrash_shks multiplies n' per shock. None means no car-crash shock; this model passes None.
+    Returns a CSR matrix.
+    """
+    f64 = lambda x: np.ascontiguousarray(x, dtype=np.float64)
+    dist_nGrid, dist_mGrid = f64(dist_nGrid), f64(dist_mGrid)
+    shape = (len(dist_nGrid), len(dist_mGrid))
+    bNext = f64(bNext).reshape((-1,) + shape)
+    nNext_unshocked = f64(nNext_unshocked).reshape((-1,) + shape)
+    weights = f64(np.broadcast_to(weights, bNext.shape))
+    shk_prbs, perm_shks, tran_shks = f64(shk_prbs), f64(perm_shks), f64(tran_shks)
+    carcrash_shks = np.ones_like(shk_prbs) if carcrash_shks is None else f64(carcrash_shks)
+    NewBornDist = f64(NewBornDist)
+    nStates = shape[0] * shape[1]
+    nChunks = min(nStates, 8 * numba.get_num_threads())
+
+    indptr = np.zeros(nStates + 1, dtype=np.int64)
+    args = (dist_nGrid, dist_mGrid, bNext, nNext_unshocked, weights,
+            shk_prbs, perm_shks, tran_shks, carcrash_shks, float(LivPrb), NewBornDist, nChunks)
+    _lottery_tran_columns(*args, False, indptr, np.empty(0, dtype=np.int64), np.empty(0))
+    np.cumsum(indptr, out=indptr)
+    indices = np.empty(indptr[-1], dtype=np.int64)
+    data = np.empty(indptr[-1])
+    _lottery_tran_columns(*args, True, indptr, indices, data)
+    return sp.csc_matrix((data, indices, indptr), shape=(nStates, nStates)).tocsr()
 
 
 def compute_erg_dstn_sparse(transition_matrix: sp.csr_matrix):
@@ -513,6 +653,62 @@ def compute_erg_dstn_sparse(transition_matrix: sp.csr_matrix):
     s_hat = spla.spsolve(T, b)
     ergodic_distr = s_hat.real / np.sum(s_hat.real)
     return ergodic_distr
+
+
+_CUPY_OK = None
+
+
+def cupy_available():
+    """True if CuPy and a CUDA device can be used (checked once)."""
+    global _CUPY_OK
+    if _CUPY_OK is None:
+        try:
+            import cupy as cp
+            import cupyx.scipy.sparse
+            _CUPY_OK = cp.cuda.runtime.getDeviceCount() > 0
+        except Exception:
+            _CUPY_OK = False
+    return _CUPY_OK
+
+
+def compute_erg_dstn_iterative(transition_matrix, tol=1e-15, maxiter=100000, check_every=50,
+                               resid_tol=1e-13, use_gpu=None):
+    """
+    Ergodic distribution of a column-stochastic sparse matrix T (origin states in columns).
+    GPU (CuPy): power iteration x <- T x until sum|T x - x| < tol.
+    CPU: GMRES on (I - T + u 1') x = u, u uniform (same fixed point, 1'x = 1).
+    Falls back to compute_erg_dstn_sparse (direct solve) if sum|T x - x| > resid_tol.
+    """
+    T = sp.csr_matrix(transition_matrix, dtype=np.float64)
+    n = T.shape[0]
+    if use_gpu is None:
+        use_gpu = cupy_available()
+    x = None
+    try:
+        if use_gpu:
+            import cupy as cp
+            import cupyx.scipy.sparse as csp
+            T_gpu = csp.csr_matrix(T)
+            x_gpu = cp.full(n, 1.0 / n)
+            for it in range(maxiter):
+                y_gpu = T_gpu @ x_gpu
+                done = it % check_every == 0 and float(cp.abs(y_gpu - x_gpu).sum()) < tol
+                x_gpu = y_gpu
+                if done:
+                    break
+            x = cp.asnumpy(x_gpu)
+            del T_gpu, x_gpu, y_gpu
+        else:
+            u = np.full(n, 1.0 / n)
+            op = spla.LinearOperator((n, n), matvec=lambda v: v - T @ v + u * np.sum(v), dtype=np.float64)
+            x, info = spla.gmres(op, u, x0=u.copy(), rtol=tol, atol=0.0, restart=100, maxiter=maxiter // 100)
+    except Exception:
+        x = None
+    if x is not None:
+        x = x / np.sum(x)
+        if np.sum(np.abs(T @ x - x)) <= resid_tol:
+            return x
+    return compute_erg_dstn_sparse(T)
 
 
 def J_from_F(F):
@@ -933,6 +1129,122 @@ def directed_search_function_closed_form(
     vPDFunc_array = eps * vPDFuncAdj_SOL_array + (1.0 - eps) * vPDFuncKeep_SOL_array
 
     return eps, cost, vFunc_array, cFunc_array, dFunc_array, aFunc_array, vPFunc_array, vPDFunc_array
+
+
+def search_first_policies(
+    nNrmGridNow, mNrmGridTotal, mNrmGridMin, search_cost_2d, price_weights,
+    v_adj, v_keep,
+    c_adj, c_keep, d_adj, d_keep, a_adj, a_keep,
+    vP_adj, vP_keep, vPD_adj, vPD_keep,
+):
+    """
+    Directed search with the search-first timing used in UnempRisk_Durable
+    (``utilities_Durable._directed_search_closed_form_search_first``).
+
+    Effort is chosen knowing only the price distribution. After a match, price
+    ``p_k`` is drawn and accepted when ``v_adj(p_k) >= v_keep``. The search cost
+    is sunk, so a bad draw is rejected.
+
+        Delta_k = v_adj_k - v_keep,          acc_k = 1{Delta_k >= 0}
+        Dbar    = sum_k w_k max(Delta_k, 0)
+        eps*    = 1 - exp(-Dbar/S)  if S > 0 and Dbar > 0, else the hard corner
+        policy  = (1 - eps* pi) keep + sum_k eps* w_k acc_k adj_k
+        pi      = sum_k w_k acc_k
+
+    Adjuster arrays are (nPrice, nN, nM). Keeper arrays and the search-cost
+    matrix are (nN, nM). Returns ``c, d, a, v, vP, vPD``, the probability of
+    adjusting ``eps* pi``, the effort ``eps*``, and ``accept`` of shape
+    (nPrice, nN, nM).
+    """
+    nNrmGridNow = np.asarray(nNrmGridNow, dtype=float)
+    mNrmGridTotal = np.asarray(mNrmGridTotal, dtype=float)
+    v_adj = np.asarray(v_adj, dtype=float)
+    v_keep = np.asarray(v_keep, dtype=float)
+    if v_adj.ndim != 3 or v_adj.shape[1:] != v_keep.shape:
+        raise ValueError(
+            "search_first expects adjuster arrays of shape (nPrice, nN, nM) "
+            "and keeper arrays of shape (nN, nM)."
+        )
+    w = np.atleast_1d(np.asarray(price_weights, dtype=float))
+    if w.size != v_adj.shape[0]:
+        raise ValueError("price_weights and adjuster arrays disagree on the number of price nodes.")
+    w = w.reshape(-1, 1, 1)
+    S = np.broadcast_to(np.asarray(search_cost_2d, dtype=float), v_keep.shape)
+
+    vP_adj = np.asarray(vP_adj, dtype=float)
+    vPD_adj = np.asarray(vPD_adj, dtype=float)
+    vP_keep = np.asarray(vP_keep, dtype=float)
+    vPD_keep = np.asarray(vPD_keep, dtype=float)
+
+    v_adj_aux = np.where(v_adj == -np.inf, -1e12, v_adj)
+    v_keep_aux = np.where(v_keep == -np.inf, -1e12, v_keep)
+    vP_adj_aux = np.where(vP_adj == np.inf, 1e12, vP_adj)
+    vP_keep_aux = np.where(vP_keep == np.inf, 1e12, vP_keep)
+    vPD_adj_aux = np.where(vPD_adj == np.inf, 1e12, vPD_adj)
+    vPD_keep_aux = np.where(vPD_keep == np.inf, 1e12, vPD_keep)
+
+    n_size = nNrmGridNow.size
+    m_size = mNrmGridTotal.size
+    n_min = len(mNrmGridMin) if mNrmGridMin is not None else 0
+    start_idx = np.maximum(n_min - np.arange(n_size), 0)
+    below_min = np.arange(m_size)[None, :] < start_idx[:, None]
+    n_is_zero = np.broadcast_to(nNrmGridNow[:, None] == 0.0, v_keep.shape)
+
+    delta = v_adj_aux - v_keep_aux[None]
+    finite_delta = np.isfinite(delta)
+    accept = finite_delta & (delta >= 0.0)
+    delta_bar = np.sum(w * np.where(finite_delta & (delta > 0.0), delta, 0.0), axis=0)
+    v_match = np.sum(w * np.where(accept, v_adj_aux, v_keep_aux[None]), axis=0)
+
+    s_pos = S > 0.0
+    gain_pos = delta_bar > 0.0
+    z = np.where(s_pos, np.clip(delta_bar / np.maximum(S, 1e-300), 0.0, _SEARCH_Z_MAX), 0.0)
+    em1 = 1.0 - np.exp(-z)
+
+    eps = np.where(gain_pos & s_pos, em1, 0.0)
+    eps = np.where(gain_pos & ~s_pos, 1.0, eps)
+    v = np.where(gain_pos & s_pos, v_match - S * em1, v_keep_aux)
+    v = np.where(gain_pos & ~s_pos, v_match, v)
+
+    vFunc_min = v_adj_aux[:, :1, :1]
+    both_min = np.all((v_keep_aux[None] == vFunc_min) & (v_adj_aux == vFunc_min), axis=0)
+    forced = both_min | n_is_zero
+    eps = np.where(forced, 1.0, eps)
+    v = np.where(forced, v_match - S, v)
+
+    eps = np.where(below_min, 1.0, eps)
+    v = np.where(below_min, -np.inf, v)
+    accept = accept | below_min[None]
+
+    branch_w = eps[None] * w * accept
+    keep_w = np.clip(1.0 - np.sum(branch_w, axis=0), 0.0, 1.0)
+
+    def _lottery(adj, keep):
+        return keep_w * np.asarray(keep, dtype=float) + np.sum(
+            branch_w * np.asarray(adj, dtype=float), axis=0
+        )
+
+    c = _lottery(c_adj, c_keep)
+    d = _lottery(d_adj, d_keep)
+    a = _lottery(a_adj, a_keep)
+    vP = _lottery(vP_adj_aux, vP_keep_aux)
+    vPD = _lottery(vPD_adj_aux, vPD_keep_aux)
+
+    adjusting_k = eps[None] * accept
+    branch_on = (w * adjusting_k) > 0.0
+    keep_on = keep_w > 0.0
+    v = np.array(v, dtype=float, copy=True)
+    vP = np.array(vP, dtype=float, copy=True)
+    vPD = np.array(vPD, dtype=float, copy=True)
+    v[(keep_on & (v_keep == -np.inf)) | np.any(branch_on & (v_adj == -np.inf), axis=0)] = -np.inf
+    vP[(keep_on & (vP_keep == np.inf)) | np.any(branch_on & (vP_adj == np.inf), axis=0)] = np.inf
+    vPD[(keep_on & (vPD_keep == np.inf)) | np.any(branch_on & (vPD_adj == np.inf), axis=0)] = np.inf
+    pure_keep = keep_w == 1.0
+    vP[pure_keep] = vP_keep[pure_keep]
+    vPD[pure_keep] = vPD_keep[pure_keep]
+
+    adjusting = 1.0 - keep_w
+    return c, d, a, v, vP, vPD, adjusting, eps, accept
 
 
 @njit(parallel=True, fastmath=True)

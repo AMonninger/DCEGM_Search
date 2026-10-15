@@ -1,14 +1,23 @@
 %============================================================
 \section{Introduction}
 %============================================================
-This paper introduces new methods for efficiently solving dynamic optimization
-problems with both discrete and continuous choices (DC models). These methods
-extend the Endogenous Gridpoint Method (EGM) \citep{Carroll2006-mv} by including
-exogenous outcome probabilities, search frictions, and taste shocks to `concavify' the
-value function of the optimization problem. Compared to existing extensions of the
-EGM for DC models, the methods introduced in this paper have the added advantage
-of not only providing greater smoothness, but also rationalizing the smoothness into
-the agent's choice problem.
+% Previous opening:
+% This paper introduces new methods for efficiently solving dynamic optimization
+% problems with both discrete and continuous choices (DC models). These methods
+% extend the Endogenous Gridpoint Method (EGM) \citep{Carroll2006-mv} by including
+% exogenous outcome probabilities, search frictions, and taste shocks to `concavify' the
+% value function of the optimization problem. Compared to existing extensions of the
+% EGM for DC models, the methods introduced in this paper have the added advantage
+% of not only providing greater smoothness, but also rationalizing the smoothness into
+% the agent's choice problem.
+This paper studies dynamic problems with both a discrete and a continuous choice.
+Applied to these problems, the endogenous gridpoint method of \citet{Carroll2006-mv}
+returns suboptimal points as well as the optimum. Extreme Value Type~I taste shocks
+remove the jumps that produce those points \citep{Iskhakov2017-jb}. Directed search,
+together with a rejectable price draw, can match that smoothness. Both objects are
+part of the agent's problem. A retirement model illustrates the mechanism. A
+keep-versus-adjust model of durables is where the three devices can be told apart:
+they move the steady-state adjustment probability in opposite directions.
 
 For dynamic stochastic optimization problems with continuous choice variables, the
 Endogenous Gridpoint Method (EGM) is significantly more efficient compared to
@@ -37,6 +46,7 @@ the expected marginal utility function. With larger taste shocks, the value func
 be `concavified' to a greater degree. Such taste shocks, however, are in fact `behavioral'
 shocks that add a degree of randomization to the discrete choice outcomes.
 
+% Earlier draft of the mechanism paragraph:
 % In contrast, this paper introduces search frictions whereby agents exert search
 % effort that determines the likelihood of changing the discrete state. In addition, it
 % includes log-normally distributed taste shocks that affect the utility that agents derive
@@ -44,48 +54,130 @@ shocks that add a degree of randomization to the discrete choice outcomes.
 % smoothness of the decision rule, they also rationalize the smoothness arising from the
 % taste shocks, as these shocks determine the search effort that the agents exert.
 
-In contrast, this paper introduces search frictions whereby agents exert search
-effort that determines the likelihood of changing the discrete state. In addition, it
-includes log-normally distributed price shocks that affect the amount of resources the agent
-has to pay to make the transaction. Combined, these two features not only lead to greater
-smoothness of the decision rule, they also rationalize the smoothness arising from the
-taste shocks, as these shocks determine the search effort that the agents exert.
+% Previous mechanism paragraph:
+% In contrast, this paper introduces search frictions whereby agents exert search
+% effort that determines the likelihood of changing the discrete state. In addition, it
+% includes log-normally distributed price shocks that affect the amount of resources the agent
+% has to pay to make the transaction. Combined, these two features not only lead to greater
+% smoothness of the decision rule, they also rationalize the smoothness arising from the
+% taste shocks, as these shocks determine the search effort that the agents exert.
+The agent chooses search effort in the unit interval. The cost of effort is convex and
+is subtracted from utility. Effort raises the probability of receiving an option: the chance
+to retire, or a match at which a purchase price is drawn. Optimal effort is continuous in
+the value gap between the two alternatives, so the combined value is smooth where that
+gap is positive. Where the gap is not positive, optimal effort is zero, and search alone
+leaves that side of the threshold unsmoothed. Conditional on receiving the option, the
+agent draws a realization and may reject it. In the retirement model the draw is an
+account factor $\phi$, and retirement wealth is $\phi$ times market resources. In the
+durable model the draw is the purchase price of the new stock. Rejecting a bad draw
+softens the extensive margin on the side of the threshold where effort is zero. The option
+value of the draw raises effort. Together, the two objects can match the smoothness of
+the Extreme Value shock.
 
-To illustrate the properties of search as a smoothing mechanism and to compare
-it to other modeling features that can also provide smoothness, we use a standard
-consumption-saving model in which the agent can also receive the `option' to make a
-binary retirement decision, depending on the search effort that they make. If the agent
-makes no search effort, they receive the option to retire with exogenous probability $p$
-and if they make the maximum effort, they receive the option to retire with certainty.
-Effort, however, is costly and the cost function is assumed to be a convex function of
-effort. In addition, households receive information about their exact retirement wealth account
-only after searching and are presented different values depending on their bank. Afterwards, they
-can either reject or accept the offer. Furthermore, households receive taste shocks that affect the relative value they
-derive from working and are also exposed to income uncertainty.
+% Shared information set. The remaining difference is the date of the benefit
+% (todo A.7). The equations are in DurableModelBasic.tex, which looks back
+% at this section's retirement lag. Combined figures are still price-first.
+The common object in the two applications is effort in $[0,1]$, a convex utility cost, and
+a success probability equal to effort. In both, the household knows the distribution of the
+draw, chooses effort before the realization, and may reject the draw if search succeeds.
+The remaining difference is the date of the benefit. Retirement effort chosen at the end of
+period $t$ is the probability that an option arrives at $t+1$, so $\beta$ enters the effort
+rule and effort is irrelevant at the terminal date. Durable effort is the probability of a
+match in the same period. The match draws a purchase price, and the household accepts
+or keeps the current stock. The probability of buying is effort times the probability that
+the draw is acceptable. Both rules are continuous in a value gap and flat where the gap
+is not positive, so either date delivers that smoothness. The probabilities remain
+different objects. The probability of retiring is next period's arrival times the probability
+that claiming is selected. The adjustment probability in Section~\ref{sec:DurableModelBasic}
+is this period's effort times the acceptance probability, and the steady-state comparison
+disciplines that object. A search duration is the expected wait until an option arrives in
+the retirement model, and the probability of a match this period in the durable model.
 
-All five of the aforementioned modeling features, i.e.\ search, exogenous switching
-probability, price dispersion, taste shocks, and income shocks, serve to smooth out the decision rule in
-the DC model with varying degrees of effectiveness. While search provides the highest
-degree of smoothness, in terms of reducing the size of the discontinuities in the decision
-rule, it has to be combined with either price dispersion or taste shocks to yield uniform smoothness around the
-discontinuities. Moreover, each of the smoothing mechanisms have different economic
-interpretations and affect the decision rules differently. While greater smoothness from
-search and exogenous switching probability shifts the consumption function upwards,
-greater smoothness from taste shocks and income shocks shifts the consumption function
-downwards. %For price dispersion?
+% Previous retirement illustration:
+% To illustrate the properties of search as a smoothing mechanism and to compare
+% it to other modeling features that can also provide smoothness, we use a standard
+% consumption-saving model in which the agent can also receive the `option' to make a
+% binary retirement decision, depending on the search effort that they make. If the agent
+% makes no search effort, they receive the option to retire with exogenous probability $p$
+% and if they make the maximum effort, they receive the option to retire with certainty.
+% Effort, however, is costly and the cost function is assumed to be a convex function of
+% effort. In addition, households receive information about their exact retirement wealth account
+% only after searching and are presented different values depending on their bank. Afterwards, they
+% can either reject or accept the offer. Furthermore, households receive taste shocks that affect the relative value they
+% derive from working and are also exposed to income uncertainty.
+Section~\ref{sec:RetirementModel} illustrates the mechanism in a consumption-saving
+model with a work-versus-retire choice, in the style of \citet{Iskhakov2017-jb}. The
+comparison is Extreme Value Type~I taste shocks against search combined with the
+account factor. The section shows how those objects smooth the consumption function.
+It is not the paper's quantitative result.
 
-Separately, we show that a coarse income-shock discretization introduces
-\emph{phantom kinks}---spurious numerical non-monotonicities that should not be
-confused with the economic discontinuities from discrete retirement---and that
-integrating the continuous income density with a transition-matrix method removes
-those artifacts at moderate computational cost (Section~\ref{sec:incdisc}). %Re-do since message is not clear
+% Previous ranking of five smoothers. Deleted: income shocks and the exogenous
+% option probability are not part of the comparison, and the period-t shifts in the
+% consumption function are not the result (see A.6, next to the durable figures).
+% All five of the aforementioned modeling features, i.e.\ search, exogenous switching
+% probability, price dispersion, taste shocks, and income shocks, serve to smooth out the decision rule in
+% the DC model with varying degrees of effectiveness. While search provides the highest
+% degree of smoothness, in terms of reducing the size of the discontinuities in the decision
+% rule, it has to be combined with either price dispersion or taste shocks to yield uniform smoothness around the
+% discontinuities. Moreover, each of the smoothing mechanisms have different economic
+% interpretations and affect the decision rules differently. While greater smoothness from
+% search and exogenous switching probability shifts the consumption function upwards,
+% greater smoothness from taste shocks and income shocks shifts the consumption function
+% downwards. %For price dispersion?
 
-In a second exercise, we show how the logic can be applied to a model of durable good adjustments similar to \cite{Carroll1997-oi, Berger2015-kp} and many others. Here, choices of buying a durable good are reversable as the agent can decide each period to buy or not to buy a new durable good. Additionally, the value of the car is continuous. Hence, the problem is a discrete-continuous choice problem.
-We show that the same level of smoothness can be created using endogeneous search and tasteshocks. Additionally, we show how stochastic prices of durable goods can introduce additional smootheness if necessary.
+% Previous phantom-kink paragraph. Deleted: not the paper's focus, and
+% Section~\ref{sec:incdisc} is not in the current draft.
+% Separately, we show that a coarse income-shock discretization introduces
+% \emph{phantom kinks}---spurious numerical non-monotonicities that should not be
+% confused with the economic discontinuities from discrete retirement---and that
+% integrating the continuous income density with a transition-matrix method removes
+% those artifacts at moderate computational cost (Section~\ref{sec:incdisc}). %Re-do since message is not clear
 
+% Previous durable paragraph:
+% In a second exercise, we show how the logic can be applied to a model of durable good adjustments similar to \cite{Carroll1997-oi, Berger2015-kp} and many others. Here, choices of buying a durable good are reversable as the agent can decide each period to buy or not to buy a new durable good. Additionally, the value of the car is continuous. Hence, the problem is a discrete-continuous choice problem.
+% We show that the same level of smoothness can be created using endogeneous search and tasteshocks. Additionally, we show how stochastic prices of durable goods can introduce additional smootheness if necessary.
+Section~\ref{sec:DurableModelBasic} applies the same pair to a keep-versus-adjust
+model of durables in the $(S,s)$ tradition of \citet{Carroll1997-oi} and
+\citet{Berger2015-kp}. The durable stock is continuous, so the problem is a genuine
+discrete-continuous choice. Extreme Value taste shocks, price dispersion, and search
+all smooth the $(S,s)$ band. In steady state their effects on the adjustment
+probability have opposite signs, and that opposition is the result. A larger taste
+scale raises the adjustment probability, and durables and assets fall. Wider price
+dispersion also raises the adjustment probability, because better draws are accepted;
+durables rise and assets fall. A higher search cost lowers the adjustment probability;
+durables fall and assets rise. Search and price dispersion can therefore be
+disciplined separately, and the model can be asked to match impulse responses of
+consumption and of the adjustment probability. That matching exercise is in
+progress. Section~\ref{sec:DurableModel} records what a fuller quantitative model
+still requires.
 
-Endogeneous search has multiple advantages over tasteshocks. First, it effects only agents close to the S,s thresholds which keeps the economic intuition of the Euler equation. In contrast, tasteshocks can influence households even far away from that threshold. In an estimated model, \cite{McKay2021} show that three quarters of adjusters do so because of the exogeneous taste (or in their words \textit{match quality shocks}). While this could be true, it limits the economic interpretation through the Euler equation, while for search the same adjuster share can be estimated. 
-Second, the size of search frictions can be microfounded using data on duration of search. The size of tasteshocks can be either estimated to match the share of durable adjustments of agents far from the S,s threshold as in \cite{McKay2021} or to match iMPCs as in \cite{Beraja2024-ua}. Both approaches result in a parameter which is hard to interpret it's size. In contrast, the endogeneous search friction leads households to engage in a search intensity within the zero one interval. Therefore, for a given set of state variables, if households optimally have an intensity of 0.5 and hence a 50 percentage chance of finding the right car per period, we would assume it takes them on average two periods to find a car. This hypothesis is directly measurable and observable using microdata.
-Third, models which use permanent and transitory income shocks as advocated by Milton Friedman in his Permanent-Income-Hypothesis, can be expressed as normalized by permanent inome as done in \cite{Carroll1992-bh} and many  papers following this approach. In case of search costs can be assumed to scale by permanent income; eg the cost of searching is time spent searcing which is related to the persoal wage rate. For tasteshocks, they are usually assumed to be the same for each household independent of income or wealth. Hence, models with tasteshocks can not be expressed as shares of permanent income and therefore have to carry over another state variable.
+% Previous microfoundations. The third advantage is rewritten so the cost matches
+% the model: a utility cost that can scale with permanent income, not time taken
+% out of the budget.
+% Endogeneous search has multiple advantages over tasteshocks. First, it effects only agents close to the S,s thresholds which keeps the economic intuition of the Euler equation. In contrast, tasteshocks can influence households even far away from that threshold. In an estimated model, \cite{McKay2021} show that three quarters of adjusters do so because of the exogeneous taste (or in their words \textit{match quality shocks}). While this could be true, it limits the economic interpretation through the Euler equation, while for search the same adjuster share can be estimated. 
+% Second, the size of search frictions can be microfounded using data on duration of search. The size of tasteshocks can be either estimated to match the share of durable adjustments of agents far from the S,s threshold as in \cite{McKay2021} or to match iMPCs as in \cite{Beraja2024-ua}. Both approaches result in a parameter which is hard to interpret it's size. In contrast, the endogeneous search friction leads households to engage in a search intensity within the zero one interval. Therefore, for a given set of state variables, if households optimally have an intensity of 0.5 and hence a 50 percentage chance of finding the right car per period, we would assume it takes them on average two periods to find a car. This hypothesis is directly measurable and observable using microdata.
+% Third, models which use permanent and transitory income shocks as advocated by Milton Friedman in his Permanent-Income-Hypothesis, can be expressed as normalized by permanent inome as done in \cite{Carroll1992-bh} and many  papers following this approach. In case of search costs can be assumed to scale by permanent income; eg the cost of searching is time spent searcing which is related to the persoal wage rate. For tasteshocks, they are usually assumed to be the same for each household independent of income or wealth. Hence, models with tasteshocks can not be expressed as shares of permanent income and therefore have to carry over another state variable.
+Search has three advantages over an Extreme Value taste shock. First, it acts near
+the $(S,s)$ thresholds, so the Euler equation still describes agents far from
+indifference. Taste shocks put probability on the dominated branch at every state.
+\citet{McKay2021-ib} find that three quarters of adjusters in an estimated model move
+because of match-quality shocks. Search can be asked to match the same adjustment
+share while leaving agents far from the band on their Euler equation. Second, search
+intensity maps into an expected duration, which is observable. Where that intensity is
+the probability an option arrives next period, a value of one half is an expected wait of
+two periods. The scale of an Extreme Value shock has no such reading. It is typically chosen to match the adjustment share of agents far from
+the band, as in \citet{McKay2021-ib}, or to match intertemporal marginal propensities
+to consume, as in \citet{Beraja2024-ua}. Third, a model with permanent and transitory
+income can be normalized by permanent income \citep{Carroll1992-bh}. The search
+cost in this paper is a utility cost. Specified so that it scales with permanent income,
+it adds no state to the normalized problem. An Extreme Value shock of the same scale
+for every household does not scale in that way, and permanent income remains a state
+variable.
 
-The rest of the paper introduces the optimal retirement problem in section~\ref{sec:RetirementModel}, followed by the durable model in section~\ref{sec:DurableModel}, and concluded by a brief discussion in section~\ref{sec:Conclusion}.
+% Previous roadmap:
+% The rest of the paper introduces the optimal retirement problem in section~\ref{sec:RetirementModel}, followed by the durable model in section~\ref{sec:DurableModel}, and concluded by a brief discussion in section~\ref{sec:Conclusion}.
+The rest of the paper proceeds as follows. Section~\ref{sec:RetirementModel}
+presents the retirement illustration. Section~\ref{sec:DurableModelBasic} compares
+taste shocks, search, and price dispersion in the basic durable model.
+Section~\ref{sec:DurableModel} states what the quantitative model still requires.
+Section~\ref{sec:Conclusion} concludes.

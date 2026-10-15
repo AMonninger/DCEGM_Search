@@ -16,7 +16,10 @@ Port of the one-period notebook suite into a self-contained class API:
 
 Channels (turn off with zeros):
   - Directed search: SearchCost (mutually exclusive with EV taste);
-    search_method="closed" (default, conjugate ε*) or "grid" (101-point argmax)
+    search_method="closed" (default, conjugate ε*) or "grid" (101-point argmax).
+    With more than one price, price_timing="search_first" (default) chooses
+    effort before the draw and then accepts or rejects. "price_first" is the
+    older nesting, effort conditional on the realized price.
   - EV Type I taste shocks: sigma_eps (closed-form logit / log-sum; no xi grid).
     kappa is an optional utility cost of adjusting; kappa=0 keeps the symmetric logit.
   - Stochastic prices: PriceShkStd
@@ -31,7 +34,7 @@ import os
 import sys
 
 import numpy as np
-import scipy.sparse as sps
+import scipy as sp
 import matplotlib.pyplot as plt
 from numba import njit, prange
 
@@ -56,7 +59,7 @@ from HARK.ConsumptionSaving.ConsIndShockModel import utility, utility_inv, utili
 from HARK.dcegm import calc_nondecreasing_segments, calc_cross_points
 from HARK.distribution import MeanOneLogNormal
 from HARK.utilities import make_grid_exp_mult
-from HARK.core import MetricObject
+from HARK.core import MetricObject, NullFunc
 
 from utility import (
     construct_grid,
@@ -68,10 +71,12 @@ from utility import (
     compute_cost_matrix,
     directed_search_function_scaled_matrix,
     directed_search_function_closed_form,
+    search_first_policies,
     FUES_allPol,
     jump_to_grid_dur,
-    gen_tran_matrix_dur_sparse,
+    gen_tran_matrix_dur_lottery,
     compute_erg_dstn_sparse,
+    compute_erg_dstn_iterative,
     J_from_F,
 )
 
@@ -752,20 +757,26 @@ def combine_search_price(
     cKeep, dKeep, aKeep, inv_vKeep, vPKeep, vPDKeep,
     nGrid, mGrid, SearchCost_func_, e_grid_, CRRA_,
     search_method="closed",
+    price_timing="search_first",
 ):
     """
-    Nested combine over price nodes with directed search (Combined notebook):
-      v = max_eps[(1-eps) vKeep + eps * vAdj(p) - sigma(eps)],
-    then integrate with mu_p.
+    Nested combine over price nodes with directed search.
 
-    ``search_method`` is ``"closed"`` (conjugate ε* = max{0, 1-exp(-Δ/S)}) or
-    ``"grid"`` (argmax over ``e_grid_``, the original 101-point kernel).
+    ``price_timing="search_first"`` and more than one price: one effort from
+    the expected gain of the price distribution, then a hard accept or reject
+    of the realized price. ``"price_first"`` chooses effort at each realized
+    price and then averages. One price node uses that same closed form.
 
-    Shutoffs: PriceShkStd=0, SearchCost=0 (hard max via zero costs).
+    ``search_method="grid"`` is the 101-point argmax and is only available
+    for price-first. Returns c, d, a, v, vP, vPD, P(adjust), effort, accept.
+    Effort and accept are None on the price-first path. P(adjust) is eps*pi
+    under search-first and the price-weighted effort under price-first.
     Adjuster arrays: (n_price, n_n, n_m). Keeper: (n_n, n_m).
     """
     if search_method not in ("grid", "closed"):
         raise ValueError("search_method must be 'grid' or 'closed'.")
+    if price_timing not in ("search_first", "price_first"):
+        raise ValueError("price_timing must be 'search_first' or 'price_first'.")
 
     n_price = cAdj.shape[0]
     keep_shape = cKeep.shape
@@ -783,6 +794,18 @@ def combine_search_price(
         else None
     )
     mNrmGridMin = np.zeros(1)
+
+    if price_timing == "search_first" and n_price > 1:
+        if search_method != "closed":
+            raise NotImplementedError(
+                "search_first is only implemented for search_method='closed'."
+            )
+        return search_first_policies(
+            nGrid, mGrid, mNrmGridMin, search_cost_matrix, price_weights,
+            vAdj_level, vKeep_level,
+            cAdj, cKeep, dAdj, dKeep, aAdj, aKeep,
+            vPAdj, vPKeep, vPDAdj, vPDKeep,
+        )
 
     barC = np.zeros(keep_shape)
     barD = np.zeros(keep_shape)
@@ -868,7 +891,7 @@ def combine_search_price(
         barVPD += w * vPD_ij
         barEps += w * eps_ij
 
-    return barC, barD, barA, barV, barVP, barVPD, barEps
+    return barC, barD, barA, barV, barVP, barVPD, barEps, None, None
 
 
 class DurableConsumerSolution(MetricObject):
@@ -889,10 +912,19 @@ class DurableConsumerSolution(MetricObject):
         inv_vPFunc=None,
         inv_vPDFunc=None,
         adjusting=None,
+        searcheffort=None,
+        accept_list=None,
         cFuncKeep=None,
         dFuncKeep=None,
+        aFuncKeep=None,
         cFuncAdj=None,
         dFuncAdj=None,
+        aFuncAdj=None,
+        cFuncAdj2D_list=None,
+        dFuncAdj2D_list=None,
+        aFuncAdj2D_list=None,
+        PriceShkVals=None,
+        PriceShkWeights=None,
         cFuncAdj_1d=None,
         dFuncAdj_1d=None,
         cFuncAdj_1d_list=None,
@@ -943,10 +975,19 @@ class DurableConsumerSolution(MetricObject):
         self.inv_vPFunc = inv_vPFunc
         self.inv_vPDFunc = inv_vPDFunc
         self.adjusting = adjusting
+        self.searcheffort = searcheffort
+        self.accept_list = accept_list
         self.cFuncKeep = cFuncKeep
         self.dFuncKeep = dFuncKeep
+        self.aFuncKeep = aFuncKeep
         self.cFuncAdj = cFuncAdj
         self.dFuncAdj = dFuncAdj
+        self.aFuncAdj = aFuncAdj
+        self.cFuncAdj2D_list = cFuncAdj2D_list
+        self.dFuncAdj2D_list = dFuncAdj2D_list
+        self.aFuncAdj2D_list = aFuncAdj2D_list
+        self.PriceShkVals = PriceShkVals
+        self.PriceShkWeights = PriceShkWeights
         # 1-D adjuster policies in liquidity ℓ (representative price ≈ 1)
         self.cFuncAdj_1d = cFuncAdj_1d
         self.dFuncAdj_1d = dFuncAdj_1d
@@ -1030,6 +1071,9 @@ durable_defaults = dict(
     ScaleBool=False,
     e_grid_count=101,
     search_method="closed",  # "closed" conjugate ε*; "grid" 101-point argmax
+    # With PriceShkStd > 0 and SearchCost > 0: effort before the draw, then
+    # accept or reject. "price_first" is effort conditional on the realized price.
+    price_timing="search_first",
     PriceShkCount=5,
     PriceShkStd=0.1,
     # EoP method
@@ -1092,7 +1136,8 @@ class DurableConsumer:
     Discrete-choice smoothers (mutually exclusive):
       - Directed search when ``SearchCost > 0`` (Combined / Search notebooks).
         ``search_method="closed"`` uses the conjugate ε*; ``"grid"`` keeps the
-        original 101-point argmax over ``e_grid``.
+        original 101-point argmax over ``e_grid``. With more than one price,
+        ``price_timing="search_first"`` chooses effort before the draw.
       - EV Type I taste shocks when ``SearchCost == 0``. ``sigma_eps`` is the
         scale (0 is a hard max). ``kappa`` is a utility cost subtracted from
         the adjuster value before the log-sum; ``kappa=0`` is the symmetric logit.
@@ -1163,6 +1208,8 @@ class DurableConsumer:
             )
         if self.search_method not in ("grid", "closed"):
             raise ValueError("search_method must be 'grid' or 'closed'.")
+        if self.price_timing not in ("search_first", "price_first"):
+            raise ValueError("price_timing must be 'search_first' or 'price_first'.")
 
         self.solution = None
         self.solution_terminal = None
@@ -1406,12 +1453,23 @@ class DurableConsumer:
                 else ""
             )
             + (
-                f" (S={self.SearchCost}, search_method={self.search_method})"
+                f" (S={self.SearchCost}, search_method={self.search_method}, price_timing={self.price_timing})"
                 if self.SearchCost > 0
                 else ""
             )
             + f"; price: {'ON' if self.PriceShkStd > 0 else 'OFF'} (nPrice={self.nPrice})"
         )
+
+    def _search_solution_fields(self, effort_arr, accept_arr, n_grid, m_grid):
+        """Interpolants of search-first effort and per-price acceptance. None otherwise."""
+        if effort_arr is None:
+            return None, None
+        grids = [n_grid, m_grid]
+        effort = LinearFast(np.asarray(effort_arr, dtype=float), grids)
+        accept_list = [
+            LinearFast(np.asarray(acc_k, dtype=float), grids) for acc_k in accept_arr
+        ]
+        return effort, accept_list
 
     def _combine(
         self,
@@ -1433,14 +1491,16 @@ class DurableConsumer:
                 cKeep, dKeep, aKeep, inv_vKeep, vPKeep, vPDKeep,
                 nGrid, mGrid, self.SearchCost_func, self.e_grid, self.CRRA,
                 search_method=self.search_method,
+                price_timing=self.price_timing,
             )
-        return combine_ev_taste_price(
+        c, d, a, v, vP, vPD, adj = combine_ev_taste_price(
             self.PriceShkVals, self.PriceShkWeights,
             cAdj, dAdj, aAdj, inv_vAdj, vPAdj, vPDAdj,
             cKeep, dKeep, aKeep, inv_vKeep, vPKeep, vPDKeep,
             self.sigma_eps, self.CRRA,
             kappa=self.kappa,
         )
+        return c, d, a, v, vP, vPD, adj, None, None
 
     # ----------------------------------------------------------- terminal
     def solve_terminal(self):
@@ -1506,6 +1566,7 @@ class DurableConsumer:
         (
             cFunc_T_arr, dFunc_T_arr, aFunc_T_arr,
             barV_T_arr, vPFunc_T_arr, vPDFunc_T_arr, adjusting_T_arr,
+            effort_T_arr, accept_T_arr,
         ) = self._combine(
             cFuncAdj_SOL_T, dFuncAdj_SOL_T, aFuncAdj_SOL_T,
             inv_vFuncAdj_SOL_T, vPFuncAdj_SOL_T, vPDFuncAdj_SOL_T,
@@ -1524,9 +1585,17 @@ class DurableConsumer:
         inv_vPFunc_T = LinearFast(utilityP_inv(vPFunc_T_arr, CRRA), [nNrmGrid_T, mNrmGrid_T])
         inv_vPDFunc_T = LinearFast(utilityP_inv(vPDFunc_T_arr, CRRA), [nNrmGrid_T, mNrmGrid_T])
         adjusting_T = LinearFast(adjusting_T_arr, [nNrmGrid_T, mNrmGrid_T])
+        searcheffort_T, accept_list_T = self._search_solution_fields(
+            effort_T_arr, accept_T_arr, nNrmGrid_T, mNrmGrid_T,
+        )
         aFunc_T = LinearFast(aFunc_T_arr, [nNrmGrid_T, mNrmGrid_T])
 
         i_p0 = int(np.argmin(np.abs(PriceShkVals - 1.0)))
+        aFuncKeep_T = LinearFast(aFuncKeep_T_arr, [nNrmGrid_T, mNrmGrid_T])
+        grids_T = [nNrmGrid_T, mNrmGrid_T]
+        cFuncAdj2D_list_T = [LinearFast(cFuncAdj_SOL_T[i_p], grids_T) for i_p in range(nPrice)]
+        dFuncAdj2D_list_T = [LinearFast(dFuncAdj_SOL_T[i_p], grids_T) for i_p in range(nPrice)]
+        aFuncAdj2D_list_T = [LinearFast(aFuncAdj_SOL_T[i_p], grids_T) for i_p in range(nPrice)]
         # 1-D adjuster in liquidity (analytical terminal)
         c_1d = alpha * self.xNrmGrid
         d_1d = (1.0 - alpha) * self.xNrmGrid / PriceShkVals[i_p0]
@@ -1559,10 +1628,19 @@ class DurableConsumer:
             inv_vPFunc=inv_vPFunc_T,
             inv_vPDFunc=inv_vPDFunc_T,
             adjusting=adjusting_T,
+            searcheffort=searcheffort_T,
+            accept_list=accept_list_T,
             cFuncKeep=cFuncKeep_T,
             dFuncKeep=dFuncKeep_T,
+            aFuncKeep=aFuncKeep_T,
             cFuncAdj=cFuncAdj_NM_T if nPrice == 1 else LinearFast(cFuncAdj_SOL_T[i_p0], [nNrmGrid_T, mNrmGrid_T]),
             dFuncAdj=dFuncAdj_NM_T if nPrice == 1 else LinearFast(dFuncAdj_SOL_T[i_p0], [nNrmGrid_T, mNrmGrid_T]),
+            aFuncAdj=aFuncAdj2D_list_T[i_p0],
+            cFuncAdj2D_list=cFuncAdj2D_list_T,
+            dFuncAdj2D_list=dFuncAdj2D_list_T,
+            aFuncAdj2D_list=aFuncAdj2D_list_T,
+            PriceShkVals=PriceShkVals,
+            PriceShkWeights=self.PriceShkWeights,
             cFuncAdj_1d=LinearFast(c_1d, [self.xNrmGrid]),
             dFuncAdj_1d=LinearFast(d_1d, [self.xNrmGrid]),
             cFuncAdj_1d_list=c_1d_list,
@@ -1575,7 +1653,7 @@ class DurableConsumer:
             nNrmGrid=nNrmGrid_T,
             mNrmGrid=mNrmGrid_T,
         )
-        self._log("Terminal combined. Mean E[eps*]:", float(adjusting_T_arr.mean()))
+        self._log("Terminal combined. Mean P(adjust):", float(adjusting_T_arr.mean()))
         return sol
 
     # --------------------------------------------------------------- EoP
@@ -2115,6 +2193,7 @@ class DurableConsumer:
         (
             cFunc_arr, dFunc_arr, aFunc_arr,
             barV_arr, vPFunc_arr, vPDFunc_arr, adjusting_arr,
+            effort_arr, accept_arr,
         ) = self._combine(
             adj["cFuncAdj_NM_arr"], adj["dFuncAdj_NM_arr"], adj["aFuncAdj_NM_arr"],
             adj["inv_vFuncAdj_NM_arr"], adj["vPFuncAdj_NM_arr"], adj["vPDFuncAdj_NM_arr"],
@@ -2136,14 +2215,27 @@ class DurableConsumer:
             utilityP_inv(vPDFunc_arr, self.CRRA), [self.nNrmGrid, self.mNrmGrid]
         )
         adjusting = LinearFast(adjusting_arr, [self.nNrmGrid, self.mNrmGrid])
+        searcheffort, accept_list = self._search_solution_fields(
+            effort_arr, accept_arr, self.nNrmGrid, self.mNrmGrid,
+        )
 
         # Diagnostic
         if getattr(self, "diagnostics", False):
             print("min and max inv_vPFunc: ", np.min(vPFunc_arr), np.max(vPFunc_arr))
             print("min and max inv_vPDFunc: ", np.min(vPDFunc_arr), np.max(vPDFunc_arr))
             print("Average adjuster probability: ", float(adjusting_arr.mean()))
-        self._log("Period combined. Mean E[eps*]:", float(adjusting_arr.mean()))
+        self._log("Period combined. Mean P(adjust):", float(adjusting_arr.mean()))
         i_p0 = int(np.argmin(np.abs(self.PriceShkVals - 1.0)))
+        grids_nm = [self.nNrmGrid, self.mNrmGrid]
+        cFuncAdj2D_list = [
+            LinearFast(adj["cFuncAdj_NM_arr"][i_p], grids_nm) for i_p in range(self.nPrice)
+        ]
+        dFuncAdj2D_list = [
+            LinearFast(adj["dFuncAdj_NM_arr"][i_p], grids_nm) for i_p in range(self.nPrice)
+        ]
+        aFuncAdj2D_list = [
+            LinearFast(adj["aFuncAdj_NM_arr"][i_p], grids_nm) for i_p in range(self.nPrice)
+        ]
         return DurableConsumerSolution(
             cFunc=cFunc,
             dFunc=dFunc,
@@ -2155,10 +2247,19 @@ class DurableConsumer:
             inv_vPFunc=inv_vPFunc,
             inv_vPDFunc=inv_vPDFunc,
             adjusting=adjusting,
+            searcheffort=searcheffort,
+            accept_list=accept_list,
             cFuncKeep=keep["cFuncKeep"],
             dFuncKeep=keep["dFuncKeep"],
+            aFuncKeep=keep["aFuncKeep"],
             cFuncAdj=adj["cFuncAdj"],
             dFuncAdj=adj["dFuncAdj"],
+            aFuncAdj=aFuncAdj2D_list[i_p0],
+            cFuncAdj2D_list=cFuncAdj2D_list,
+            dFuncAdj2D_list=dFuncAdj2D_list,
+            aFuncAdj2D_list=aFuncAdj2D_list,
+            PriceShkVals=self.PriceShkVals,
+            PriceShkWeights=self.PriceShkWeights,
             cFuncAdj_1d=adj["cFuncAdj_list"][i_p0],
             dFuncAdj_1d=adj["dFuncAdj_list"][i_p0],
             cFuncAdj_1d_list=adj["cFuncAdj_list"],
@@ -2447,55 +2548,331 @@ class DurableConsumer:
         else:
             self.dist_nGrid = dist_nGrid
 
+    def _adjuster_policies_single(self, sol, n, m):
+        '''
+        Pure adjuster policies (c, d, a) on (n, m) with a single price node.
+        '''
+        xNrm = m + (1 - self.tau_func(m + n)) * n
+        # cFuncAdj / dFuncAdj are on (n, m) in this solver, including alpha < 1.
+        cNrm = sol.cFuncAdj(n, m)
+        dNrm = sol.dFuncAdj(n, m)
+        if not isinstance(sol.aFuncAdj, NullFunc):
+            aNrm = sol.aFuncAdj(n, m)
+        else:
+            aNrm = xNrm - cNrm - dNrm
+        return cNrm, dNrm, aNrm
+
+    @staticmethod
+    def _keeper_policies(sol, n, m):
+        '''
+        Pure keeper policies (c, d, a) on (n, m): the durable stock is kept, d = n.
+        '''
+        cNrm = sol.cFuncKeep(n, m)
+        if not isinstance(sol.aFuncKeep, NullFunc):
+            aNrm = sol.aFuncKeep(n, m)
+        else:
+            aNrm = m - cNrm
+        return cNrm, np.copy(n), aNrm
+
+    def get_controls(self):
+        """
+        Keep/adjust lottery for each agent, then the pure policies of the realised branch.
+        Procedure B (search first, several price nodes): match with probability searcheffort,
+        draw the price node k with PriceShkWeights, accept with probability accept_list[k],
+        and use the pure adjuster at node k (c/d/aFuncAdj2D_list[k]); everybody else keeps.
+        Single price node: adjust with probability adjusting (cFuncAdj, dFuncAdj, aFuncAdj).
+        Price first with several price nodes: total policies cFunc, dFunc and adjust with
+        probability adjusting.
+        Sets controls cNrm, dNrm and states aNrm, searcheffort, adjusting, PriceIdx.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        cNrmNow = np.zeros(self.AgentCount) + np.nan
+        dNrmNow = np.zeros(self.AgentCount) + np.nan
+        aNrmNow = np.zeros(self.AgentCount) + np.nan
+        searcheffort = np.zeros(self.AgentCount)
+        adjusting = np.zeros(self.AgentCount, dtype=int)
+        PriceIdx = np.zeros(self.AgentCount, dtype=int)
+        u_match, u_price, u_accept = self.RNG.random((3, self.AgentCount))
+
+        for t in range(self.T_cycle):
+            these = t == self.t_cycle
+            if not np.any(these):
+                continue
+            sol = self.solution[t]
+            n = self.state_now['nNrm'][these]
+            m = self.state_now['mNrm'][these]
+            cNrm, dNrm, aNrm = self._keeper_policies(sol, n, m)
+
+            if getattr(sol, "accept_list", None) is not None:
+                nK = len(sol.PriceShkWeights)
+                eps = np.clip(sol.searcheffort(n, m), 0, 1)
+                idx = np.minimum(np.searchsorted(np.cumsum(sol.PriceShkWeights), u_price[these], side="right"), nK - 1)
+                acc = np.array([np.clip(acc_k(n, m), 0, 1) for acc_k in sol.accept_list])
+                adj = (u_match[these] < eps) & (u_accept[these] < acc[idx, np.arange(len(n))])
+                for k in range(nK):
+                    sel = adj & (idx == k)
+                    cNrm[sel] = sol.cFuncAdj2D_list[k](n[sel], m[sel])
+                    dNrm[sel] = sol.dFuncAdj2D_list[k](n[sel], m[sel])
+                    aNrm[sel] = sol.aFuncAdj2D_list[k](n[sel], m[sel])
+                PriceIdx[these] = idx
+            elif len(getattr(sol, "PriceShkWeights", [1.0])) == 1:
+                eps = np.clip(sol.adjusting(n, m), 0, 1)
+                adj = u_match[these] < eps
+                cNrm[adj], dNrm[adj], aNrm[adj] = self._adjuster_policies_single(sol, n[adj], m[adj])
+            else:
+                eps = np.clip(sol.adjusting(n, m), 0, 1)
+                adj = u_match[these] < eps
+                cNrm = sol.cFunc(n, m)
+                dNrm = sol.dFunc(n, m)
+                aNrm[adj] = self._adjuster_policies_single(sol, n[adj], m[adj])[2]
+
+            cNrmNow[these] = cNrm
+            dNrmNow[these] = dNrm
+            aNrmNow[these] = aNrm
+            searcheffort[these] = eps
+            adjusting[these] = adj
+
+        self.controls['cNrm'] = cNrmNow
+        self.controls['dNrm'] = dNrmNow
+        self.state_now['aNrm'] = aNrmNow
+        self.state_now['searcheffort'] = searcheffort
+        self.state_now['adjusting'] = adjusting
+        self.state_now['PriceIdx'] = PriceIdx
+        return None
+
+    def get_poststates(self):
+        """
+        Calculates levels of end-of-period assets and durable stock (aNrm is set in get_controls).
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        # Useful in some cases to precalculate asset level
+        self.state_now['aLvl'] = self.state_now['aNrm'] * self.state_now['pLvl']
+
+        # Add durable stocks normalized and in levels
+        self.state_now['dNrm'] = self.controls['dNrm'] #Durable consumption this period is equal to the stock next period
+        self.state_now['dLvl'] = self.state_now['dNrm'] * self.state_now['pLvl']
+        self.state_now['nLvl'] = self.state_now['nNrm'] * self.state_now['pLvl']
+        self.state_now['mLvl'] = self.state_now['mNrm'] * self.state_now['pLvl']
+        # moves now to prev
+        # super().get_poststates() # If this is true, then calculates poststates based on ConsIndShockModel
+
+        return None
+
+    def _branch_policy_grids(self, sol, dist_nGrid, dist_mGrid):
+        '''
+        Keep/adjust lottery on the distribution grid, the same lottery as get_controls:
+        list of (weight, aPol, dPol, cPol, adjPol) per branch, weights sum to one in every cell.
+        Procedure B: keeper with weight 1 - eps* sum_k w_k acc_k, pure adjuster at node k with
+        weight eps* w_k acc_k. Single price node: keeper 1 - adjusting, adjuster adjusting.
+        None for price_first with several price nodes.
+        '''
+        if getattr(sol, "accept_list", None) is None and len(getattr(sol, "PriceShkWeights", [1.0])) > 1:
+            return None
+        shape = (len(dist_nGrid), len(dist_mGrid))
+        n = np.repeat(dist_nGrid[:, None], len(dist_mGrid), axis=1).ravel()
+        m = np.repeat(dist_mGrid[None, :], len(dist_nGrid), axis=0).ravel()
+
+        if getattr(sol, "accept_list", None) is not None:
+            eps = np.clip(sol.searcheffort(n, m), 0, 1)
+            w_adj = [eps * w_k * np.clip(acc_k(n, m), 0, 1)
+                     for w_k, acc_k in zip(sol.PriceShkWeights, sol.accept_list)]
+            pol_adj = [(cF(n, m), dF(n, m), aF(n, m)) for cF, dF, aF in
+                       zip(sol.cFuncAdj2D_list, sol.dFuncAdj2D_list, sol.aFuncAdj2D_list)]
+        else:
+            w_adj = [np.clip(sol.adjusting(n, m), 0, 1)]
+            pol_adj = [self._adjuster_policies_single(sol, n, m)]
+        w_keep = 1.0 - np.sum(w_adj, axis=0)
+
+        branches = []
+        for w_b, (c_b, d_b, a_b), adj_b in ([(w_keep, self._keeper_policies(sol, n, m), 0.0)]
+                                            + [(w_k, pol_k, 1.0) for w_k, pol_k in zip(w_adj, pol_adj)]):
+            branches.append((w_b.reshape(shape), a_b.reshape(shape), d_b.reshape(shape),
+                             c_b.reshape(shape), np.full(shape, adj_b)))
+        return branches
+
+    @staticmethod
+    def _mix_branch_lottery(branches, build_matrix):
+        '''
+        Lottery transition matrix sum_b T_b diag(w_b). Origin states are columns, so the
+        state-dependent branch weights scale the columns of T_b = build_matrix(aPol_b, dPol_b).
+        '''
+        TranMatrix = None
+        for w_b, a_b, d_b, c_b, adj_b in branches:
+            T_b = build_matrix(a_b, d_b) @ sp.sparse.diags(w_b.ravel())
+            TranMatrix = T_b if TranMatrix is None else TranMatrix + T_b
+        return sp.sparse.csr_matrix(TranMatrix)
+
+    @staticmethod
+    def _lottery_tran_matrix(branches, next_states, dist_nGrid, dist_mGrid,
+                             shk_prbs, perm_shks, tran_shks, LivPrb, NewBornDist):
+        '''
+        Same matrix as _mix_branch_lottery, built in one pass by gen_tran_matrix_dur_lottery.
+        next_states(aPol, dPol) returns (bNext, nNext_unshocked) and is applied to the stacked arrays.
+        '''
+        W = np.array([w_b for w_b, a_b, d_b, c_b, adj_b in branches])
+        A = np.array([a_b for w_b, a_b, d_b, c_b, adj_b in branches])
+        D = np.array([d_b for w_b, a_b, d_b, c_b, adj_b in branches])
+        bNext, nNext = next_states(A, D)
+        return gen_tran_matrix_dur_lottery(
+            dist_nGrid, dist_mGrid, bNext, nNext, W,
+            shk_prbs, perm_shks, tran_shks, LivPrb, NewBornDist,
+        )
+
+    def _next_states(self, aPol, dPol, R, Rs):
+        R_p = np.where(aPol < 0, R + Rs, R)
+        bNext = (R_p * aPol) - dPol * (self.OpCost + self.dDepr * self.MaintCost)
+        nNext = (1.0 - self.dDepr * (1.0 - self.MaintCost)) * dPol
+        return bNext, nNext
+
+    def _tran_matrix_lottery(self, branches, aPol, dPol, shk, R, Rs):
+        '''
+        Transition matrix on the histogram grid. Several branches are the keep/adjust lottery.
+        branches is None moves the single averaged policy with weight one.
+        Newborns stay at (nNrmInitMean, mNrmInitMean).
+        '''
+        dist_nGrid, dist_mGrid = self.dist_nGrid, self.dist_mGrid
+        tran = np.asarray(shk.atoms[1])
+        NewBornDist = jump_to_grid_dur(
+            np.ones_like(tran) * self.nNrmInitMean,
+            np.ones_like(tran) * self.mNrmInitMean,
+            shk.pmv, dist_nGrid, dist_mGrid,
+        )
+        if branches is None:
+            branches = [(np.ones(aPol.shape), aPol, dPol, None, None)]
+
+        def next_states(A, D):
+            return self._next_states(A, D, R, Rs)
+
+        return self._lottery_tran_matrix(
+            branches, next_states, dist_nGrid, dist_mGrid,
+            shk.pmv, shk.atoms[0], shk.atoms[1], self.LivPrb, NewBornDist,
+        )
+
+    @staticmethod
+    def _branch_average(branches):
+        '''
+        Lottery-weighted (cPol, dPol, aPol, adjPol) from _branch_policy_grids.
+        '''
+        cPol = sum(w_b * c_b for w_b, a_b, d_b, c_b, adj_b in branches)
+        dPol = sum(w_b * d_b for w_b, a_b, d_b, c_b, adj_b in branches)
+        aPol = sum(w_b * a_b for w_b, a_b, d_b, c_b, adj_b in branches)
+        adjPol = sum(w_b * adj_b for w_b, a_b, d_b, c_b, adj_b in branches)
+        return cPol, dPol, aPol, adjPol
+
+    def calc_price_moments_ss(self):
+        '''
+        Moments of offered and realized (accepted) durable purchase prices in the steady state.
+
+        Every household draws a price offer p_k with probability mu_k; it transacts with
+        probability adjusting_k(n, m). With the ergodic distribution D(n, m):
+            transaction mass at p_k:  M_k = mu_k * sum D * adjusting_k
+            purchase volume at p_k:   Q_k = mu_k * sum D * adjusting_k * d_k
+        Realized moments weight p_k by M_k (per transaction) or Q_k (per unit of durable).
+        Procedure B: adjusting_k = searcheffort * accept_list[k], d_k = dFuncAdj2D_list[k].
+        Single price node: adjusting_k = adjusting, d_k = adjuster durable stock.
+        Requires calc_transition_matrix_dur and calc_ergodic_dist to have been run.
+
+        Returns
+        -------
+        dict, also stored as self.price_moments_ss
+        '''
+        sol = self.solution[0]
+        dist = self.erg_dstn
+        dist_nGrid, dist_mGrid = self.dist_nGrid, self.dist_mGrid
+        N = np.repeat(dist_nGrid[:, None], len(dist_mGrid), axis=1).ravel()
+        M = np.repeat(dist_mGrid[None, :], len(dist_nGrid), axis=0).ravel()
+
+        if getattr(sol, "accept_list", None) is not None:
+            price_vals, price_wgts = sol.PriceShkVals, sol.PriceShkWeights
+            eps = np.clip(sol.searcheffort(N, M), 0.0, 1.0)
+            adj_vals = [eps * np.clip(acc_k(N, M), 0.0, 1.0) for acc_k in sol.accept_list]
+            d_vals = [dF(N, M) for dF in sol.dFuncAdj2D_list]
+        elif getattr(sol, "adjusting_list", None) is None:
+            price_vals, price_wgts = np.array([1.0]), np.array([1.0])
+            adj_vals = [np.clip(sol.adjusting(N, M), 0.0, 1.0)]
+            d_vals = [self._adjuster_policies_single(sol, N, M)[1]]
+        else:
+            price_vals, price_wgts = sol.PriceShkVals, sol.PriceShkWeights
+            adj_vals = [np.clip(adjF(N, M), 0.0, 1.0) for adjF in sol.adjusting_list]
+            d_vals = [dF(N, M) for dF in sol.dFunc_list]
+
+        acc_rate = np.zeros(len(price_vals))
+        vol = np.zeros(len(price_vals))
+        for k, (adj_k, d_k) in enumerate(zip(adj_vals, d_vals)):
+            adj_k = np.asarray(adj_k).reshape(dist.shape)
+            d_k = np.asarray(d_k).reshape(dist.shape)
+            acc_rate[k] = np.sum(dist * adj_k)
+            vol[k] = np.sum(dist * adj_k * d_k)
+        mass = price_wgts * acc_rate
+        qty = price_wgts * vol
+
+        def _moments(w):
+            w = w / np.sum(w)
+            mean = np.sum(w * price_vals)
+            return mean, np.sqrt(np.sum(w * (price_vals - mean) ** 2))
+
+        offer_mean, offer_std = _moments(price_wgts)
+        trans_mean, trans_std = _moments(mass)
+        qty_mean, qty_std = _moments(qty)
+        self.price_moments_ss = dict(
+            PriceShkVals=price_vals, PriceShkWeights=price_wgts,
+            acceptance_rate=acc_rate,           # P(adjust | offer p_k)
+            transaction_share=mass / np.sum(mass),  # share of transactions at p_k
+            adjuster_share=np.sum(mass),        # fraction of households that transact
+            offer_mean=offer_mean, offer_std=offer_std,
+            transaction_mean=trans_mean, transaction_std=trans_std,
+            volume_weighted_mean=qty_mean, volume_weighted_std=qty_std,
+        )
+        return self.price_moments_ss
+
     def _tran_matrix_one_period(self, sol, shk):
         """Policy grids + sparse transition matrix for a single solved period."""
         dist_nGrid = self.dist_nGrid
         dist_mGrid = self.dist_mGrid
         shape = (len(dist_nGrid), len(dist_mGrid))
 
-        cPol = np.zeros(shape)
-        dPol = np.zeros(shape)
-        aPol = np.zeros(shape)
-        adjPol = np.zeros(shape)
-        dexPol = np.zeros(shape)
-        for i_n in range(len(dist_nGrid)):
-            n_aux = np.ones(len(dist_mGrid)) * dist_nGrid[i_n]
-            cPol[i_n] = sol.cFunc(n_aux, dist_mGrid)
-            dPol[i_n] = sol.dFunc(n_aux, dist_mGrid)
-            dexPol[i_n] = dPol[i_n] - n_aux
-            adjPol[i_n] = np.clip(sol.adjusting(n_aux, dist_mGrid), 0.0, 1.0)
-            aPol[i_n] = sol.aFunc(n_aux, dist_mGrid)
+        # Keep/adjust lottery (None for price_first with several price nodes)
+        branches = self._branch_policy_grids(sol, dist_nGrid, dist_mGrid)
+        if branches is not None:
+            cPol, dPol, aPol, adjPol = self._branch_average(branches)
+            dexPol = dPol - dist_nGrid[:, None]
+        else:
+            cPol = np.zeros(shape)
+            dPol = np.zeros(shape)
+            aPol = np.zeros(shape)
+            adjPol = np.zeros(shape)
+            dexPol = np.zeros(shape)
+            for i_n in range(len(dist_nGrid)):
+                n_aux = np.ones(len(dist_mGrid)) * dist_nGrid[i_n]
+                cPol[i_n] = sol.cFunc(n_aux, dist_mGrid)
+                dPol[i_n] = sol.dFunc(n_aux, dist_mGrid)
+                dexPol[i_n] = dPol[i_n] - n_aux
+                adjPol[i_n] = np.clip(sol.adjusting(n_aux, dist_mGrid), 0.0, 1.0)
+                aPol[i_n] = sol.aFunc(n_aux, dist_mGrid)
         texPol = cPol + dexPol
 
         if np.any(np.isnan(cPol)):
             print("cPol_Grid has NaNs")
 
+        # Old: one gen_tran_matrix_dur_sparse per branch, mixed by _mix_branch_lottery.
         # Scalar Rfree/RSpread/LivPrb in the simplified model (no time variation).
-        R_vec = np.where(aPol < 0, self.Rfree + self.RSpread, self.Rfree)
-        bNext = (R_vec * aPol) - dPol * (self.OpCost + self.dDepr * self.MaintCost)
-        nNext_unshocked = (1.0 - self.dDepr * (1.0 - self.MaintCost)) * dPol
-
-        shk_prbs = shk.pmv
-        perm_shks = shk.atoms[0]
-        tran_shks = shk.atoms[1]
-        LivPrb = self.LivPrb
-
-        NewBornDist = jump_to_grid_dur(
-            np.ones_like(tran_shks) * self.nNrmInitMean,
-            np.ones_like(tran_shks) * self.mNrmInitMean,
-            shk_prbs,
-            dist_nGrid,
-            dist_mGrid,
+        TranMatrix = self._tran_matrix_lottery(
+            branches, aPol, dPol, shk, self.Rfree, self.RSpread
         )
-
-        rows, cols, data, nStates = gen_tran_matrix_dur_sparse(
-            dist_nGrid, dist_mGrid, bNext, nNext_unshocked,
-            shk_prbs, perm_shks, tran_shks, LivPrb, NewBornDist,
-        )
-        rows = np.array(rows, dtype=np.int32)
-        cols = np.array(cols, dtype=np.int32)
-        data = np.array(data, dtype=np.float64)
-        TranMatrix = sps.csr_matrix((data, (rows, cols)), shape=(nStates, nStates))
 
         return dict(
             cPol=cPol, dPol=dPol, aPol=aPol, adjPol=adjPol,
@@ -2566,14 +2943,21 @@ class DurableConsumer:
                 self.texPol_Grid.append(out["texPol"])
                 self.tran_matrix.append(out["TranMatrix"])
 
-    def calc_ergodic_dist(self, transition_matrix=None):
-        """Stationary distribution (eigenvector for eigenvalue 1) of the matrix."""
+    def calc_ergodic_dist(self, transition_matrix=None, method=None):
+        """Stationary distribution (eigenvector for eigenvalue 1) of the matrix.
+
+        method ``"direct"`` is the sparse LU. The default is GPU power iteration,
+        or CPU GMRES, and falls back to the direct solve.
+        """
         if transition_matrix is None:
             transition_matrix = self.tran_matrix
         if isinstance(transition_matrix, list):
             transition_matrix = transition_matrix[0]
 
-        ergodic_distr = compute_erg_dstn_sparse(transition_matrix)
+        if method == "direct":
+            ergodic_distr = compute_erg_dstn_sparse(transition_matrix)
+        else:
+            ergodic_distr = compute_erg_dstn_iterative(transition_matrix)
         self.vec_erg_dstn = ergodic_distr
         self.erg_dstn = ergodic_distr.reshape(
             (len(self.dist_nGrid), len(self.dist_mGrid))
@@ -2822,25 +3206,8 @@ class DurableConsumer:
         return n, m, n_aux, m_aux
 
     def _tran_matrix_from_pols(self, cPol, dPol, aPol, shk):
-        """Sparse transition matrix from mixed policies on the histogram grid."""
-        dist_nGrid, dist_mGrid = self.dist_nGrid, self.dist_mGrid
-        R_vec = np.where(aPol < 0, self.Rfree + self.RSpread, self.Rfree)
-        bNext = (R_vec * aPol) - dPol * (self.OpCost + self.dDepr * self.MaintCost)
-        nNext_unshocked = (1.0 - self.dDepr * (1.0 - self.MaintCost)) * dPol
-        NewBornDist = jump_to_grid_dur(
-            np.ones_like(shk.atoms[1]) * self.nNrmInitMean,
-            np.ones_like(shk.atoms[1]) * self.mNrmInitMean,
-            shk.pmv, dist_nGrid, dist_mGrid,
-        )
-        rows, cols, data, nStates = gen_tran_matrix_dur_sparse(
-            dist_nGrid, dist_mGrid, bNext, nNext_unshocked,
-            shk.pmv, shk.atoms[0], shk.atoms[1], self.LivPrb, NewBornDist,
-        )
-        return sps.csr_matrix(
-            (np.asarray(data, dtype=np.float64),
-             (np.asarray(rows, dtype=np.int32), np.asarray(cols, dtype=np.int32))),
-            shape=(nStates, nStates),
-        )
+        """Sparse transition matrix from one mixed policy on the histogram grid."""
+        return self._tran_matrix_lottery(None, aPol, dPol, shk, self.Rfree, self.RSpread)
 
     def _search_on_dist_grid(self, sol, sol_next, period_params=None):
         """
@@ -2946,7 +3313,7 @@ class DurableConsumer:
                     vPAdj[i_p] = self.CRRAutilityP(cAdj[i_p], dAdj[i_p])
                     vPDAdj[i_p] = (1.0 - tau_nm) * vPAdj[i_p]
 
-            c, d, a, _v, _vp, _vpd, eps = self._combine(
+            c, d, a, _v, _vp, _vpd, eps, _effort, _accept = self._combine(
                 cAdj, dAdj, aAdj, inv_vAdj, vPAdj, vPDAdj,
                 cKeep, dKeep, aKeep, inv_vKeep, vPKeep, vPDKeep,
                 nGrid, mGrid,
@@ -2966,6 +3333,24 @@ class DurableConsumer:
 
     def _cond_one_period(self, sol, sol_next, shk, period_params=None):
         """Mixed policies + transition matrix after re-search on the dist grid."""
+        dist_nGrid = self.dist_nGrid
+        dist_mGrid = self.dist_mGrid
+        branches = self._branch_policy_grids(sol, dist_nGrid, dist_mGrid)
+        if branches is not None:
+            cPol, dPol, aPol, adjPol = self._branch_average(branches)
+            n_aux = np.repeat(dist_nGrid[:, None], len(dist_mGrid), axis=1)
+            dex = dPol - n_aux
+            return dict(
+                cPol=cPol,
+                dPol=dPol,
+                aPol=aPol,
+                adjPol=adjPol,
+                dexPol=dex,
+                texPol=cPol + dex,
+                TranMatrix=self._tran_matrix_lottery(
+                    branches, aPol, dPol, shk, self.Rfree, self.RSpread
+                ),
+            )
         cond = self._search_on_dist_grid(sol, sol_next, period_params)
         n_aux = np.repeat(self.dist_nGrid[:, None], len(self.dist_mGrid), axis=1)
         dex = cond["d"] - n_aux

@@ -1,0 +1,28 @@
+\documentclass[tikz,border=5pt]{standalone}
+\usetikzlibrary{positioning}
+
+\begin{document}
+	\begin{tikzpicture}[>=stealth, thick]
+		
+		% Timeline base
+		\draw[thick] (0,0) -- (24,0);
+		
+		% Tick marks with alternating label placement
+		\foreach \x/\pos/\label in {
+			0/above/{\Large\textbf{Start \boldmath$t$}:\\ \large\textbf{\boldmath$M_t$}},
+			4/above/{\large\textbf{Option from} \\ \large\textbf{\boldmath$\varepsilon_{t-1}$}},
+			8/above/{\large\textbf{Draw account} \\ \large\textbf{\boldmath$\phi_t$}},
+			8/below/{\large\textbf{Claim or deny}},
+			12/above/{\large\textbf{Worker: choose} \\ \large\textbf{\boldmath$(c_t,\varepsilon_t)$}},
+			12/below/{\large\textbf{Retiree: choose} \\ \large\textbf{\boldmath$c_t$}},
+			16/above/{\Large\textbf{End \boldmath$t$}: \\ \large\textbf{\boldmath$A_t$}},
+			20/below/{\large\textbf{Interest \boldmath$R$}},
+			20/above/{\large\textbf{Labor income \boldmath$y$}},
+			24/above/{\Large\textbf{Start \boldmath$t{+}1$}:\\ \large\textbf{\boldmath$M_{t+1}$}}
+		}{
+			\draw (\x,0.3) -- (\x,-0.3); % tick
+			\node[\pos=6mm, align=center, text width=4cm] at (\x,0) {\label};
+		}
+		
+	\end{tikzpicture}
+\end{document}

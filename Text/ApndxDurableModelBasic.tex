@@ -530,71 +530,46 @@ where the continuation value is now the price-integrated $\bar v_{t+1}$ from equ
 with equality when the borrowing constraint does not bind. The price $p_t$ enters only through the durable first-order condition~\eqref{eq:full_foc_d}, exactly as in~\eqref{eq:price_foc_d}. The keeper's first-order condition is likewise unchanged relative to the baseline, with $d_t=n_t$ fixed and no price term.
 
 \paragraph{Optimal search effort}
-Recall the nested discrete problem~\eqref{eq:full_discrete},
+Recall the nested discrete problem~\eqref{eq:full_discrete}. Effort is chosen before $p_t$ is realized, so the gap in the first-order condition is the expected positive value of a match, $\bar\Delta(m_t,n_t)=\mathbb{E}_{p_t}[\max\{v_t^{adj}(\ell_t,p_t)-v_t^{keep}(m_t,n_t),\,0\}]$, not the gap at a realized price. Because $\sigma$ is strictly convex, the objective is strictly concave in $\varepsilon_t$. The interior first-order condition is
 \begin{align}
-	v_t(m_t,n_t,p_t)
-	&= \max_{\varepsilon_t\in[0,1]}
-	\underbrace{\Big[(1-\varepsilon_t)\, v_t^{keep}(m_t,n_t)
-	+ \varepsilon_t\, v_t^{adj}(\ell_t,p_t)
-	- \sigma(\varepsilon_t)\Big]}_{\equiv\, g(\varepsilon_t;\,m_t,n_t,p_t)}.
-\end{align}
-Because $\sigma$ is strictly convex, $g$ is strictly concave in $\varepsilon_t$. The interior first-order condition is
-\begin{align}
-	v_t^{adj}(\ell_t,p_t) - v_t^{keep}(m_t,n_t) - \sigma'(\varepsilon_t^\ast) = 0
+	\bar\Delta(m_t,n_t) - \sigma'(\varepsilon_t^\ast) = 0
 	\quad\Longleftrightarrow\quad
-	v_t^{adj}(\ell_t,p_t) - v_t^{keep}(m_t,n_t) = -S\log(1-\varepsilon_t^\ast),
+	\bar\Delta(m_t,n_t) = -S\log(1-\varepsilon_t^\ast),
 \end{align}
-which yields the closed-form, state- and price-contingent optimal search effort
-\begin{align}
-	\varepsilon_t^\ast(m_t,n_t,p_t)
-	= \max\left\{0,\;
-	1 - \exp\left(-\frac{v_t^{adj}(\ell_t,p_t) - v_t^{keep}(m_t,n_t)}{S}\right)
-	\right\}. \label{eq:full_eps_star}
-\end{align}
-Relative to the search-only rule~\eqref{eq:eps_star_basic}, the gap that drives effort is now $v_t^{adj}(\ell_t,p_t)-v_t^{keep}$: a low durable price (which raises $v_t^{adj}$) increases $\varepsilon_t^\ast$, while a high price reduces it. As in the search-only case, $\varepsilon_t^\ast=0$ whenever $v_t^{adj}\le v_t^{keep}$, and the upper constraint $\varepsilon_t\le 1$ never binds for finite $S$. Special cases recover the earlier extensions: with $p_t\equiv 1$, equation~\eqref{eq:full_eps_star} reduces to~\eqref{eq:eps_star_basic}; with $S\to 0$, $\varepsilon_t^\ast\to\mathbb{1}\{v_t^{adj}(\ell_t,p_t)>v_t^{keep}\}$, the hard indicator of the price-contingent hard maximum.
+which yields~\eqref{eq:full_eps}. Let $\mathbb{1}(p_t)=1$ when $v_t^{adj}(\ell_t,p_t)\ge v_t^{keep}(m_t,n_t)$ and write $\pi_t=\mathbb{E}_{p_t}[\mathbb{1}(p_t)]$. The probability of buying is $\varepsilon_t^\ast\pi_t$. As in the search-only case, $\varepsilon_t^\ast=0$ whenever $\bar\Delta\le 0$, and the upper constraint $\varepsilon_t\le 1$ never binds for finite $S$. With $p_t\equiv 1$, \eqref{eq:full_eps} reduces to~\eqref{eq:eps_star_basic}. With $S\to 0$ and $\bar\Delta>0$, effort goes to one and the acceptance decision is the hard indicator of~\eqref{eq:price_discrete}.
 
 \paragraph{Envelope conditions and combined marginal values}
-Because $\varepsilon_t^\ast$ is chosen optimally, the envelope theorem eliminates indirect effects through search effort. Differentiating $v_t=g(\varepsilon_t^\ast;m_t,n_t,p_t)$ and using the adjuster envelopes~\eqref{eq:price_adj_m}--\eqref{eq:price_adj_n} together with the keeper envelopes~\eqref{eq:keep_m_basic}--\eqref{eq:keep_n_basic} gives
+Because $\varepsilon_t^\ast$ is chosen optimally, the envelope theorem eliminates indirect effects through search effort. The accept indicator is a hard maximum, so it contributes no derivative either. The ex-ante marginal values put weight $1-\varepsilon_t^\ast\pi_t$ on the keeper and weight $\varepsilon_t^\ast$ on the accepted adjuster nodes:
 \begin{align}
-	\frac{\partial v_t(m_t,n_t,p_t)}{\partial m_t}
-	&= (1-\varepsilon_t^\ast)\, u_c(c_t^{keep,\ast},n_t)
-	+ \varepsilon_t^\ast\, u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big), \label{eq:full_vm}\\
-	\frac{\partial v_t(m_t,n_t,p_t)}{\partial n_t}
-	&= (1-\varepsilon_t^\ast)\Big[u_d(c_t^{keep,\ast},n_t) + \beta(1-\delta)\,\mathbb{E}_t\big[\bar v_{n,t+1}\big]\Big]
-	+ \varepsilon_t^\ast\,(1-\tau)\, u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big). \label{eq:full_vn}
+	\frac{\partial v_t(m_t,n_t)}{\partial m_t}
+	&= (1-\varepsilon_t^\ast\pi_t)\, u_c(c_t^{keep,\ast},n_t)
+	+ \varepsilon_t^\ast\, \mathbb{E}_{p_t}\Big[\mathbb{1}(p_t)\, u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big)\Big], \label{eq:full_vm}\\
+	\frac{\partial v_t(m_t,n_t)}{\partial n_t}
+	&= (1-\varepsilon_t^\ast\pi_t)\Big[u_d(c_t^{keep,\ast},n_t) + \beta(1-\delta)\,\mathbb{E}_t\big[\bar v_{n,t+1}\big]\Big] \nonumber\\
+	&\quad + \varepsilon_t^\ast\,(1-\tau)\, \mathbb{E}_{p_t}\Big[\mathbb{1}(p_t)\, u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big)\Big]. \label{eq:full_vn}
 \end{align}
-Equations~\eqref{eq:full_vm}--\eqref{eq:full_vn} nest the earlier combined marginal-value formulas: with $\varepsilon_t^\ast\in\{0,1\}$ they collapse to the price-only indicators~\eqref{eq:price_vm}--\eqref{eq:price_vn}; with $p_t\equiv 1$ they collapse to the search-only envelopes~\eqref{eq:search_vm}--\eqref{eq:search_vn}. The price $p_t$ enters only indirectly through $(c_t^{adj,\ast},d_t^{adj,\ast})$ and through $\varepsilon_t^\ast$ itself.
+With a degenerate price and $\pi_t\in\{0,1\}$, these collapse to the search-only envelopes~\eqref{eq:search_vm}--\eqref{eq:search_vn}. With $S\to 0$ and $\bar\Delta>0$, they collapse to the price-only indicators~\eqref{eq:price_vm}--\eqref{eq:price_vn}.
 
-\paragraph{Integrating out price shocks}
-The objects that enter the time-$(t-1)$ Euler equations are the price-integrated value and marginal-value functions
+\paragraph{Objects passed to the previous period}
+The value passed to period $t-1$ is~\eqref{eq:full_barv}. The marginal values are~\eqref{eq:full_vm} and~\eqref{eq:full_vn},
 \begin{align}
-	\bar v_t(m_t,n_t)
-	&\equiv \mathbb{E}_{p_t}\big[v_t(m_t,n_t,p_t)\big], \label{eq:full_barv_defn}\\
 	\bar v_{m,t}(m_t,n_t)
-	&\equiv \mathbb{E}_{p_t}\Big[
-	(1-\varepsilon_t^\ast)\, u_c(c_t^{keep,\ast},n_t)
-	+ \varepsilon_t^\ast\, u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big)
-	\Big], \label{eq:full_barvm}\\
+	&\equiv \frac{\partial v_t(m_t,n_t)}{\partial m_t}, \label{eq:full_barvm}\\
 	\bar v_{n,t}(m_t,n_t)
-	&\equiv \mathbb{E}_{p_t}\Big[
-	(1-\varepsilon_t^\ast)\Big(u_d(c_t^{keep,\ast},n_t) + \beta(1-\delta)\,\mathbb{E}_t\big[\bar v_{n,t+1}\big]\Big)
-	+ \varepsilon_t^\ast\,(1-\tau)\, u_c\big(c_t^{adj,\ast}(p_t),d_t^{adj,\ast}(p_t)\big)
-	\Big], \label{eq:full_barvn}
+	&\equiv \frac{\partial v_t(m_t,n_t)}{\partial n_t}. \label{eq:full_barvn}
 \end{align}
-where $\varepsilon_t^\ast=\varepsilon_t^\ast(m_t,n_t,p_t)$ from~\eqref{eq:full_eps_star}, and equation~\eqref{eq:full_barv_defn} restates~\eqref{eq:full_barv} from the main text. The model's ex-ante (price-weighted) policy functions are
+The ex-ante policies use the same lottery. A rejected draw, and a failed search, both leave the household on the keeper:
 \begin{align}
 	\bar c_t(m_t,n_t)
-	&\equiv \mathbb{E}_{p_t}\Big[
-	(1-\varepsilon_t^\ast)\, c_t^{keep} + \varepsilon_t^\ast\, c_t^{adj}(p_t)
-	\Big], \label{eq:full_barc}\\
+	&\equiv (1-\varepsilon_t^\ast\pi_t)\, c_t^{keep}
+	+ \varepsilon_t^\ast\, \mathbb{E}_{p_t}\big[\mathbb{1}(p_t)\, c_t^{adj}(p_t)\big], \label{eq:full_barc}\\
 	\bar d_t(m_t,n_t)
-	&\equiv \mathbb{E}_{p_t}\Big[
-	(1-\varepsilon_t^\ast)\, n_t + \varepsilon_t^\ast\, d_t^{adj}(p_t)
-	\Big], \label{eq:full_bard}\\
+	&\equiv (1-\varepsilon_t^\ast\pi_t)\, n_t
+	+ \varepsilon_t^\ast\, \mathbb{E}_{p_t}\big[\mathbb{1}(p_t)\, d_t^{adj}(p_t)\big], \label{eq:full_bard}\\
 	\bar\varepsilon_t(m_t,n_t)
-	&\equiv \mathbb{E}_{p_t}\big[\varepsilon_t^\ast(m_t,n_t,p_t)\big]. \label{eq:full_bareps}
+	&\equiv \varepsilon_t^\ast(m_t,n_t)\,\pi_t. \label{eq:full_bareps}
 \end{align}
-Because the household observes $p_t$ before choosing $\varepsilon_t$, the \emph{realized} policy for a given draw is the search-weighted mix of keep and adjust at that price; equations~\eqref{eq:full_barc}--\eqref{eq:full_bareps} are the objects reported for simulation and plotting.
+Equation~\eqref{eq:full_bareps} is the probability of buying. Effort itself is $\varepsilon_t^\ast(m_t,n_t)$ from~\eqref{eq:full_eps}. Conditional on a match at $p_t$, the realized policy is the pure adjuster when $\mathbb{1}(p_t)=1$ and the pure keeper otherwise.
 
 \paragraph{Euler equations}
 Combining~\eqref{eq:full_foc_c}--\eqref{eq:full_foc_d} with the integrated continuation values~\eqref{eq:full_barvm}--\eqref{eq:full_barvn} yields the within-branch Euler equations
@@ -612,14 +587,7 @@ The within-branch terminal solutions are those of the price extension: $c_T^{kee
 \begin{align}
 	c_T^{adj,\ast}=\alpha\,\ell_T, \qquad d_T^{adj,\ast}=\frac{(1-\alpha)\,\ell_T}{p_T},
 \end{align}
-from equation~\eqref{eq:price_terminal}. The terminal discrete problem then resolves through the optimal terminal search effort
-\begin{align}
-	\varepsilon_T^\ast(m_T,n_T,p_T)
-	= \max\left\{0,\;
-	1 - \exp\left(-\frac{v_T^{adj}(\ell_T,p_T) - v_T^{keep}(m_T,n_T)}{S}\right)
-	\right\},
-\end{align}
-the terminal value follows~\eqref{eq:full_discrete} evaluated at $T$, and $\bar v_T(m_T,n_T)=\mathbb{E}_{p_T}[v_T(m_T,n_T,p_T)]$ is the continuation value handed to period $T-1$.
+from equation~\eqref{eq:price_terminal}. The terminal discrete problem then resolves through~\eqref{eq:full_eps} evaluated at $T$. Search is defined in the terminal period because the benefit is the current comparison. The continuation value handed to period $T-1$ is $\bar v_T$ from~\eqref{eq:full_barv}.
 
 \paragraph{EGM algorithm with search and stochastic prices}
 Let $\vec p=\{p_1,\dots,p_{K_p}\}$ be quadrature nodes for the log-normal price density with weights $\vec\mu^p$, in addition to the income-shock integration used to build $\mathfrak{v}(d_t,a_t)$, $\mathfrak{v}_c'(d_t,a_t)$, and $\mathfrak{v}_d'(d_t,a_t)$. The algorithm nests the standalone price and search steps:
@@ -630,12 +598,7 @@ Let $\vec p=\{p_1,\dots,p_{K_p}\}$ be quadrature nodes for the log-normal price 
 		0 = u_d(c_t,d_t) - p_k\,\mathfrak{v}_c'(d_t,a_t) + \mathfrak{v}_d'(d_t,a_t),
 	\end{align}
 	form $\ell_t^{(k)}=c_t+p_k\,d_t+a_t$, and apply FUES to obtain $c_t^{adj}(\ell_t;p_k)$, $d_t^{adj}(\ell_t;p_k)$, and $v_t^{adj}(\ell_t;p_k)$.
-	\item \textbf{Combine on a grid of $(m_t,n_t)$, integrating over $p_k$.} For each grid point, compute $\ell_t=m_t+(1-\tau)n_t$ and $v_t^{keep}(m_t,n_t)$. Then for each $p_k$:
-	\begin{enumerate}
-		\item Evaluate $v_t^{adj}(\ell_t;p_k)$ and form the optimal search effort $\varepsilon^\ast(m_t,n_t,p_k)$ from~\eqref{eq:full_eps_star} (or, for robustness when a conditional value is infinite, by a fine grid search over $[0,1]$ maximizing $g$).
-		\item Form the price-contingent value and marginal values from~\eqref{eq:full_discrete} and~\eqref{eq:full_vm}--\eqref{eq:full_vn}.
-	\end{enumerate}
-	Integrate with weights $\mu_k^p$ to obtain $\bar v_t$, $\bar v_{m,t}$, $\bar v_{n,t}$ as in~\eqref{eq:full_barv_defn}--\eqref{eq:full_barvn} (and, for reporting, $\bar c_t$, $\bar d_t$, $\bar\varepsilon_t$ from~\eqref{eq:full_barc}--\eqref{eq:full_bareps}).
+	\item \textbf{Combine on a grid of $(m_t,n_t)$.} For each grid point, compute $\ell_t=m_t+(1-\tau)n_t$ and $v_t^{keep}(m_t,n_t)$. Evaluate $v_t^{adj}(\ell_t;p_k)$ at every price node, form $\bar\Delta$, $\pi_t$, and one effort $\varepsilon^\ast(m_t,n_t)$ from~\eqref{eq:full_eps}, and accept at node $k$ when $v_t^{adj}(\ell_t;p_k)\ge v_t^{keep}$. The value and marginal values are~\eqref{eq:full_barv} and~\eqref{eq:full_vm}--\eqref{eq:full_vn}. The reported policies are~\eqref{eq:full_barc}--\eqref{eq:full_bareps}.
 	\item \textbf{Feed $\bar v_t$, $\bar v_{m,t}$, $\bar v_{n,t}$ into the period-$(t-1)$ end-of-period step,} in place of the hard-maximum objects used in the baseline model.
 \end{enumerate}
 As in the earlier algorithms, I store and evaluate inverse representations of the (marginal) value functions so that infinite conditional values do not propagate into numerical errors during interpolation. Computational cost scales with $K_p$ for both the adjuster solve and the combine step.

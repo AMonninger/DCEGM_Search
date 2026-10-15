@@ -10,12 +10,13 @@
 		% Tick marks with alternating label placement
 		\foreach \x/\pos/\label in {
 			0/above/{\Large\textbf{Start \boldmath$t$}:\\ \large\textbf{\boldmath$(n_t,m_t)$}},
-			4/above/{\large\textbf{Keeper: choose} \\ \large\textbf{\boldmath$(c_t, a_t)$}},            
-			4/below/{\large\textbf{Adjuster: choose} \\ \large\textbf{\boldmath$(c_t, d_t, a_t)$}},
-			% 8/above/{\large\textbf{Choose search} \\ \large\textbf{\boldmath$\varepsilon_t$}},
-			12/below/{\large\textbf{Combine solutions}},
+			4/above/{\large\textbf{Choose search} \\ \large\textbf{\boldmath$\varepsilon_t$}},
+			8/above/{\large\textbf{Draw price} \\ \large\textbf{\boldmath$p_t$}},
+			8/below/{\large\textbf{Accept or reject}},
+			12/above/{\large\textbf{Keeper: choose} \\ \large\textbf{\boldmath$(c_t, a_t)$}},
+			12/below/{\large\textbf{Adjuster: choose} \\ \large\textbf{\boldmath$(c_t, d_t, a_t)$}},
 			16/above/{\Large\textbf{End \boldmath$t$}: \\ \large\textbf{\boldmath$(d_t,a_t)$}},
-			20/below/{\large\textbf{Interest \boldmath$R$} \\ \large\textbf{income shocks \boldmath$(\theta)$}},
+			20/below/{\large\textbf{Interest \boldmath$R$} \\ \large\textbf{income shock \boldmath$\theta$}},
 			20/above/{\large\textbf{Depreciation \boldmath$\delta$}},
 			24/above/{\Large\textbf{Start \boldmath$t{+}1$}:\\ \large\textbf{\boldmath$(n_{t+1},m_{t+1})$}}
 		}{

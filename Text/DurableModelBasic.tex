@@ -12,7 +12,7 @@ The model consists of ex-ante identical agents who face uninsurable income risk 
 	\label{fig:timeline_DurableModel}
 \end{figure}
 
-The agent starts each period with beginning-of-period durable stock ($n_t$) and market resources ($m_t$). The agent solves the adjuster and keeper problems separately and chooses optimal levels of nondurable consumption $c_t$, durable stock $d_t$, and assets $a_t$. The discrete keep-versus-adjust decision is then resolved by a hard maximum over the two conditional value functions. At the end of the period, the agent holds a durable stock $d_t$ and liquid assets $a_t$. Between period $t$ and $t+1$, the transitory income shock materializes, interest is received, and the durable stock depreciates.
+Figure~\ref{fig:timeline_DurableModel} places search effort before the price draw. The household starts with durable stock $n_t$ and market resources $m_t$, and chooses effort from the distribution of the purchase price. A match draws that price, and the household accepts the draw or keeps the current stock. The keeper then chooses nondurable consumption and assets. The adjuster chooses nondurable consumption, a new stock, and assets at the realized price. The period ends with $(d_t,a_t)$. Between $t$ and $t+1$, interest is received, the transitory income shock realizes, and the durable depreciates. With search and price dispersion shut off, this order collapses to a hard maximum over the keeper and the adjuster. That baseline follows. Search and the price draw return together in Section~\ref{subsec:ModelBasicSearch}.
 
 Each household is characterized by two state variables: beginning-of-period market resources $m_t$ and the stock of durables $n_t$. Preferences exhibit constant relative risk aversion and combine nondurable consumption $c_t$ and the service flow of durables $d_t$ using a Cobb-Douglas aggregator\footnote{Using this form is standard (eg see \cite{Berger2015-kp, McKay2021-ib}) which is in line with micro-evidence \cite{Berger2018-yb}. An alternative approach is to use a CES aggregator as in \cite{Mankiw1983-za}}:
 \begin{align}
@@ -135,7 +135,7 @@ Collect the combined policies and (inverse) value functions on $(\vec{n}_t,\vec{
 
 \subsection{Illustration of the numerical challenge}
 
-Fig.~\ref{fig:baseline_T} illustrates the terminal solution. Taking the hard-max between the options of adjusting and keeping, the S,s structure emerges (fig.~\ref{fig:baseline_ss_T}) which leads to a sharp switch between fully adjusting or fully keeping. As a result, the optimal policy functions of the model conditional on adjusting and keeping experience discontinuities along the switchpoints as illustrated for the durable consumption function (fig.~\ref{fig:baseline_d_T}).
+Figure~\ref{fig:baseline_T} is the last period, when nothing in the continuation can smooth today's choice. Figure~\ref{fig:baseline_t_MPC_decomp} is an earlier period, after the jump at that boundary has been passed backward.
 
 \begin{figure}[htbp]
 	\centering
@@ -165,9 +165,10 @@ Fig.~\ref{fig:baseline_T} illustrates the terminal solution. Taking the hard-max
 	\caption{Terminal-period solution of the baseline durable model (hard max). The upper left panel shows the keep--adjust regions in $(m_t,n_t)$ space; the upper right panel shows the combined durable policy for selected beginning-of-period durable stocks $n_t$. The lower panels show the MPC decomposition of nondurable and durable consumption given a fixed beginning-of-period durable stock $n_t$.}
 	\label{fig:baseline_T}
 \end{figure}
-	
-	
-In earlier periods, the agent incorporates the switchpoints in the next period into the solution of today's problem. Together with non-convex adjustment costs, the first order conditions are only necessary, but not sufficient. Hence, we need to incorporate an upper envelope algorithm such as FUES. However, even with this algorithm, small discontinuities still arise in the adjuster policy functions. Additionally, by combining the keeper and adjuster functions each period, these non-convexities propagade backwards similar to the retirement problem. Figure~\ref{fig:baseline_t_MPC_decomp} illustrates this for a fixed beginning-of-period durable stock $n_t$. In the yellow adjuster region, the policy function and MPC follows the adjuster policy function. With higher market resources, the S,s border gets crossed resulting in stark spikes in MPCs.
+
+The upper left panel is the adjustment region in $(m_t,n_t)$. The household adjusts with probability one in one region and keeps with probability one in the other. The boundary between them is the $(S,s)$ band. Inside it, the beginning-of-period stock is close enough to the stock the household would choose that the proportional cost is not worth paying. Outside it, the household pays the cost and reoptimizes. Because the choice is an indicator, the combined durable policy in the upper right panel jumps between the keeper, who is stuck at $d_T = n_T$, and the adjuster, who sets $d_T = (1-\alpha)\ell_T$. The lower panels hold the beginning-of-period stock fixed and plot the combined rule together with the two branches it switches between. Where the band is crossed, the marginal propensity inherits the jump. The spike is the discrete change of branch, rather than a feature of either branch's own Euler equation.
+
+In every earlier period the household anticipates that jump. Next period's value is kinked along the future band, so today's first-order conditions are necessary and not sufficient, and the endogenous grid for the keeper can fold back on itself. The adjuster's scan of the durable first-order condition likewise returns several candidates. Algorithm~\ref{alg:durable_baseline} therefore applies an upper envelope on each branch, DC-EGM for the keeper and FUES for the adjuster. The envelope removes the dominated candidates on a branch. Joining the two refined branches by a hard maximum puts the jump back into the combined policy, and that combined policy is the continuation of the previous period. The nonconvexity is passed backward, as in the retirement problem. Figure~\ref{fig:baseline_t_MPC_decomp} shows the resulting rules at a fixed beginning-of-period stock. Where adjusting is optimal, the combined rule and its marginal propensity lie on the adjuster. Once market resources cross the band they lie on the keeper, and both marginal propensities spike at the crossing. The extensions that follow replace this indicator with a probability. The remainder of the section asks whether that replacement removes the spike, and whether the three replacements can be told apart.
 
 \begin{figure}[htbp]
 	\centering
@@ -223,17 +224,17 @@ The expected (ex-ante) policy functions are the probability-weighted averages of
 \end{align}
 As $\sigma_\zeta \to 0$, the logit probabilities collapse to the hard indicators of the baseline model and~\eqref{eq:taste_logsum} collapses to the hard maximum. Larger $\sigma_\zeta$ spreads probability mass onto the inferior branch near indifference, so $c_t$ and $d_t$ (and the marginal-value functions derived from the inclusive value~\eqref{eq:taste_logsum}) are smooth in $(m_t,n_t)$. No quadrature over taste nodes is required: the EV Type I assumption delivers the inclusive value and choice probabilities in closed form. The taste shocks do not alter the household's budget set, so the no-borrowing constraint $a_t \ge 0$ is unaffected. I derive the envelope conditions, the Euler equations, and the EGM algorithm with EV Type I taste shocks in appendix~\ref{subsec:appdx_taste_basic}.
 
-As a result, the S,s curve in the terminal period is smoothened and adjuster values between zero and one are optimal. In the aggregate, the policy functions are a convex combination of adjuster and keeper policy functions around the S,s thresholds. Fig~\ref{fig:tasteshock_T} illustrates the point clearly.
+The inclusive value~\eqref{eq:taste_logsum} is differentiable in $(m_t,n_t)$ for any $\sigma_\zeta > 0$, so the terminal keep--adjust boundary is no longer a line. Figure~\ref{fig:tasteshock_T} plots the adjustment probability for $\sigma_\zeta \in \{0.1, 0.15, 0.2\}$. Where the two conditional values are close, the logit probability lies strictly between zero and one, and a larger scale widens that band because the household needs a larger value gap before it is willing to put almost all of its probability on the better branch. The combined rules~\eqref{eq:taste_c_combined}--\eqref{eq:taste_d_combined} are the same probabilities applied to the two branches. Around the old threshold the plotted consumption and durable policies are therefore mixtures of the keeper and the adjuster, rather than a jump from one to the other.
 
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=\linewidth]{../Figures/DurableModel/TasteShock_Ss_T.pdf}
-	\caption{Terminal-period keep--adjust regions in $(m_t,n_t)$ space under EV Type I taste shocks for $\sigma_\zeta \in \{0, 0.05, 0.1, 0.2\}$.}
+	\caption{Terminal-period keep--adjust regions in $(m_t,n_t)$ space under EV Type I taste shocks for $\sigma_\zeta \in \{0.1, 0.15, 0.2\}$.}
 	\label{fig:tasteshock_ss_T}
 	\label{fig:tasteshock_T}
 \end{figure}
 
-As a result, the discontinuities in period t disapear with a small EV shock parameter. Fig~\ref{fig:tasteshock_periodt_MPC_decomp} show the now continuous consumption functions and marginal propensities to consume and expend.
+One period earlier, the continuation value that enters the endogenous grid is this smooth inclusive value, so the nonconvexity that the hard maximum passes backward is already integrated out. Figure~\ref{fig:tasteshock_periodt_MPC_decomp} plots the combined consumption and durable rules, and their marginal propensities, at a fixed beginning-of-period stock. The jump at the old threshold and the spike in the marginal propensity are both replaced by a gradual transition between the keeper and the adjuster. A small taste scale is enough for that transition to be continuous. The same scale also moves probability onto the inferior branch at states far from indifference, which is the feature the steady-state comparison below will use to separate taste shocks from search.
 
 
 \begin{figure}[htbp]
@@ -295,26 +296,42 @@ In KKT form these are
 \end{align}
 with equality when the borrowing constraint does not bind. Because $p_t$ multiplies only $d_t$ in the budget, the nondurable condition is the baseline condition~\eqref{eq:FOC_c_basic} given $d_t$. The durable condition prices the marginal unit at $p_t$ rather than at one. The adjuster's continuous policies $c_t^{\text{adj}}(\ell_t,p_t)$ and $d_t^{\text{adj}}(\ell_t,p_t)$ are therefore solved at each price node, and the reported ex-ante rules are price-weighted averages of those state-contingent choices.
 
-After $\theta_t$ has materialized and $(m_t,n_t)$ are known, the household observes $p_t$ and chooses search intensity,
+After $\theta_t$ has materialized and $(m_t,n_t)$ are known, the household chooses search intensity from the distribution of $p_t$, before the realization. A successful search then draws $p_t$. The household adjusts when the realized price is worth taking and otherwise keeps the current stock. The search cost is sunk, so a bad draw can be rejected. Let
 \begin{align}
-	v_t(m_t,n_t,p_t)
+	v_t^{\mathrm{match}}(m_t,n_t)
+	&\equiv \mathbb{E}_{p_t}\Big[\max\big\{ v_t^{\text{adj}}(\ell_t,p_t),\; v_t^{\text{keep}}(m_t,n_t)\big\}\Big]
+\end{align}
+be the expected value of a match. The discrete problem is
+\begin{align}
+	v_t(m_t,n_t)
 	&= \max_{\varepsilon_t\in[0,1]}
 	\Big[(1-\varepsilon_t)\, v_t^{\text{keep}}(m_t,n_t)
-	+ \varepsilon_t\, v_t^{\text{adj}}(\ell_t,p_t)
+	+ \varepsilon_t\, v_t^{\mathrm{match}}(m_t,n_t)
 	- \sigma(\varepsilon_t)\Big]. \label{eq:full_discrete}
 \end{align}
-Effort is the probability of locating a suitable durable this period, chosen once the price is known, so the value is a probability-weighted average of the two conditional values, net of the search cost. A low price raises $v_t^{\text{adj}}$ and therefore optimal effort; a high price lowers it. The object that enters the previous period is the price-integrated value
+Write $\Delta(p_t) = v_t^{\text{adj}}(\ell_t,p_t) - v_t^{\text{keep}}(m_t,n_t)$ and $\bar\Delta(m_t,n_t) = \mathbb{E}_{p_t}[\max\{\Delta(p_t),0\}]$. Optimal effort is one number at $(m_t,n_t)$,
+\begin{align}
+	\varepsilon_t^\ast(m_t,n_t)
+	= \max\left\{0,\;
+	1 - \exp\big(-\bar\Delta(m_t,n_t)/S\big)
+	\right\}. \label{eq:full_eps}
+\end{align}
+It does not depend on the realized price. Let $\mathbb{1}(p_t)=1$ when $\Delta(p_t)\ge 0$, and let $\pi_t=\mathbb{E}_{p_t}[\mathbb{1}(p_t)]$ be the probability that a draw is acceptable. The probability of buying is $\varepsilon_t^\ast\pi_t$. The ex-ante value that enters the previous period is
 \begin{align}
 	\bar v_t(m_t,n_t)
-	&\equiv \mathbb{E}_{p_t}\big[v_t(m_t,n_t,p_t)\big], \label{eq:full_barv}
+	&= (1-\varepsilon_t^\ast)\, v_t^{\text{keep}}(m_t,n_t)
+	+ \varepsilon_t^\ast\, v_t^{\mathrm{match}}(m_t,n_t)
+	- \sigma(\varepsilon_t^\ast), \label{eq:full_barv}
 \end{align}
-which replaces $v_t(m_t,n_t)$ inside the keeper and adjuster problems one period earlier. The two mechanisms are complementary: $p_t$ shifts the adjuster's continuous problem and the level of $v_t^{\text{adj}}$, and $\varepsilon_t^\ast$ turns the gap $v_t^{\text{adj}}-v_t^{\text{keep}}$ into a smooth probability of adjusting.
+which replaces $v_t(m_t,n_t)$ inside the keeper and adjuster problems one period earlier. The two mechanisms are complementary. Price dispersion raises $v_t^{\mathrm{match}}$ above $v_t^{\text{keep}}$ in states where adjusting at the mean price is worse but some draws are better, and that option value raises effort. Search governs whether a draw arrives. The realized price is the content of the draw.
 
-Two limits isolate each mechanism. As $\sigma_p\to 0$, the price collapses to one and~\eqref{eq:full_discrete} becomes the search problem
+This is the information order of Section~\ref{sec:RetirementModel}. There, effort is chosen from the distribution of the account factor, the realization is observed only if the option arrives, and the household then claims or denies the draw. The remaining difference is the date of the benefit. Retirement effort chosen at the end of period $t$ is the probability that an option arrives at $t+1$, so $\beta$ enters that effort rule and effort is irrelevant at the terminal date. Here the match and the acceptance decision fall in the same period, the effort rule has no discount factor, and search is defined in the terminal period because the benefit is the current comparison. The probability of retiring in that section is last period's effort times the probability that the hard maximum selects claiming. The probability of adjusting here is this period's effort times $\pi_t$.
+
+Two limits isolate each mechanism. As $\sigma_p\to 0$, the price collapses to one. Then $\pi_t\in\{0,1\}$, and whenever adjusting is better, \eqref{eq:full_discrete} is the search problem
 \begin{align}
 	v_t(m_t,n_t) = \max_{\varepsilon_t \in [0,1]} \Big[(1-\varepsilon_t)\, v_t^{\text{keep}}(m_t,n_t) + \varepsilon_t\, v_t^{\text{adj}}(\ell_t) - \sigma(\varepsilon_t)\Big], \label{eq:search_discrete_basic}
 \end{align}
-with the same continuation one period ahead. As $S\to 0$, search is costless, effort jumps to a corner, and~\eqref{eq:full_discrete} becomes the price-contingent hard maximum
+with the same continuation one period ahead. As $S\to 0$, search is costless. Whenever $\bar\Delta>0$, effort goes to one, the household draws a price, and the acceptance decision is the hard maximum
 \begin{align}
 	v_t(m_t,n_t,p_t) = \max\Big\{ v_t^{\text{keep}}(m_t,n_t),\; v_t^{\text{adj}}(\ell_t,p_t)\Big\}, \label{eq:price_discrete}
 \end{align}
@@ -326,12 +343,12 @@ whose expectation is
 As $S\to\infty$, effort goes to zero and the household never adjusts. Both limits together, $\sigma_p\to 0$ and $S\to 0$, recover the hard-maximum baseline of Section~\ref{sec:ModelBasic}. The optimal effort rule, the envelope conditions, and the EGM steps are derived in Appendices~\ref{subsec:appdx_search_basic}, \ref{subsec:appdx_price_basic}, and~\ref{subsec:appdx_full_basic}.
 
 \paragraph{Search alone.}
-With the price shut down ($\sigma_p = 0$), a small search cost smooths the terminal keep--adjust region. Figure~\ref{fig:search_ss_T} shows the terminal S,s bands for $S\in\{0,0.05,0.1,0.2\}$. The period-$t$ consumption functions in Figure~\ref{fig:search_periodt_MPC_decomp} are smooth as well.
+Shutting the price down ($\sigma_p = 0$) isolates the extensive margin. Effort is then the probability of moving from the keeper to the adjuster, and the closed form~\eqref{eq:full_eps} sets that probability to zero wherever adjusting does not raise value and raises it continuously once the gap is positive. The sharp boundary of the hard maximum therefore becomes a band of partial adjustment. Figure~\ref{fig:search_ss_T} plots that band in the terminal period for $S\in\{0.15,0.2,0.25\}$: a higher search cost makes the same value gap buy less effort, so the region of interior adjustment shrinks toward the states where adjusting is most valuable. One period earlier, the combined consumption and durable rules are the effort-weighted average of the two branches. Figure~\ref{fig:search_periodt_MPC_decomp} shows the consequence. The jump at the old threshold is replaced by a gradual transition, and the spikes in the marginal propensities, which in the baseline are the discrete switch from one branch to the other, are damped with it.
 
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=\linewidth]{../Figures/DurableModel/Search_Ss_T.pdf}
-	\caption{Terminal-period keep--adjust regions in $(m_t,n_t)$ space under endogeneous search for search-cost scales $S \in \{0, 0.05, 0.1, 0.2\}$.}
+	\caption{Terminal-period keep--adjust regions in $(m_t,n_t)$ space under endogenous search for search-cost scales $S \in \{0.15, 0.2, 0.25\}$.}
 	\label{fig:search_ss_T}
 \end{figure}
 
@@ -354,12 +371,12 @@ With the price shut down ($\sigma_p = 0$), a small search cost smooths the termi
 
 
 \paragraph{Prices alone.}
-With search shut down ($S \to 0$), the discrete choice is the price-contingent hard maximum \eqref{eq:price_discrete}. Price dispersion produces adjustment intensities between zero and one, while a threshold remains at each realized price, so the period-$t$ rules are less smooth than under search. Figure~\ref{fig:pricestd_Ss_T} varies $\sigma_p$ at a fixed number of price nodes. Figure~\ref{fig:PriceStd_periodt_MPC_decomp} shows the corresponding period-$t$ policies, and Figure~\ref{fig:PriceCount_periodt_MPC_decomp} varies the number of price nodes at a fixed $\sigma_p$.
+Shutting search down ($S \to 0$) isolates the other margin. A draw arrives with probability one, and at each realized price the household still takes the hard maximum~\eqref{eq:price_discrete}. A threshold therefore survives inside every price node. What softens is the probability, taken before the draw, that the realized price is worth accepting. Figure~\ref{fig:pricestd_Ss_T} plots that ex-ante adjustment region for $\sigma_p \in \{0.05, 0.1, 0.15\}$ at a fixed number of price nodes. Near the old keep--adjust boundary the probability lies strictly between zero and one, and a wider price distribution widens the set of states in which some draws are accepted and others are rejected. Figure~\ref{fig:PriceStd_periodt_MPC_decomp} shows the corresponding period-$t$ rules. They are smoother than the hard maximum and less smooth than search, because the average over prices does not remove the kink at a given price. Figure~\ref{fig:PriceCount_periodt_MPC_decomp} holds $\sigma_p$ fixed and varies the number of nodes used to compute that average. It is a check on the discretization, not a third economic experiment.
 
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=0.85\linewidth]{../Figures/DurableModel/PriceStd_Ss_T.pdf}
-	\caption{Adjustment regions in period $T$ under stochastic durable prices for $\sigma_p \in \{0, 0.05, 0.1, 0.2\}$ (fixed number of price nodes). Greater price dispersion softens the hard keep--adjust threshold.}
+	\caption{Adjustment regions in period $T$ under stochastic durable prices for $\sigma_p \in \{0.05, 0.1, 0.15\}$ (fixed number of price nodes). Greater price dispersion softens the hard keep--adjust threshold.}
 	\label{fig:pricestd_Ss_T}
 \end{figure}
 
@@ -400,7 +417,7 @@ With search shut down ($S \to 0$), the discrete choice is the price-contingent h
 \end{figure}
 
 \paragraph{Search and prices together.}
-With both mechanisms active, search smooths the margin that a single realized price still leaves sharp, and the price shifts the adjuster's continuous choice. Figure~\ref{fig:pricestd_search_Ss_T} shows the terminal keep--adjust region, and Figure~\ref{fig:PriceStd_Search_periodt_MPC_decomp} shows the period-$t$ policies.
+The specification compared with Extreme Value taste shocks uses both margins at once. Effort is chosen from the distribution of the purchase price, a successful search draws that price, and a bad draw is rejected. States in which keeping dominates at the mean price can still adjust when a good draw arrives, and states in which adjusting dominates can still keep when the draw is poor. The probability of buying, effort times the acceptance probability, is therefore interior on both sides of the threshold that the hard maximum draws as a line. Figure~\ref{fig:pricestd_search_Ss_T} shows the terminal region under that pair, and Figure~\ref{fig:PriceStd_Search_periodt_MPC_decomp} shows the period-$t$ consumption and durable rules. The one-at-a-time figures above are the two limits that isolate each piece. The comparison in the next subsection is about the pair.
 
 \begin{figure}[htbp]
 	\centering
@@ -430,13 +447,17 @@ With both mechanisms active, search smooths the margin that a single realized pr
 
 \subsection{Comparing smoothness mechanisms: Lifecycle}\label{subsec:ModelBasicSmoothingCompare}
 
-As in the retirement application of Section~\ref{sec:RetirementModel}, each of the mechanisms above---EV Type~I taste shocks $\sigma_\zeta$, search frictions $S$, durable-price dispersion $\sigma_p$, and transitory income risk $\sigma_\eta$---can smooth the discontinuities that arise from the hard keep-versus-adjust margin. It is therefore natural to ask whether they also shift the combined decision rules in economically distinct directions, as taste shocks and search frictions do for the worker's consumption function.
+The three extensions above each replace the hard keep-versus-adjust maximum with a probability that can lie between zero and one. This subsection asks whether that replacement produces comparable smoothness over a finite horizon, and whether one period's decision rule is enough to tell the devices apart. The answer to the second question is what sends the argument to the stationary distribution in Section~\ref{subsec:ModelBasicInf}.
 
-To make the comparison transparent, I fix beginning-of-period durables at a representative stock $n_t=n_0$ and plot the \emph{combined} policies $c_t(n_0,m_t)$ and $d_t(n_0,m_t)$ in an earlier period, together with the corresponding marginal propensities $\partial c_t/\partial m_t$ and $\partial d_t/\partial m_t$. Starting from a lightly smoothed reference in each channel, I then increase one smoothness parameter at a time (holding the others at their inactive values, except that the income experiment retains a small EV scale so that the discrete margin remains smooth). Figures~\ref{fig:smoothing_shifts_levels} and~\ref{fig:smoothing_shifts_mpcs} summarize the results.
+Figures~\ref{fig:tasteshock_ss_T}, \ref{fig:search_ss_T}, and~\ref{fig:pricestd_Ss_T} are the same terminal adjustment region once each device is turned on. In the baseline of Figure~\ref{fig:baseline_ss_T} the household adjusts with probability one outside the $(S,s)$ band and keeps with probability one inside it. Under Extreme Value shocks that indicator becomes the logit probability~\eqref{eq:taste_logit}. It rises continuously through the old boundary, and a larger $\sigma_\zeta$ spreads the rise over a wider set of states, because a larger scale makes the household willing to take the inferior branch at a larger value gap. Under search with the price shut off, the indicator becomes effort. Effort is zero where keeping is better and rises with the value gap where adjusting is better, so the band is the set of states in which a match is worth paying for. Under price dispersion with search shut off, each realized price still has its own threshold, and the figure plots the probability that a draw from the price distribution falls on the acceptable side of that threshold. A larger $\sigma_p$ widens the set of states in which some draws are accepted and others are rejected. All three figures therefore replace that sharp boundary with a region in which the adjustment probability lies strictly between zero and one. The three regions are not the same object, which the kink counts make precise.
 
-In contrast to the retirement model, all four mechanisms move the durable policies in the \emph{same} direction. Raising $\sigma_\zeta$, $S$, $\sigma_p$, or $\sigma_\eta$ increases combined nondurable consumption, decreases combined durable holdings, and dampens the sharp MPC spikes that appear around the S,s band under a hard maximum. The common pattern reflects the nature of the discrete choice. Keep-versus-adjust reallocates a stock subject to a transaction cost $\tau$; it does not permanently alter the household's labor-income stream. Larger search costs, a more diffuse logit mix of keep and adjust, or greater ex-ante averaging over purchase prices all reduce the weight (or the extremity) of the full adjuster branch relative to keeping $d_t=n_t$. The combined rule therefore shifts toward the keeper---higher liquid consumption out of $m_t$ and a durable stock closer to the inherited $n_0$---and the discontinuous jump in MPCs at the S,s threshold is attenuated. Larger income shocks reinforce the same qualitative shift through standard precautionary saving into liquid resources.
+Table~\ref{tab:smoothing_kinks} counts the candidates that the upper envelope still has to delete, in the same earlier period as the policy figures below, on the raw endogenous-grid cloud before it is interpolated. For the keeper, a decreasing segment is a fold in the locus that maps end-of-period assets back to beginning-of-period market resources. Such a fold appears when next period's value is nonconcave, so the first-order condition is necessary and not sufficient, and the upper envelope of \citet{Iskhakov2017-jb} discards it. For the adjuster, the scan of the durable first-order condition returns several candidates at nearby levels of liquidity, and FUES keeps only those on the upper envelope of the value cloud. Under the hard maximum the keeper still has five decreasing segments, about $4.5$ percent of the locus, and the adjuster still loses four candidates. A taste scale of $\sigma_\zeta = 0.05$ and a search cost of $S = 0.1$ drive both counts to zero. The continuation that enters today's endogenous grid is already smooth enough that every first-order candidate lies on the envelope. Price dispersion at $\sigma_p = 0.1$ does the same for the keeper and leaves the adjuster with seventeen candidates still removed, about $3.5$ percent of the cloud summed over price nodes. Each price node is its own hard-maximum problem, so nonconvexity survives inside the price-contingent choice even after the ex-ante probability has been averaged.
 
-These visual improvements are matched by the numerical kink diagnostics stored with each period's solution. For the keeper, I count decreasing segments of the EGM locus (the breaks between nondecreasing pieces that necessitate an upper envelope); for the adjuster, I count the FOC candidates removed by FUES. Table~\ref{tab:smoothing_kinks} reports both counts and shares in the same earlier period as Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs}, for the hard-max baseline and one representative magnitude of each discrete-choice smoother. Relative to the hard maximum, taste shocks, search frictions, and price dispersion all drive the keeper's decreasing-segment count to zero. Taste shocks and search frictions also eliminate FUES removals in that period; price dispersion leaves a small residual share of removed adjuster points (the absolute count is not comparable to the single-price baseline because FUES is applied separately at each price node), but the keeper side is fully cleaned and the combined MPC spikes are still damped. A zero deletion count is not the same as an accurate interpolant; Section~\ref{subsec:ModelBasicEuler} pairs the counts with off-grid Euler residuals.
+Search alone has a further limitation that a deletion count cannot see. Where the expected gain from a match is not strictly positive, effort in~\eqref{eq:full_eps} is exactly zero, and the household keeps with probability one. Extreme Value shocks randomize that side of the threshold as well, because the logit assigns positive probability to adjustment at every finite value gap. Price dispersion alone randomizes through the draw and retains a threshold at each realized price. The specification whose smoothness is comparable to the taste shock is the pair: effort governs whether a draw arrives, and the household can still reject it, so the probability of buying is interior on both sides of the old boundary. A zero deletion count is also a statement about the raw cloud, not about the interpolant that is stored and plotted. Section~\ref{subsec:ModelBasicEuler} pairs these counts with off-grid Euler residuals.
+
+The decision rule in a single period does not carry the distinction. Figures~\ref{fig:smoothing_shifts_levels} and~\ref{fig:smoothing_shifts_mpcs} hold the beginning-of-period durable stock fixed and overlay the combined consumption and durable rules, and their slopes with respect to market resources, as one scale is strengthened. Panels (a)--(c) are taste, search, and price dispersion, each with the other two shut off. In every one of those panels the combined nondurable rule shifts up, the combined durable rule shifts down, and the spikes in the marginal propensities around the band are damped. Near indifference the household puts weight on both branches. The adjuster liquidates the current stock, pays the proportional cost, and reoptimizes, which on these grids means more nondurable consumption and a smaller chosen durable than the keeper, who is stuck with $d_t = n_t$. Strengthening the smoother widens the set of states that mix the two branches, so the combined rule moves toward the adjuster's bundle. Panel (d) raises the standard deviation of the transitory income shock. Income risk changes the continuation value of both branches. It does not replace the discrete choice, and it is drawn next to the other three so that a smoother operating through the income process is visible and is kept out of the comparison.
+
+This common period-$t$ shift is why the finite horizon cannot identify the three devices. In the retirement illustration, taste and search moved the worker's consumption function in opposite directions, so the decision rule itself separated them. Keep-versus-adjust reallocates a stock the household already owns, and it leaves the labor-income process unchanged, so the combined rules move together. The devices separate once households are allowed to accumulate. The probability of adjusting then changes how often the stock is reset and how much liquid wealth is held against that reset, which is a property of the stationary distribution rather than of one period's policy.
 
 \begin{table}[htbp]
 \centering
@@ -456,8 +477,6 @@ $\sigma_p = 0.1$ & 0 & 0 & 17 & 0.035 \\
 \end{tabular}
 \end{table}
 
-The retirement contrast is immediate. There, lowering the probability of a successful switch or raising search frictions reduces the likelihood of leaving work, so agents expect more years of labor income and consume more today; larger taste shocks instead raise the risk of retiring ``too early'' and induce precautionary saving, so consumption falls. Taste and search therefore shift the worker's rule in opposite directions even though both smooth the discrete margin. In the durable environment, both channels primarily reweight the same keep-versus-adjust comparison toward less aggressive adjustment, so their effects on combined $c_t$ and $d_t$ line up---as do price dispersion and income risk.
-
 \begin{figure}[htbp]
 	\centering
 	\begin{subfigure}{0.48\textwidth}
@@ -471,7 +490,7 @@ The retirement contrast is immediate. There, lowering the probability of a succe
 		\caption{Combined durable stock $d_t(n_0,m_t)$.}
 		\label{fig:smoothing_shifts_d}
 	\end{subfigure}
-	\caption{Combined policies at fixed $n_0$ when each smoothness channel is strengthened. Panels vary (a)~$\sigma_\zeta$, (b)~$S$, (c)~$\sigma_p$, and (d)~$\sigma_\eta$. All four raise $c_t$ and lower $d_t$ relative to the lightly smoothed reference in that panel.}
+	\caption{Combined policies at a fixed beginning-of-period stock $n_0$, one period before the terminal date. Panels (a)--(c) strengthen the taste scale, the search cost, and price dispersion one at a time, with the other two shut off. In each of those panels combined nondurable consumption shifts up and the combined durable stock shifts down. Panel (d) raises transitory income risk, which changes the continuation value and is outside the comparison of the three devices.}
 	\label{fig:smoothing_shifts_levels}
 \end{figure}
 
@@ -488,51 +507,55 @@ The retirement contrast is immediate. There, lowering the probability of a succe
 		\caption{MPC of durable stock $\partial d_t/\partial m_t$.}
 		\label{fig:smoothing_shifts_d_MPC}
 	\end{subfigure}
-	\caption{Combined MPCs at fixed $n_0$ under the same four experiments as Figure~\ref{fig:smoothing_shifts_levels}. Strengthening any channel dampens the spikes around the S,s band.}
+	\caption{Slopes of the combined rules in Figure~\ref{fig:smoothing_shifts_levels} with respect to market resources. The spikes are the discrete switch between the keeper and the adjuster. Strengthening taste, search, or price dispersion replaces that switch with a gradual transition, so the spikes in both marginal propensities are damped. The income panel is the same experiment as panel (d) of the levels figure.}
 	\label{fig:smoothing_shifts_mpcs}
 \end{figure}
 
 \subsection{Comparing smoothness mechanisms: Infinite horizon}
 \label{subsec:ModelBasicInf}
 
-The comparisons above are period-$t$ objects on a fixed beginning-of-period durable stock. I next ask how the same three discrete-choice smoothers---EV taste shocks $\sigma_\zeta$, search frictions $S$, and durable-price dispersion $\sigma_p$---shape the \emph{stationary} economy. For each channel I solve the infinite-horizon problem with that smoother active and the other two shut off, using the same magnitudes as in Figures~\ref{fig:smoothing_shifts_levels}--\ref{fig:smoothing_shifts_mpcs}. Given the converged policies, I build the transition matrix over the joint $(n,m)$ histogram grid, compute the ergodic distribution, and report aggregate steady-state nondurable consumption $C$, durable stock $D$, durable expenditure $\mathrm{DEX}$, total expenditure $\mathrm{TEX}$, liquid assets $A$, and the adjustment probability $\mathrm{ADJ}$.
+The finite-horizon comparison showed that taste shocks, search, and price dispersion each replace the keep--adjust line with a band, and that one period's combined rules move in the same direction when any of the three is strengthened. Households in that exercise do not accumulate. The probability of adjusting changes how often the durable is reset and how much liquid wealth is held against the reset, so the three devices can separate only in a stationary distribution. This subsection solves each economy to a time-invariant policy and reads the comparison off the distribution of households on that policy.
 
-I also compute sequence-space Jacobians of these aggregates with respect to the risk-free return $R$ and to a labor (mean-income) shock, using the fake-news algorithm for sequence-space Jacobians; the labor Jacobians are reported separately below. Table~\ref{tab:inf_ss} reports the steady-state aggregates.
+Table~\ref{tab:inf_ss} reports the stationary means. $C$ is nondurable consumption, $D$ is the durable stock, $\mathrm{DEX}$ is expenditure on durables, $\mathrm{TEX} = C + \mathrm{DEX}$ is total expenditure, $A$ is liquid assets, and $\mathrm{ADJ}$ is the fraction of households that buy in a period, in percent. The first block is the Extreme Value economy by itself. Search is shut off, the purchase price is degenerate at one, and the taste scale runs through $\sigma_\zeta \in \{0.1,\, 0.15,\, 0.2\}$. The other two blocks are one search-and-price economy, solved twice as a comparative static, rather than two further experiments with the other mechanism shut off. Effort is chosen from the price distribution before the draw, as in~\eqref{eq:full_discrete}, and a bad draw is rejected. The second block holds the search cost at $S = 0.2$ and raises price dispersion through $\sigma_p \in \{0.08,\, 0.1,\, 0.12\}$. The third holds price dispersion at $\sigma_p = 0.1$ and raises the search cost through $S \in \{0.15,\, 0.2,\, 0.25\}$. The middle specification is the same household in both blocks, which is why that row appears twice. Search with the price shut off would be the one-sided limit of the previous subsection: effort is zero wherever keeping is better, and a higher search cost then need not reduce how often households adjust. The sign of $S$ is therefore read inside the pair, where the option value of a rejectable draw is what effort is buying.
 
 \begin{table}[htbp]
 \centering
-\caption{Infinite-horizon steady-state aggregates: EV taste shocks $\sigma_\zeta$, and search+price with either $\sigma_p$ varied at $S=0.2$ or $S$ varied at $\sigma_p=0.1$.}
+\caption{Stationary aggregates. The first block is Extreme Value taste shocks alone, with search and price dispersion shut off. The second block raises price dispersion at a fixed search cost. The third raises the search cost at a fixed price dispersion. The middle row of the second block and the middle row of the third block are the same household.}
 \label{tab:inf_ss}
 \footnotesize
 \input{../Output/DurableModel_Inf_SS_short}
 \end{table}
 
-\paragraph{Results.}
+\paragraph{Steady state.}
 
-All three features smooth the S,s thresholds and therefore smooth non-durable consumption functions. However, the different economic interpretations manifest into different steady state values. The key divergence is the share of adjuster. A larger taste shock leads to more households who exogenously want to adjust. For prices, we get a larger share as well, but for a different reason. Higher price dispersion lead to cheaper durable goods and hence, households who draw a lucky price draw adjust more frequently. The opposite is true for search. With a higher search friction, households start searching earlier, but the intensity reduces which leads to a lower share of adjusters.
+A larger taste scale raises the adjustment probability because the logit puts more weight on the inferior branch at every state, including states in which adjusting is only slightly worse than keeping. Households replace the durable for reasons that do not track the value gap. They carry a smaller stock, and they hold fewer liquid assets against a discrete expenditure that now arrives more often. From $\sigma_\zeta = 0.1$ to $0.15$ to $0.2$, the adjustment probability rises from $12.2\%$ to $18.6\%$ to $24.7\%$, the durable stock falls from $3.56$ to $3.27$ to $3.03$, and liquid assets fall from $0.93$ to $0.71$ to $0.60$. Nondurable consumption barely moves, from $0.80$ to $0.79$. The entire comparative static is a change in how often an exogenous shock selects the adjuster.
 
-\paragraph{Jacobians}
+Price dispersion, inside the pair, raises the adjustment probability for a different reason and moves the stock the other way. At $S = 0.2$, raising $\sigma_p$ from $0.08$ to $0.12$ raises the adjustment probability from $7.7\%$ to $9.9\%$, and liquid assets fall from $1.39$ to $1.27$, while the durable stock rises from $4.28$ to $4.87$. The price distribution is normalized to mean one before the household accepts or rejects the draw, so a wider distribution is a wider spread of offers rather than a cheaper posted price. Unusually good draws are accepted and unusually bad draws are rejected, and the purchases that go through install a larger stock. Taste and price dispersion can therefore produce the same rise in the adjustment frequency while moving durables in opposite directions. An adjustment frequency by itself cannot tell those two mechanisms apart.
 
-The smoothing feature does not only affect steady state values, but also the reactions of policy functions with respect to factors such as labor income and interest rates. Figure~\ref{fig:Taste_Inf_Jacobians_labor} captures the punchline in \cite{Beraja2024-ua}: a larger taste shock reduces the responsiveness of households and therefore reduces MPCs and MPXs. Additionally, it also reduces the share of households who adjust additionally due to the shock. Importantly, for varying search and price dispersion in figures~\ref{fig:Combined_varS_Inf_Jacobians_labor}-\ref{fig:Combined_varS_InP_Jacobians_labor}, we see that the impact MPC and MPX is less affected, but the reactions are more long lasting before reverting to steady state. Therefore, the intertemporal responses can be tweaked much better using search or price dispersion.
+The search cost moves the adjustment probability in the remaining direction. At $\sigma_p = 0.1$, raising $S$ from $0.15$ to $0.25$ lowers the adjustment probability from $9.3\%$ to $8.3\%$. The durable stock falls from $4.59$ to $4.45$, and liquid assets rise from $1.27$ to $1.37$. Effort has become more expensive, so fewer matches arrive, replacement is less frequent, and the resources that would have been spent on those purchases stay in the liquid asset. The movements are smaller than in the taste block because effort responds where the option value of a draw is positive, whereas the logit randomizes every state. Across the two blocks of the pair, the parameters push the adjustment probability in opposite directions: wider price dispersion raises it, and a higher search cost lowers it. A target for that frequency therefore leaves $S$ and $\sigma_p$ separately free, which is the sense in which the pair can be disciplined by more than one moment. The quantitative step, matching the response of consumption and the response of the adjustment probability together, belongs to the fuller model and is not carried out here.
+
+\paragraph{Labor Jacobians.}
+
+The same stationary policies yield sequence-space Jacobians. A column of the Jacobian is the path of an aggregate after a one-time unanticipated change in an aggregate shock, so the date of the shock itself is the impact response and the later dates are the propagation. Figures~\ref{fig:Taste_Inf_Jacobians_labor}--\ref{fig:Combined_varS_InP_Jacobians_labor} plot that object for a rise in mean labor income, for the three blocks of Table~\ref{tab:inf_ss}. The paths describe dynamics around the steady states just reported. They are a different question from the signs in the table. On this grid a larger taste scale raises the impact response of nondurable consumption slightly, from $0.089$ at $\sigma_\zeta = 0.1$ to $0.095$ at $\sigma_\zeta = 0.2$, so the comparative static in the taste scale is not a dampening of the impact propensity to consume. Holding the search cost at $S = 0.2$ and varying price dispersion leaves that impact response in a narrow range, between $0.076$ and $0.079$. Holding price dispersion at $\sigma_p = 0.1$ and varying the search cost moves it: the impact response is about zero at $S = 0.15$, and it is $0.077$ and $0.060$ at $S = 0.2$ and $S = 0.25$. Any later exercise that matches impulse responses has to confront both the impact and the shape of these paths, including the search-cost case in which the impact response changes with $S$.
 
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=0.85\linewidth]{../Figures/DurableModel/Taste_Inf_Jacobians_labor.pdf}
-	\caption{Jacobians wrt labor varying taste intensity.}
+	\caption{Jacobians with respect to a labor shock for $\sigma_\zeta \in \{0.1, 0.15, 0.2\}$. Search and price dispersion are shut off.}
 	\label{fig:Taste_Inf_Jacobians_labor}
 \end{figure}
 
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=0.85\linewidth]{../Figures/DurableModel/Combined_varS_Inf_Jacobians_labor.pdf}
-	\caption{Jacobians wrt labor varying search intensity.}
+	\caption{Labor Jacobians of the search-plus-price model at $\sigma_p = 0.1$, for $S \in \{0.15, 0.2, 0.25\}$.}
 	\label{fig:Combined_varS_Inf_Jacobians_labor}
 \end{figure}
 
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=0.85\linewidth]{../Figures/DurableModel/Combined_varP_Inf_Jacobians_labor.pdf}
-	\caption{Jacobians wrt labor varying price dispersion.}
+	\caption{Labor Jacobians of the search-plus-price model at $S = 0.2$, for $\sigma_p \in \{0.08, 0.1, 0.12\}$.}
 	\label{fig:Combined_varS_InP_Jacobians_labor}
 \end{figure}
 
@@ -566,7 +589,7 @@ For the adjuster the deletion count is not enough. Taste and search eliminate FU
 
 \begin{table}[htbp]
 \centering
-\caption{Infinite-horizon kink counts and Euler residuals under the same $\sigma_\zeta$, $S$, and $\sigma_p$ sweep as Figure~\ref{fig:smoothing_shifts_levels} and Table~\ref{tab:inf_ss}. Each channel is varied with the other two shut off. Residuals are mean and 95th percentile of~\eqref{eq:judd_ee} on an off-grid test mesh evaluated at the stationary policy; constrained points excluded. The $\sigma_p$ adjuster kink count sums over price nodes.}
+\caption{Infinite-horizon kink counts and Euler residuals. The taste, search-only, and price-only blocks vary one device with the other two shut off. The last two blocks vary $\sigma_p$ at $S=0.2$ and $S$ at $\sigma_p=0.1$, as in Table~\ref{tab:inf_ss}. Residuals are the mean and 95th percentile of~\eqref{eq:judd_ee} on an off-grid test mesh at the stationary policy; constrained points are excluded. The $\sigma_p$ adjuster kink count sums over price nodes.}
 \label{tab:smoothing_euler_inf}
 \small
 \input{../Tables/smoothing_euler_Inf}

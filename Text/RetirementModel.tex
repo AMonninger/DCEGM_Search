@@ -6,7 +6,8 @@ state the problem with a hard maximum over work and retirement, and no device th
 smooths that margin. We then summarize the Extreme Value Type I taste shocks of
 \citet{Iskhakov2017-jb}, which are the usual smoother. We then replace those shocks
 with directed search and an endogenous price of retirement wealth, and derive that
-problem in detail.
+problem in detail. Labor income while at work is a constant $y$. The illustration
+abstracts from income risk.
 
 %------------------------------------------------------------
 \subsection{The problem without smoothing}
@@ -20,9 +21,8 @@ u(c_t, d_t) = \log(c_t) - \delta d_t.
 \end{equation}
 At the end of each period, households save their end-of-period liquid assets $A_t$ at a
 risk-free rate $R$. Working in the current period determines whether the agent receives
-income $y_t$ in the following period, so beginning-of-period resources are
-$M_t = R A_t + y_t d_{t-1}$. We assume that $y_t = y \eta_t$, where $\eta_t$ follows a mean-one
-log-normal distribution, $\eta_t \sim \mathcal{N}(-\sigma_\eta^2/2, \sigma_\eta^2)$.
+income in the following period, so beginning-of-period resources are
+$M_t = R A_{t-1} + y\, d_{t-1}$.
 
 Retirement is self-absorbing, so the retiree's problem is the ordinary consumption-saving
 problem. In Bellman form,
@@ -49,9 +49,9 @@ V_t(M_t) = \max \left\{ V_t^{\Ret}(M_t);\ V_t^{W}(M_t) \right\}.
 The worker who continues solves
 \begin{equation}
 V_t^{W}(M_t) = \max_{0 \le c_t \le M_t}
-\left\{ \log(c_t) - \delta + \beta\, \E_t \big[ V_{t+1}(M_{t+1}) \big] \right\},
+\left\{ \log(c_t) - \delta + \beta\, V_{t+1}(M_{t+1}) \right\},
 \end{equation}
-with $A_t = M_t - c_t$ and $M_{t+1} = R A_t + y_{t+1}$. Next period's value is again the hard
+with $A_t = M_t - c_t$ and $M_{t+1} = R A_t + y$. Next period's value is again the hard
 maximum, so a kink at the wealth level where the household is indifferent between
 retiring and working is inherited by the continuation value. The worker's consumption
 function therefore jumps at each such threshold, and those jumps propagate backward.
@@ -81,15 +81,16 @@ V_t(M_t) = \sigma_\zeta \log \Big(
 and the probability of retiring is the logit weight on $V_t^{\Ret}$. As $\sigma_\zeta \to 0$ this
 collapses to the hard maximum above. A larger scale puts weight on the inferior branch
 near indifference, so the worker's consumption function is smooth in $M_t$. The results
-below show this case with the option arriving for sure and with search and account
-dispersion shut down.
+below show this case with search and account dispersion shut down, so the household
+always faces the retirement choice.
 
 %------------------------------------------------------------
 \subsection{Search and an endogenous account price}
 %------------------------------------------------------------
 We now replace the taste shocks with two mechanisms that enter together. Each period
-there is a possibility of receiving an option to retire. The likelihood depends on the
-search effort $\eff_{t-1}$ exerted in the previous period. Search is costly, with
+there is a possibility of receiving an option to retire. Search effort $\eff_{t-1}$ exerted
+in the previous period is the probability of receiving that option. Zero effort means the
+option does not arrive. Search is costly, with
 \begin{equation}
 \theta(\eff_t) = \sigma_s \left(\eff_t + (1 - \eff_t) \log (1 - \eff_t)\right),
 \end{equation}
@@ -108,7 +109,7 @@ log-normal distribution,
 	\qquad \mathbb{E}[\phi_t]=1,
 	\label{eq:ret_price_dist}
 \end{align}
-independent of $\eta_t$ and independent across periods. If the household claims, retirement
+independent across periods. If the household claims, retirement
 begins with wealth
 \begin{align}
 	\tilde M_t = \phi_t M_t,
@@ -140,10 +141,9 @@ consumption function.
 \subsection{Worker's sub-problem}
 %------------------------------------------------------------
 Each period, a worker either receives the option to retire or has to continue working.
-A worker can increase the likelihood of receiving the option to retire by exerting search effort.
-The search effort is made at the end of a period and affects the likelihood of receiving
-the option to retire in the following period. When period $t$ starts, an income shock is
-realized and beginning-of-period book resources $M_t$ are known. The household then
+The search effort is made at the end of a period and is the probability of receiving
+the option to retire in the following period. When period $t$ starts, beginning-of-period
+book resources $M_t$ are known. The household then
 learns whether the option arrived, which was determined by last period's effort. If it did
 not, the agent must work, and $\phi_t$ is irrelevant, because there is no account to claim.
 If it did, the agent observes $\phi_t$ and decides whether to claim and retire or to deny the
@@ -151,7 +151,7 @@ draw and continue working. The discrete comparison is a hard maximum, contingent
 the realized account price. Having made the discrete choice, the agent makes a consumption
 decision. If the agent chooses to retire, they stay as a retiree, because retirement is
 self-absorbing. If the agent chooses to continue working, they exert search effort, which
-then determines the likelihood of receiving a new draw in the next period.
+is the probability of receiving a new draw in the next period.
 Fig.~\ref{fig:timing_RetirementModel} outlines the timeline of the realization of the shocks and
 the decisions in the worker's problem.
 
@@ -167,6 +167,8 @@ $\mathcal{D}_t \in \{\{\text{Retire}, \text{Work}\}, \{\text{Work}\}\}$
 $\equiv \{\{d_t = 0, d_t = 1\}, \{d_t = 1\}\}$. The first element of
 this set is the case when the agent has the option to switch and the second element is
 the case when the agent does not have the option to switch and must continue working.
+Write $P_1(\eff_t) = \eff_t$ for the probability of receiving the option next period and
+$P_2(\eff_t) = 1 - \eff_t$ for the probability of not receiving it.
 For the case when $\mathcal{D}_t = \{W\}$, i.e.\ the worker does not have the option to switch, the
 Bellman equation is given by:
 \begin{equation}
@@ -174,12 +176,10 @@ V_t^{W}(M_t) = \max_{\substack{0 \le c_t \le M_t \\ 0 \le \eff_t \le 1}}
 \left\{ u(c_t, 1, \eff_t) + \beta P_1(\eff_t) \goth{V}_t^1(A_t) + \beta P_2(\eff_t) \goth{V}_t^2(A_t) \right\},
 \label{eq:ret_full_VW}
 \end{equation}
-where $A_t = M_t - c_t$, $\goth{V}_t^1(A_t)$ is the expected value of saving $A_t$ when having the
-option to retire in $t + 1$, $P_1(\eff_t) = (1 - \eff_t)p + \eff_t$ is the probability of receiving the
-option to retire in $t + 1$, given the search effort $\eff_t$ in the current period, $\goth{V}_t^2(A_t)$
-is the expected value of saving $A_t$ when not having the option to retire in $t + 1$, and
-$P_2(\eff_t) = (1 - \eff_t)(1 - p)$ is the probability of not receiving the option to retire in
-$t+1$, given the search effort $\eff_t$ in the current period. Current $\phi_t$ does not enter
+where $A_t = M_t - c_t$, $\goth{V}_t^1(A_t)$ is the value of saving $A_t$ when having the
+option to retire in $t + 1$, and $\goth{V}_t^2(A_t)$
+is the value of saving $A_t$ when not having the option to retire in $t + 1$.
+Current $\phi_t$ does not enter
 \eqref{eq:ret_full_VW}. A worker who did not claim does not cash the account this period.
 
 For the case when $\mathcal{D}_t = \{R, W\}$, i.e.\ the case when the worker has the option to
@@ -205,20 +205,20 @@ A high $\phi_t$ makes claiming more attractive and, if accepted, delivers higher
 consumption along $c_t^{\Ret}(\cdot)$. A low $\phi_t$ makes claiming less attractive and is denied
 whenever $V_t^{\Ret}(\phi_t M_t) < V_t^{W}(M_t)$.
 
-The expected value of saving $A_t$ when having the option to retire in $t + 1$, i.e.\ $\goth{V}_t^1(A_t)$,
-now integrates over next period's account draw as well as income,
+The value of saving $A_t$ when having the option to retire in $t + 1$, i.e.\ $\goth{V}_t^1(A_t)$,
+integrates over next period's account draw. Next period's labor income is the constant $y$,
+so book resources $M_{t+1} = A_t R + y$ are certain:
 \begin{equation}
-\goth{V}_t^1(A_t) = \int_{y_{t+1}} \int_{\phi_{t+1}}
-V_{t+1}\bigl(M_{t+1}(A_t), \{R, W\}, \phi_{t+1}\bigr)\, dF(y_{t+1})\, dF(\phi_{t+1}),
+\goth{V}_t^1(A_t) = \int_{\phi_{t+1}}
+V_{t+1}\bigl(M_{t+1}(A_t), \{R, W\}, \phi_{t+1}\bigr)\, dF(\phi_{t+1}),
 \label{eq:ret_full_gothV1}
 \end{equation}
-where $M_{t+1} = A_t R + y_{t+1}$, because the agent worked this period, and
+where
 $V_{t+1}(M_{t+1}, \{R, W\}, \phi_{t+1})$ is the hard maximum \eqref{eq:ret_full_discrete} one
-period ahead. Similarly, the expected value of saving $A_t$ when not having the option to
-retire in $t + 1$, i.e.\ $\goth{V}_t^2(A_t)$, is given by
+period ahead. The value of saving $A_t$ when not having the option to
+retire in $t + 1$, i.e.\ $\goth{V}_t^2(A_t)$, is
 \begin{equation}
-\goth{V}_t^2(A_t) = \int_{y_{t+1}}
-V_{t+1}^{W}\bigl(M_{t+1}(A_t)\bigr)\, dF(y_{t+1}).
+\goth{V}_t^2(A_t) = V_{t+1}^{W}\bigl(M_{t+1}(A_t)\bigr).
 \label{eq:ret_full_gothV2}
 \end{equation}
 This continuation does not integrate over $\phi_{t+1}$, because a worker who must work
@@ -235,7 +235,7 @@ option, after integrating out the account price, is
 	\Big],
 	\label{eq:ret_full_barVRW}
 \end{align}
-so that $\goth{V}_{t-1}^{1}(A_{t-1}) = \mathbb{E}_{\eta_t}\bigl[\bar V_t^{R,W}(R A_{t-1} + y_t)\bigr]$. Integrating
+so that $\goth{V}_{t-1}^{1}(A_{t-1}) = \bar V_t^{R,W}(R A_{t-1} + y)$. Integrating
 \eqref{eq:ret_price_discrete} over $\phi_t$ replaces a single wealth threshold with a family of
 thresholds, one for each realization, so the ex-ante claiming probability is interior.
 
@@ -254,22 +254,22 @@ where
 \end{equation}
 Search effort is chosen only on the working branch and does not depend on the current
 draw. The current $\phi_t$ is already sunk from the point of view of next period's option.
-Thus, the first order condition gives the optimal effort as a function of the end-of-period
-assets that are determined after the optimal consumption decision has been made in the
-previous sub-period. The optimal effort is given by
+Because the arrival probability equals effort, $\partial P_1/\partial \eff_t = 1$ and
+$\partial P_2/\partial \eff_t = -1$. The first order condition gives the optimal effort as a
+function of the end-of-period assets that are determined after the optimal consumption
+decision has been made in the previous sub-period:
 \begin{align}
 \frac{\partial \theta(\eff_t)}{\partial \eff_t}
-&= \beta \goth{V}_t^1(A_t) \frac{\partial P_1(\eff_t)}{\partial \eff_t}
-+ \beta \goth{V}_t^2(A_t) \frac{\partial P_2(\eff_t)}{\partial \eff_t} \\
+&= \beta \left( \goth{V}_t^1(A_t) - \goth{V}_t^2(A_t) \right) \\
 -\sigma_s \log(1 - \eff_t^*)
-&= \beta (1 - p) \goth{V}_t^1(A_t) - \beta (1 - p) \goth{V}_t^2(A_t) \\
-\eff_t^* &= 1 - \exp\left( -\frac{\beta (1 - p)}{\sigma_s}
-\left( \goth{V}_t^1(A_t) - \goth{V}_t^2(A_t) \right) \right).
+&= \beta \left( \goth{V}_t^1(A_t) - \goth{V}_t^2(A_t) \right) \\
+\eff_t^* &= \max\left\{0,\; 1 - \exp\left( -\frac{\beta}{\sigma_s}
+\left( \goth{V}_t^1(A_t) - \goth{V}_t^2(A_t) \right) \right)\right\}.
 \label{eq:ret_full_effort}
 \end{align}
-This expression states that optimal effort is an increasing function of the excess value
-of receiving the option to switch in the next period over not receiving the option to
-switch. Account-value dispersion raises $\goth{V}_t^1$ relative to $\goth{V}_t^2$, because the
+Optimal effort is zero when receiving the option is not strictly better than not receiving
+it, and it is increasing in that excess value when the gap is positive. Account-value
+dispersion raises $\goth{V}_t^1$ relative to $\goth{V}_t^2$, because the
 option to retire is also an option on $\phi_{t+1}$: the household claims when the draw is
 attractive and otherwise continues working. That option value increases the excess value
 of receiving the option, and therefore increases search effort. The two frictions are
@@ -280,8 +280,8 @@ which it is exercised.
 
 As $\sigma_\phi \to 0$, $\phi_t \to 1$ almost surely and
 \eqref{eq:ret_full_VW} is the search problem with a hard maximum at book resources.
-Shutting search down as well recovers the single wealth threshold of the unsmoothed
-problem.
+Shutting search down as well, so that the retirement choice is simply available, recovers
+the single wealth threshold of the unsmoothed problem.
 
 Next, we derive the expressions for the optimal consumption functions for the retiree
 and the worker. Since retirement is self-absorbing, and $\phi_t$ is locked in at the moment
@@ -308,20 +308,20 @@ where $\eff_t^*$ is the optimal effort function in \eqref{eq:ret_full_effort}, a
 of the end-of-period values are given by
 \begin{equation}
 \frac{\partial \goth{V}_t^1(A_t)}{\partial A_t}
-= R\, \E_t \left\{ \frac{\partial V_{t+1}(M_{t+1}, \{R, W\}, \phi_{t+1})}{\partial M_{t+1}} \right\}
+= R\, \E_{\phi_{t+1}} \left\{ \frac{\partial V_{t+1}(M_{t+1}, \{R, W\}, \phi_{t+1})}{\partial M_{t+1}} \right\}
 \end{equation}
 and
 \begin{equation}
 \frac{\partial \goth{V}_t^2(A_t)}{\partial A_t}
-= R\, \E_t \left\{ \frac{\partial V_{t+1}^{W}(M_{t+1})}{\partial M_{t+1}} \right\},
+= R\, \frac{\partial V_{t+1}^{W}(M_{t+1})}{\partial M_{t+1}},
 \end{equation}
-where the expectation in the first line is over next period's income and account price, the
-expectation in the second line is over next period's income only, and $M_{t+1} = A_t R + y_{t+1}$.
+where the expectation in the first line is over next period's account price and
+$M_{t+1} = A_t R + y$.
 Substituting these expressions yields
 \begin{equation}
 u'(c_t, 1, \eff_t^*) = R \beta \left[
-P_1(\eff_t^*) \E_t \left\{ \frac{\partial V_{t+1}(M_{t+1}, \{R, W\}, \phi_{t+1})}{\partial M_{t+1}} \right\}
-+ P_2(\eff_t^*) \E_t \left\{ \frac{\partial V_{t+1}^{W}(M_{t+1})}{\partial M_{t+1}} \right\}
+P_1(\eff_t^*) \E_{\phi_{t+1}} \left\{ \frac{\partial V_{t+1}(M_{t+1}, \{R, W\}, \phi_{t+1})}{\partial M_{t+1}} \right\}
++ P_2(\eff_t^*) \frac{\partial V_{t+1}^{W}(M_{t+1})}{\partial M_{t+1}}
 \right].
 \end{equation}
 The envelope condition on the working branch is
@@ -352,13 +352,12 @@ first-order condition yields the consumption function for the worker who continu
 \begin{equation}
 \begin{aligned}
 u'(c_t, 1, \eff_t^*) = R \beta \Big[
-&P_1(\eff_t^*) \int_{y_{t+1}} \int_{\phi_{t+1}}
+&P_1(\eff_t^*) \int_{\phi_{t+1}}
 \left[ \mathbbm{1}_{t+1}^0 \cdot \phi_{t+1} \cdot u'\bigl(c_{t+1}^{\Ret}(\phi_{t+1} M_{t+1}), 0, 0\bigr)
 + \mathbbm{1}_{t+1}^1 \cdot u'\bigl(c_{t+1}^{W}(M_{t+1}), 1, \eff_{t+1}^*\bigr) \right]
-dF(y_{t+1})\, dF(\phi_{t+1}) \\
-&+ P_2(\eff_t^*) \int_{y_{t+1}}
+dF(\phi_{t+1}) \\
+&+ P_2(\eff_t^*) \,
 u'\bigl(c_{t+1}^{W}(M_{t+1}), 1, \eff_{t+1}^*\bigr)
-\, dF(y_{t+1})
 \Big],
 \end{aligned}
 \end{equation}
@@ -366,21 +365,21 @@ or, with logarithmic utility,
 \begin{equation}
 \begin{aligned}
 c_t^{W} = \Bigg( R \beta \Big[
-&P_1(\eff_t^*) \int_{y_{t+1}} \int_{\phi_{t+1}}
+&P_1(\eff_t^*) \int_{\phi_{t+1}}
 \left[ \mathbbm{1}_{t+1}^0 \, \phi_{t+1} \left( c_{t+1}^{\Ret}(\phi_{t+1} M_{t+1}) \right)^{-1}
 + \mathbbm{1}_{t+1}^1 \left( c_{t+1}^{W}(M_{t+1}) \right)^{-1} \right]
-dF(y_{t+1})\, dF(\phi_{t+1}) \\
-&+ P_2(\eff_t^*) \int_{y_{t+1}}
+dF(\phi_{t+1}) \\
+&+ P_2(\eff_t^*)
 \left( c_{t+1}^{W}(M_{t+1}) \right)^{-1}
-\, dF(y_{t+1})
 \Big] \Bigg)^{-1},
 \end{aligned}
 \label{eq:ret_worker_c}
 \end{equation}
-where $M_{t+1} = A_t R + y_{t+1}$. Because the household observes $\phi_t$ before choosing,
-the realized policy of a worker who has the option is the hard choice at that draw. The
-ex-ante consumption function is the $\phi$-weighted average of those choices. Working-branch
-consumption $c_t^{W}$ and effort $\eff_t^*$ do not depend on the current draw. The envelope
+where $M_{t+1} = A_t R + y$. A worker who has received the option observes $\phi_t$
+before the claim-or-work choice, so the realized policy is the hard maximum at that
+draw. The ex-ante consumption function is the $\phi$-weighted average of those choices.
+Working-branch consumption $c_t^{W}$ and effort $\eff_t^*$ do not depend on the current
+draw. The envelope
 conditions and the EGM algorithm for this baseline are derived in
 Appendix~\ref{subsec:appdx_ret_full}.
 
@@ -390,28 +389,29 @@ Appendix~\ref{subsec:appdx_ret_full}.
 Having established the solution of the retirement problem, we show how the consumption
 rule of the worker who continues to work responds to Extreme Value Type I taste shocks,
 to search, and to dispersion in the retirement account. Every figure is drawn at period
-$t = 15$ of a $T = 20$ problem, with $R = 1$, $\beta = 0.98$, and $y = 20$, and with no
-income uncertainty. The object plotted is the worker's consumption function $C(m_t)$.
+$t = 15$ of a $T = 20$ problem, with $R = 1$, $\beta = 0.98$, and $y = 20$. The object
+plotted is the worker's consumption function $C(m_t)$.
 
-With the option arriving for sure ($p = 1$), and with search and account dispersion shut
-down, Fig.~\ref{fig:ev} varies the Extreme Value scale $\sigma_\zeta$. At $\sigma_\zeta = 0$
-the hard maximum leaves a sequence of sharp discontinuities. Raising the scale to
-$0.05$ rounds the peaks. At $0.10$ and $0.15$ the kinks are essentially gone. Larger
-taste shocks also shift consumption down through the middle of the resource range and
-up at high resources.
+With search and account dispersion shut down, so that the household always faces the
+retirement choice, Fig.~\ref{fig:ev} varies the Extreme Value scale $\sigma_\zeta$. At
+$\sigma_\zeta = 0$ the hard maximum leaves a sequence of sharp discontinuities. Raising
+the scale to $0.05$ rounds the peaks. At $0.10$ and $0.15$ the kinks are essentially gone.
+Larger taste shocks also shift consumption down through the middle of the resource range
+and up at high resources.
 
 %---- EV ----
 \begin{figure}[htbp]
 \centering
     \includegraphics[width=0.72\linewidth]{EV_VaryT.pdf}
-\caption{Worker consumption at $t = 15$ under Extreme Value Type I taste shocks.
-The option arrives with certainty ($p = 1$). Search and account dispersion are shut
-down ($\sigma_s = 0$, $\sigma_\phi = 0$).}
+\caption{Worker consumption at $t = 15$ under Extreme Value Type I taste shocks,
+$\sigma_\zeta \in \{0, 0.05, 0.10, 0.15\}$.
+Search and account dispersion are shut down ($\sigma_s = 0$, $\sigma_\phi = 0$), so the
+household always faces the retirement choice.}
 \label{fig:ev}
 \end{figure}
 
-Fig.~\ref{fig:search} shuts the taste shocks and the account price down and sets
-$p = 0$, so a worker receives the option only by searching. At $\sigma_s = 0$ the
+Fig.~\ref{fig:search} shuts the taste shocks and the account price down. The option
+arrives only through search. At $\sigma_s = 0$ the
 discontinuities remain. A small search cost, $\sigma_s = 0.15$, trims them from the
 right. At $\sigma_s = 0.50$ and $\sigma_s = 1$ the rule is much smoother, and the
 smoothing sits to the right of each kink: workers with low liquid resources do not
@@ -423,12 +423,13 @@ also shift consumption up at high resources.
 \centering
     \includegraphics[width=0.72\linewidth]{Search_VaryS.pdf}
 \caption{Worker consumption at $t = 15$ under search alone. Taste shocks and account
-dispersion are shut down ($\sigma_\zeta = 0$, $\sigma_\phi = 0$), and $p = 0$.}
+dispersion are shut down ($\sigma_\zeta = 0$, $\sigma_\phi = 0$). The option arrives
+only through search.}
 \label{fig:search}
 \end{figure}
 
-Account dispersion on its own is shown in Fig.~\ref{fig:price}. Search is shut down
-and $p = 1$, so a draw of $\phi_t$ arrives with certainty. In panel~(a), with
+Account dispersion on its own is shown in Fig.~\ref{fig:price}. Search is shut down,
+so a draw of $\phi_t$ arrives with certainty. In panel~(a), with
 $N_\phi = 151$ quadrature nodes, $\sigma_\phi = 0$ reproduces the sawtooth. A small
 dispersion, $\sigma_\phi = 0.05$, removes every kink but the first. At $\sigma_\phi = 0.10$
 and $0.15$ the rule is smooth, and it lies below the hard-maximum rule through the
@@ -450,12 +451,13 @@ top of each other, so further nodes do not change the consumption function.
     \caption{Varying the number of account-price nodes, $\sigma_\phi = 0.1$.}
 \end{subfigure}
 \caption{Worker consumption at $t = 15$ with account dispersion alone. Search and
-taste shocks are shut down ($\sigma_s = 0$, $\sigma_\zeta = 0$) and $p = 1$.}
+taste shocks are shut down ($\sigma_s = 0$, $\sigma_\zeta = 0$), so the account draw
+arrives with certainty.}
 \label{fig:price}
 \end{figure}
 
-Search and the account price together are shown in Fig.~\ref{fig:searchphi}, again
-with $p = 0$ and no taste shocks. In panel~(a), $\sigma_\phi = 0.1$ and
+Search and the account price together are shown in Fig.~\ref{fig:searchphi}, with no
+taste shocks. The option arrives only through search. In panel~(a), $\sigma_\phi = 0.1$ and
 $N_\phi = 151$ are held fixed while $\sigma_s$ rises from $0$ to $1$. The price draw
 has already removed most of the sawtooth; raising the search cost removes the
 remaining bump at low resources and shifts the rule up. In panel~(b), $\sigma_s = 0.5$
@@ -477,15 +479,43 @@ consumption function at scales at which either one, used alone, still leaves kin
     \caption{Varying account dispersion, $\sigma_s = 0.5$, $N_\phi = 151$.}
 \end{subfigure}
 \caption{Worker consumption at $t = 15$ with search and account dispersion together.
-Taste shocks are shut down ($\sigma_\zeta = 0$) and $p = 0$.}
+Taste shocks are shut down ($\sigma_\zeta = 0$). The option arrives only through search.}
 \label{fig:searchphi}
+\end{figure}
+
+% Numbers from Output/Retirement_EV_vs_SearchPhi.pkl. Re-estimate with
+% optimize = True in Code/Figures_Retirement.ipynb before changing them.
+\subsection{Direct comparison}\label{subsec:ret_ev_pair}
+The four figures above vary one device at a time. Fig.~\ref{fig:ev_pair} puts an
+Extreme Value consumption function and a search-and-account consumption function on
+the same axes. The target is the Extreme Value rule at $\sigma_\zeta = 0.10$. The
+search cost and the account dispersion are chosen to minimize the root mean squared
+gap between the two rules on resources from $15$ to $120$. The minimum is at
+$\sigma_s = 0.171$ and $\sigma_\phi = 0.046$. The remaining gap is $0.23$ consumption
+units, so the search-and-account rule tracks the Extreme Value rule and stays a short
+distance from it.
+
+%---- EV versus search and account ----
+\begin{figure}[htbp]
+\centering
+    \includegraphics[width=0.72\linewidth]{EV_vs_SearchPhi.pdf}
+\caption{Worker consumption at $t = 15$. The Extreme Value rule uses
+$\sigma_\zeta = 0.10$, with search and account dispersion shut down. The
+search-and-account rule uses $\sigma_s = 0.171$ and $\sigma_\phi = 0.046$, the pair
+that minimizes the root mean squared gap between the two rules on resources from
+$15$ to $120$. Taste shocks are shut down on that rule, and the option arrives only
+through search. The minimized gap is $0.23$.}
+\label{fig:ev_pair}
 \end{figure}
 
 %============================================================
 \subsection{Algorithm}
 %------------------------------------------------------------
 This section outlines the algorithm for solving the problem of the worker who continues
-to work in the current period. The retiree is solved first, by the standard consumption-saving
+to work in the current period, when search and account dispersion are both active.
+Effort is the probability of receiving the option next period. When search is shut down,
+the retirement choice or the account draw is available with certainty and this effort
+step is not used. The retiree is solved first, by the standard consumption-saving
 EGM, and is evaluated later at claimed wealth $\phi M$. Taste shocks are shut down, so the
 option comparison is a hard maximum. Values are stored in the inverse form
 $V^{T} = -1/V$ and recovered by $V = -1/V^{T}$ before that comparison.
@@ -495,43 +525,35 @@ segments of the endogenous grid.
 \begin{algorithm}[htbp]
 \caption{EGM-step with search and account dispersion for the worker who continues to work}
 \DontPrintSemicolon
-Let $\vec{\eta} = \{\eta_1, \dots, \eta_J\}$ and $\vec{\phi} = \{\phi_1, \dots, \phi_K\}$ be quadrature nodes for income and the account price, with weights
-$\vec{\omega} = \{\omega_1, \dots, \omega_J\}$ and $\vec{\mu} = \{\mu_1, \dots, \mu_K\}$.\;
+Let $\vec{\phi} = \{\phi_1, \dots, \phi_K\}$ be quadrature nodes for the account price, with weights
+$\vec{\mu} = \{\mu_1, \dots, \mu_K\}$.\;
 Form an ascending grid over end-of-period wealth, $\vec{A}_t = \{A_t^1, \dots, A_t^I\}$.\;
 \For{$i = 1, \dots, I$}{
-    \For{$j = 1, \dots, J$}{
-        Compute book resources $M_{t+1}^j(A_i) = R A_i + y \eta_j$.\;
-        Interpolate the worker at book resources:
-        $c_{t+1}^{W}(M_{t+1}^j)$ and $V_{t+1}^{W} = -1/V_{t+1}^{T,W}(M_{t+1}^j)$.
-        The worker does not depend on $\phi$.\;
-        \For{$k = 1, \dots, K$}{
-            Compute claimed wealth $\tilde M = \phi_k M_{t+1}^j(A_i)$.\;
-            Interpolate the retiree at claimed wealth:
-            $c_{t+1}^{\Ret}(\tilde M)$ and $V_{t+1}^{\Ret} = -1/V_{t+1}^{T,\Ret}(\tilde M)$.\;
-            Set $V_{t+1}^{RW}(M_{t+1}^j, \phi_k) = \max\{V_{t+1}^{\Ret}(\tilde M),\, V_{t+1}^{W}(M_{t+1}^j)\}$.\;
-            Set $\mathbbm{1}_{t+1}^0 = 1$ if $V_{t+1}^{\Ret}(\tilde M) \ge V_{t+1}^{W}(M_{t+1}^j)$, and $0$ otherwise;
-            set $\mathbbm{1}_{t+1}^1 = 1 - \mathbbm{1}_{t+1}^0$.\;
-            Set $\mathrm{RHS}_1^{\mathrm{pre}}(M_{t+1}^j, \phi_k) = \mathbbm{1}_{t+1}^0 \cdot \phi_k \cdot u'(c_{t+1}^{\Ret}(\tilde M)) + \mathbbm{1}_{t+1}^1 \cdot u'(c_{t+1}^{W}(M_{t+1}^j))$.\;
-        }
-        Average over the account price:
-        $V_{t+1}^{RW}(M_{t+1}^j) = \sum_k \mu_k V_{t+1}^{RW}(M_{t+1}^j, \phi_k)$ and
-        $\mathrm{RHS}_1^{\mathrm{pre}}(M_{t+1}^j) = \sum_k \mu_k \mathrm{RHS}_1^{\mathrm{pre}}(M_{t+1}^j, \phi_k)$.\;
-        Set $\mathrm{RHS}_2^{\mathrm{pre}}(M_{t+1}^j) = u'(c_{t+1}^{W}(M_{t+1}^j))$. The must-work branch is not averaged over $\phi$.\;
+    Compute book resources $M_{t+1}(A_i) = R A_i + y$.\;
+    Interpolate the worker at book resources:
+    $c_{t+1}^{W}(M_{t+1})$ and $V_{t+1}^{W} = -1/V_{t+1}^{T,W}(M_{t+1})$.
+    The worker does not depend on $\phi$.\;
+    \For{$k = 1, \dots, K$}{
+        Compute claimed wealth $\tilde M = \phi_k M_{t+1}(A_i)$.\;
+        Interpolate the retiree at claimed wealth:
+        $c_{t+1}^{\Ret}(\tilde M)$ and $V_{t+1}^{\Ret} = -1/V_{t+1}^{T,\Ret}(\tilde M)$.\;
+        Set $V_{t+1}^{RW}(M_{t+1}, \phi_k) = \max\{V_{t+1}^{\Ret}(\tilde M),\, V_{t+1}^{W}(M_{t+1})\}$.\;
+        Set $\mathbbm{1}_{t+1}^0 = 1$ if $V_{t+1}^{\Ret}(\tilde M) \ge V_{t+1}^{W}(M_{t+1})$, and $0$ otherwise;
+        set $\mathbbm{1}_{t+1}^1 = 1 - \mathbbm{1}_{t+1}^0$.\;
+        Set $\mathrm{RHS}_1^{\mathrm{pre}}(M_{t+1}, \phi_k) = \mathbbm{1}_{t+1}^0 \cdot \phi_k \cdot u'(c_{t+1}^{\Ret}(\tilde M)) + \mathbbm{1}_{t+1}^1 \cdot u'(c_{t+1}^{W}(M_{t+1}))$.\;
     }
-    Compute $\goth{V}_t^1(A_i) = \sum_{j=1}^{J} \omega_j \, V_{t+1}^{RW}(M_{t+1}^j)$ and
-    $\goth{V}_t^2(A_i) = \sum_{j=1}^{J} \omega_j \, V_{t+1}^{W}(M_{t+1}^j)$.\;
-    Set effort from the two gothic values.
-    If $p = 1$, set $\eff_t(A_i) = 0$.
-    If $p < 1$ and $\sigma_s = 0$, set $\eff_t(A_i) = 1$.
+    Average over the account price:
+    $\goth{V}_t^1(A_i) = \sum_k \mu_k V_{t+1}^{RW}(M_{t+1}, \phi_k)$ and
+    $\mathrm{RHS}_1(A_i) = \sum_k \mu_k \mathrm{RHS}_1^{\mathrm{pre}}(M_{t+1}, \phi_k)$.\;
+    Set $\goth{V}_t^2(A_i) = V_{t+1}^{W}(M_{t+1})$ and $\mathrm{RHS}_2(A_i) = u'(c_{t+1}^{W}(M_{t+1}))$.
+    The must-work branch is not averaged over $\phi$.\;
+    If $\sigma_s = 0$, set $\eff_t(A_i) = 1$ when $\goth{V}_t^1(A_i) > \goth{V}_t^2(A_i)$ and $0$ otherwise.
     Otherwise
-    $\eff_t(A_i) = 1 - \exp\bigl(-\beta(1-p)(\goth{V}_t^1(A_i) - \goth{V}_t^2(A_i))/\sigma_s\bigr)$,
-    and replace a negative value by $0$.\;
+    $\eff_t(A_i) = \max\big\{0,\; 1 - \exp\bigl(-\beta(\goth{V}_t^1(A_i) - \goth{V}_t^2(A_i))/\sigma_s\bigr)\big\}$.\;
     Compute $\theta(\eff_t(A_i)) = \sigma_s\bigl(\eff_t(A_i) + (1-\eff_t(A_i))\log(1-\eff_t(A_i))\bigr)$,
-    with $\theta = \sigma_s$ if $\eff_t = 1$.\;
-    Compute $P_1(\eff_t) = (1-\eff_t)\,p + \eff_t$ and $P_2(\eff_t) = (1-\eff_t)\,(1-p)$.\;
-    Compute $\mathrm{RHS}_1(A_i) = P_1 \sum_j \omega_j \mathrm{RHS}_1^{\mathrm{pre}}(M_{t+1}^j)$ and
-    $\mathrm{RHS}_2(A_i) = P_2 \sum_j \omega_j \mathrm{RHS}_2^{\mathrm{pre}}(M_{t+1}^j)$.\;
-    Compute $\mathrm{RHS}(A_i) = R\bigl(\mathrm{RHS}_1(A_i) + \mathrm{RHS}_2(A_i)\bigr)$.\;
+    with $\theta = 0$ if $\eff_t = 0$ and $\theta = \sigma_s$ if $\eff_t = 1$.\;
+    Set $P_1(\eff_t) = \eff_t(A_i)$ and $P_2(\eff_t) = 1 - \eff_t(A_i)$.\;
+    Compute $\mathrm{RHS}(A_i) = R\bigl(P_1\,\mathrm{RHS}_1(A_i) + P_2\,\mathrm{RHS}_2(A_i)\bigr)$.\;
     Compute $\E V_{t+1}(A_i) = P_1\,\goth{V}_t^1(A_i) + P_2\,\goth{V}_t^2(A_i)$.\;
     Compute $c_t^{W}(A_i) = u'^{-1}\bigl(\beta\,\mathrm{RHS}(A_i)\bigr)$ and
     $M_t(A_i) = A_i + c_t^{W}(A_i)$.\;
@@ -540,3 +562,50 @@ Form an ascending grid over end-of-period wealth, $\vec{A}_t = \{A_t^1, \dots, A
 On the endogenous grid, fill the liquidity-constrained segment below the smallest $M_t(A_i)$ by setting consumption equal to resources.\;
 Apply the upper envelope to $(M_t, c_t^{W}, V_t^{T,W})$ and interpolate the consumption and inverse-value functions on the common $M$-grid.\;
 \end{algorithm}
+
+%------------------------------------------------------------
+\subsection{Other smoothing mechanisms}\label{subsec:ret_other_smoothers}
+%------------------------------------------------------------
+% Specifications recorded for the later draft (todo A.10). Not part of the
+% comparison above. The solver still implements all three.
+Three devices smooth the same margin and are not part of the comparison above.
+The specifications they had in this model are recorded here so the later draft
+does not have to reconstruct them.
+
+Transitory income. Labor income while working was $y_{t+1}=y\eta_{t+1}$, with
+$\eta_{t+1}$ mean-one log-normal,
+$\log\eta_{t+1}\sim\mathcal{N}(-\sigma_\eta^2/2,\sigma_\eta^2)$. Next period's
+book resources $M_{t+1}=RA_t+y\eta_{t+1}$ were random, so $\goth{V}_t^1$,
+$\goth{V}_t^2$, and the worker's Euler equation integrated over $\eta_{t+1}$ as
+well as over $\phi_{t+1}$. The figures set $\sigma_\eta=0$.
+
+Exogenous arrival. The probability of receiving the option was
+$P_1(\eff_t)=(1-\eff_t)p+\eff_t$, and the probability of not receiving it was
+$P_2(\eff_t)=(1-\eff_t)(1-p)$. The factor $(1-p)$ multiplied the value gap in the
+effort rule,
+\begin{equation}
+\eff_t^* = \max\left\{0,\; 1 - \exp\left( -\frac{\beta(1-p)}{\sigma_s}
+\left( \goth{V}_t^1(A_t) - \goth{V}_t^2(A_t) \right) \right)\right\}.
+\end{equation}
+At $p=1$ the option arrived for sure and optimal effort was zero. At $p=0$ the
+arrival probability equals effort, which is the case in the text above. The
+Extreme Value and account-only figures used $p=1$. The search and
+search-plus-account figures used $p=0$.
+
+Multiplicative taste shock. A mean-one log-normal shock $\xi_t$, with scale
+$\sigma_\xi$, multiplied the working branch from outside the consumption and
+effort choice,
+\begin{equation}
+V_t^{W}(M_t,\xi_t)
+= \xi_t\max_{\substack{0\le c_t\le M_t\\ 0\le\eff_t\le 1}}
+\left\{
+\log(c_t)-\delta-\theta(\eff_t)
++\beta P_1(\eff_t)\,\goth{V}_t^{1}(A_t)
++\beta P_2(\eff_t)\,\goth{V}_t^{2}(A_t)
+\right\}.
+\end{equation}
+The envelope on that branch was $\xi_t/c_t^{W}$. In the terminal period,
+$V_T^{W}(M_T,\xi_T)=\xi_T\bigl(\log(M_T)-\delta\bigr)$. This is not the Extreme
+Value Type~I shock: $\xi_t$ rescales the value of working, and the expectation
+over it is a quadrature, not the closed-form log-sum. The comparison in this
+section shuts $\xi_t$ down.
