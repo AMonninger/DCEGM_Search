@@ -390,7 +390,10 @@ Having established the solution of the retirement problem, we show how the consu
 rule of the worker who continues to work responds to Extreme Value Type I taste shocks,
 to search, and to dispersion in the retirement account. Every figure is drawn at period
 $t = 15$ of a $T = 20$ problem, with $R = 1$, $\beta = 0.98$, and $y = 20$. The object
-plotted is the worker's consumption function $C(m_t)$.
+plotted is the worker's consumption function $C(m_t)$. The one-at-a-time figures show
+the shape of each rule. The comparison that follows measures how far the flattening
+goes, on the solver's own grid, and whether search and the account factor can match
+the Extreme Value rule on that measure.
 
 With search and account dispersion shut down, so that the household always faces the
 retirement choice, Fig.~\ref{fig:ev} varies the Extreme Value scale $\sigma_\zeta$. At
@@ -406,7 +409,9 @@ and up at high resources.
 \caption{Worker consumption at $t = 15$ under Extreme Value Type I taste shocks,
 $\sigma_\zeta \in \{0, 0.05, 0.10, 0.15\}$.
 Search and account dispersion are shut down ($\sigma_s = 0$, $\sigma_\phi = 0$), so the
-household always faces the retirement choice.}
+household always faces the retirement choice.
+Notes: the plotted object is $C(m)$. A larger scale removes the inherited jumps and
+also shifts the level of the rule.}
 \label{fig:ev}
 \end{figure}
 
@@ -424,7 +429,9 @@ also shift consumption up at high resources.
     \includegraphics[width=0.72\linewidth]{Search_VaryS.pdf}
 \caption{Worker consumption at $t = 15$ under search alone. Taste shocks and account
 dispersion are shut down ($\sigma_\zeta = 0$, $\sigma_\phi = 0$). The option arrives
-only through search.}
+only through search.
+Notes: smoothing is one-sided. Effort is zero at low resources, so the left side of
+each jump remains.}
 \label{fig:search}
 \end{figure}
 
@@ -452,7 +459,9 @@ top of each other, so further nodes do not change the consumption function.
 \end{subfigure}
 \caption{Worker consumption at $t = 15$ with account dispersion alone. Search and
 taste shocks are shut down ($\sigma_s = 0$, $\sigma_\zeta = 0$), so the account draw
-arrives with certainty.}
+arrives with certainty.
+Notes: panel (b) is a numerical check. The rules at $N_\phi = 151$ and $N_\phi = 351$
+coincide, so the smoothness in panel (a) is not an artifact of the node count.}
 \label{fig:price}
 \end{figure}
 
@@ -479,32 +488,144 @@ consumption function at scales at which either one, used alone, still leaves kin
     \caption{Varying account dispersion, $\sigma_s = 0.5$, $N_\phi = 151$.}
 \end{subfigure}
 \caption{Worker consumption at $t = 15$ with search and account dispersion together.
-Taste shocks are shut down ($\sigma_\zeta = 0$). The option arrives only through search.}
+Taste shocks are shut down ($\sigma_\zeta = 0$). The option arrives only through search.
+Notes: used together, the two devices remove kinks at scales at which either one, used
+alone, still leaves them.}
 \label{fig:searchphi}
 \end{figure}
 
-% Numbers from Output/Retirement_EV_vs_SearchPhi.pkl. Re-estimate with
-% optimize = True in Code/Figures_Retirement.ipynb before changing them.
+% Smoothness from Output/Retirement_Folds.txt and
+% Output/Retirement_KinkFrontier.txt. Hard maximum K = 190, D = 3.50.
+% Extreme Value reaches K = 0 at 0.15 and D = 0 at 0.11.
+% Search plus account: K = 0 on 13 of 357 nodes, sigma_s from 2.50 to 4
+% and sigma_phi from 0.06 to 0.08; D = 0 on 239 nodes.
+% Level fit is still Output/Retirement_EV_vs_SearchPhi_EV015.pkl
+% (sigma_s = 2, sigma_phi = 0.2047). Do not refit.
 \subsection{Direct comparison}\label{subsec:ret_ev_pair}
-The four figures above vary one device at a time. Fig.~\ref{fig:ev_pair} puts an
-Extreme Value consumption function and a search-and-account consumption function on
-the same axes. The target is the Extreme Value rule at $\sigma_\zeta = 0.10$. The
-search cost and the account dispersion are chosen to minimize the root mean squared
-gap between the two rules on resources from $15$ to $120$. The minimum is at
-$\sigma_s = 0.171$ and $\sigma_\phi = 0.046$. The remaining gap is $0.23$ consumption
-units, so the search-and-account rule tracks the Extreme Value rule and stays a short
-distance from it.
+The four figures above show that each device can flatten the worker's consumption
+function. The exercise here is to measure that flattening on the objects the solver
+uses, and to ask whether search and the account factor can match Extreme Value
+Type~I on those objects. The comparison is not a match of levels. Taste shocks
+shift the rule one way; search and the account factor shift it another.
+Fig.~\ref{fig:ev_pair} records that gap. Smoothness is measured separately.
+
+Two statistics. $K$ counts decreasing runs on the raw worker grid $m_t$ before the
+upper envelope, added over every date. The hard maximum has $K = 190$. The share
+$\bar K = K/190$ is zero when the endogenous grid is monotone at every date, so the
+envelope has nothing to delete. $D$ is the largest fall in worker consumption at
+$t = 15$ on the solver grid, among consecutive steps on resources from $20$ to $120$
+whose slope is steeper than $-1$. The hard maximum has $D = 3.50$. The share
+$\bar D = D/3.50$ is zero when no such cliff remains.
+
+Table~\ref{tab:ret_folds} reports both for the rules in the figures. Extreme Value
+at $\sigma_\zeta = 0.15$ has $K = 0$ and $D = 0$. Search alone at $\sigma_s = 0.50$
+still has $K = 75$ and $D = 1.36$. The account factor alone at $\sigma_\phi = 0.10$
+cuts the cliff to $D = 0.33$ but raises the fold count to $K = 1018$: those extra
+folds are short quadrature chatter, not the inherited sawtooth. Used together at
+$\sigma_s = 0.50$ and $\sigma_\phi = 0.10$, $K$ falls to $75$ and $D$ is already $0$.
+The pair that matches the Extreme Value rule in levels still has $K = 114$ and
+$D = 0$: the plotted function has no cliff, and the endogenous grid is not yet
+monotone.
+
+Figs.~\ref{fig:ret_ev_smooth} and~\ref{fig:ret_sp_smooth} vary the scales.
+Extreme Value reaches $D = 0$ at $\sigma_\zeta = 0.11$ and $K = 0$ at $0.15$.
+Search and the account factor reach $D = 0$ on most of the interior of
+$(\sigma_s, \sigma_\phi)$, including $\sigma_s = 2$. They reach $K = 0$ only in a
+thin band with $\sigma_s$ from $2.50$ to $4$ and $\sigma_\phi$ from $0.06$ to
+$0.08$. The level-fit pair sits outside that band. Matching the Extreme Value
+consumption function on resources from $20$ to $40$ is not the same as matching
+it on the endogenous grid.
+
+\begin{table}[htbp]
+\centering
+\caption{Smoothness of the worker's rule. $K$ is the number of decreasing runs on
+the raw endogenous grid $m_t$, summed over dates. $\bar K = K/190$. $D$ is the
+largest steep consumption drop at $t = 15$ on resources from $20$ to $120$.
+$\bar D = D/3.50$.
+Notes: a share of zero means the hard-maximum object is gone. Values of $\bar K$
+above one are extra folds from the account-price quadrature, not a deeper sawtooth.
+The level-fit pair is $\sigma_s = 2$ and $\sigma_\phi = 0.205$.}
+\label{tab:ret_folds}
+\begin{tabular}{lcccc}
+\hline
+Specification & $K$ & $\bar K$ & $D$ & $\bar D$ \\
+\hline
+Hard maximum & 190 & 1.00 & 3.50 & 1.00 \\
+$\sigma_\zeta = 0.05$ & 42 & 0.22 & 3.25 & 0.93 \\
+$\sigma_\zeta = 0.10$ & 15 & 0.08 & 0.62 & 0.18 \\
+$\sigma_\zeta = 0.15$ & 0 & 0 & 0 & 0 \\
+Search, $\sigma_s = 0.50$ & 75 & 0.39 & 1.36 & 0.39 \\
+Account, $\sigma_\phi = 0.10$ & 1018 & 5.36 & 0.33 & 0.10 \\
+Search and account, $(0.50,\, 0.10)$ & 75 & 0.39 & 0 & 0 \\
+Level-fit pair, $(2,\, 0.205)$ & 114 & 0.60 & 0 & 0 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}{\linewidth}
+    \centering
+    \includegraphics[width=0.86\linewidth]{Retirement_KinkFrontier_EV.pdf}
+    \caption{Raw folds $K$.}
+\end{subfigure}\\[0.6em]
+\begin{subfigure}{\linewidth}
+    \centering
+    \includegraphics[width=0.86\linewidth]{Retirement_SteepDrop_EV.pdf}
+    \caption{Steep consumption drop $D$ at $t = 15$.}
+\end{subfigure}
+\caption{Extreme Value Type~I, with search and account dispersion shut down.
+Panel (a) of each row is the raw object. Panel (b) is the share of the hard
+maximum. Shares are drawn from $0$ to $1$; values above $1$ would saturate.
+Notes: $K = 0$ at $\sigma_\zeta = 0.15$. $D = 0$ at $\sigma_\zeta = 0.11$. The
+taste shock that removes the plotted cliff is smaller than the one that makes
+the endogenous grid monotone at every date.}
+\label{fig:ret_ev_smooth}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}{\linewidth}
+    \centering
+    \includegraphics[width=0.86\linewidth]{Retirement_KinkFrontier_SP.pdf}
+    \caption{Raw folds $K$.}
+\end{subfigure}\\[0.6em]
+\begin{subfigure}{\linewidth}
+    \centering
+    \includegraphics[width=0.86\linewidth]{Retirement_SteepDrop_SP.pdf}
+    \caption{Steep consumption drop $D$ at $t = 15$.}
+\end{subfigure}
+\caption{Search and the account factor, with taste shocks shut down. The option
+arrives only through search. Panel (a) of each row is the raw object. Panel (b)
+is the share of the hard maximum, drawn from $0$ to $1$; yellow is one or more.
+Notes: $D = 0$ on $239$ of $357$ nodes, including $\sigma_s = 2$. $K = 0$ on
+$13$ nodes, with $\sigma_s$ from $2.50$ to $4$ and $\sigma_\phi$ from $0.06$ to
+$0.08$. The level-fit pair $(\sigma_s, \sigma_\phi) = (2, 0.205)$ lies in the
+first set and not the second.}
+\label{fig:ret_sp_smooth}
+\end{figure}
+
+Fig.~\ref{fig:ev_pair} plots the Extreme Value rule at $\sigma_\zeta = 0.15$ and
+the search-and-account rule whose level gap on resources from $20$ to $40$ was
+minimized. The minimum is at $\sigma_s = 2$ and $\sigma_\phi = 0.205$. The
+remaining gap is $0.25$ consumption units on that interval and $2.05$ from $40$
+to $120$. That gap is a difference in levels. The smoothness comparison is
+Table~\ref{tab:ret_folds} and Figs.~\ref{fig:ret_ev_smooth}--\ref{fig:ret_sp_smooth},
+not the overlay.
 
 %---- EV versus search and account ----
 \begin{figure}[htbp]
 \centering
-    \includegraphics[width=0.72\linewidth]{EV_vs_SearchPhi.pdf}
+    \includegraphics[width=0.72\linewidth]{EV_vs_SearchPhi_EV015.pdf}
 \caption{Worker consumption at $t = 15$. The Extreme Value rule uses
-$\sigma_\zeta = 0.10$, with search and account dispersion shut down. The
-search-and-account rule uses $\sigma_s = 0.171$ and $\sigma_\phi = 0.046$, the pair
+$\sigma_\zeta = 0.15$, with search and account dispersion shut down. The
+search-and-account rule uses $\sigma_s = 2$ and $\sigma_\phi = 0.205$, the pair
 that minimizes the root mean squared gap between the two rules on resources from
-$15$ to $120$. Taste shocks are shut down on that rule, and the option arrives only
-through search. The minimized gap is $0.23$.}
+$20$ to $40$. Taste shocks are shut down on that rule, and the option arrives only
+through search.
+Notes: the minimized gap on that interval is $0.25$. The gap from $40$ to $120$
+is $2.05$. Both are differences in levels. Smoothness is $K$ and $D$ in
+Table~\ref{tab:ret_folds}, not the overlay.}
 \label{fig:ev_pair}
 \end{figure}
 

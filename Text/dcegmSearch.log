@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.18)  15 OCT 2026 17:43
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.18)  19 OCT 2026 17:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -859,13 +859,6 @@ d-pdftex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count350
 ) (dcegmSearch.aux)
-! I can't write on file `dcegmSearch.aux'.
-\document ...ate \openout \@mainaux \jobname .aux 
-                                                  \immediate \write \@mainau...
-l.43 \begin{document}
-                     
-(Press Enter to retry, or Control-C to exit; default file extension is `.tex')
-Please type another output file name: 
 \openout1 = `dcegmSearch.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 43.
@@ -990,83 +983,16 @@ Underfull \hbox (badness 6428) in paragraph at lines 21--21
  []
 
 
-Package natbib Warning: Citation `Iskhakov2017-jb' on page 1 undefined on input
- line 25.
-
-
 Package natbib Warning: Citation `Carroll2017-hk' on page 1 undefined on input 
 line 40.
 
 ) [1
 
 {C:/Users/amonninger/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
-(Introduction.tex
+(Introduction.tex [2
 
-Package natbib Warning: Citation `Carroll2006-mv' on page 2 undefined on input 
-line 14.
-
-
-Package natbib Warning: Citation `Iskhakov2017-jb' on page 2 undefined on input
- line 16.
-
-
-Package natbib Warning: Citation `Fella2014-pm' on page 2 undefined on input li
-ne 37.
-
-
-Package natbib Warning: Citation `Druedahl2017-ve' on page 2 undefined on input
- line 37.
-
-
-Package natbib Warning: Citation `Iskhakov2017-jb' on page 2 undefined on input
- line 37.
-
-
-Package natbib Warning: Citation `dobrescu2022fast' on page 2 undefined on inpu
-t line 37.
-
-
-Package natbib Warning: Citation `Iskhakov2017-jb' on page 2 undefined on input
- line 42.
-
-[2
-
-]
-
-Package natbib Warning: Citation `Iskhakov2017-jb' on page 3 undefined on input
- line 109.
-
-
-Package natbib Warning: Citation `Carroll1997-oi' on page 3 undefined on input 
-line 140.
-
-
-Package natbib Warning: Citation `Berger2015-kp' on page 3 undefined on input l
-ine 141.
-
-
-Package natbib Warning: Citation `McKay2021-ib' on page 3 undefined on input li
-ne 163.
-
-
-Package natbib Warning: Citation `McKay2021-ib' on page 3 undefined on input li
-ne 169.
-
-
-Package natbib Warning: Citation `Beraja2024-ua' on page 3 undefined on input l
-ine 170.
-
-
-Package natbib Warning: Citation `Carroll1992-bh' on page 3 undefined on input 
-line 171.
-
-) (RetirementModel.tex
-
-Package natbib Warning: Citation `Iskhakov2017-jb' on page 3 undefined on input
- line 7.
-
-[3] [4]
-<timeline_RetirementModel.pdf, id=291, 813.34265pt x 105.3556pt>
+]) (RetirementModel.tex [3] [4]
+<timeline_RetirementModel.pdf, id=334, 813.34265pt x 105.3556pt>
 File: timeline_RetirementModel.pdf Graphic file (type pdf)
 <use timeline_RetirementModel.pdf>
 Package pdftex.def Info: timeline_RetirementModel.pdf  used on input line 160.
@@ -1098,86 +1024,89 @@ Overfull \hbox (49.12273pt too wide) detected at line 363
  []
 
 [8]
-<../Figures/Figures_v4/EV_VaryT.pdf, id=386, 453.22606pt x 336.71384pt>
+<../Figures/Figures_v4/EV_VaryT.pdf, id=429, 453.22606pt x 336.71384pt>
 File: ../Figures/Figures_v4/EV_VaryT.pdf Graphic file (type pdf)
 <use ../Figures/Figures_v4/EV_VaryT.pdf>
 Package pdftex.def Info: ../Figures/Figures_v4/EV_VaryT.pdf  used on input line
- 405.
+ 408.
 (pdftex.def)             Requested size: 338.22418pt x 251.27599pt.
- [9 <../Figures/Figures_v4/EV_VaryT.pdf>]
-<../Figures/Figures_v4/Search_VaryS.pdf, id=442, 453.22606pt x 336.71384pt>
+<../Figures/Figures_v4/Search_VaryS.pdf, id=431, 453.22606pt x 336.71384pt>
 File: ../Figures/Figures_v4/Search_VaryS.pdf Graphic file (type pdf)
 <use ../Figures/Figures_v4/Search_VaryS.pdf>
 Package pdftex.def Info: ../Figures/Figures_v4/Search_VaryS.pdf  used on input 
-line 424.
+line 429.
 (pdftex.def)             Requested size: 338.22418pt x 251.27599pt.
-<../Figures/Figures_v4/Price_VaryPhi.pdf, id=444, 453.22606pt x 336.71384pt>
+<../Figures/Figures_v4/Price_VaryPhi.pdf, id=433, 453.22606pt x 336.71384pt>
 File: ../Figures/Figures_v4/Price_VaryPhi.pdf Graphic file (type pdf)
 <use ../Figures/Figures_v4/Price_VaryPhi.pdf>
 Package pdftex.def Info: ../Figures/Figures_v4/Price_VaryPhi.pdf  used on input
- line 445.
+ line 452.
 (pdftex.def)             Requested size: 225.4804pt x 167.5139pt.
-<../Figures/Figures_v4/Price_VaryPhiCount.pdf, id=445, 453.22606pt x 336.71384p
+<../Figures/Figures_v4/Price_VaryPhiCount.pdf, id=434, 453.22606pt x 336.71384p
 t>
 File: ../Figures/Figures_v4/Price_VaryPhiCount.pdf Graphic file (type pdf)
 <use ../Figures/Figures_v4/Price_VaryPhiCount.pdf>
 Package pdftex.def Info: ../Figures/Figures_v4/Price_VaryPhiCount.pdf  used on 
-input line 450.
+input line 457.
 (pdftex.def)             Requested size: 225.4804pt x 167.5139pt.
-<../Figures/Figures_v4/SearchPhi_VaryS.pdf, id=447, 453.22606pt x 336.71384pt>
+<../Figures/Figures_v4/SearchPhi_VaryS.pdf, id=436, 453.22606pt x 336.71384pt>
 File: ../Figures/Figures_v4/SearchPhi_VaryS.pdf Graphic file (type pdf)
 <use ../Figures/Figures_v4/SearchPhi_VaryS.pdf>
 Package pdftex.def Info: ../Figures/Figures_v4/SearchPhi_VaryS.pdf  used on inp
-ut line 473.
+ut line 482.
 (pdftex.def)             Requested size: 225.4804pt x 167.5139pt.
-<../Figures/Figures_v4/SearchPhi_VaryPhi.pdf, id=448, 453.22606pt x 336.71384pt
+<../Figures/Figures_v4/SearchPhi_VaryPhi.pdf, id=437, 453.22606pt x 336.71384pt
 >
 File: ../Figures/Figures_v4/SearchPhi_VaryPhi.pdf Graphic file (type pdf)
 <use ../Figures/Figures_v4/SearchPhi_VaryPhi.pdf>
 Package pdftex.def Info: ../Figures/Figures_v4/SearchPhi_VaryPhi.pdf  used on i
-nput line 478.
+nput line 487.
 (pdftex.def)             Requested size: 225.4804pt x 167.5139pt.
- [10 <../Figures/Figures_v4/Search_VaryS.pdf>] [11 <../Figures/Figures_v4/Price
-_VaryPhi.pdf> <../Figures/Figures_v4/Price_VaryPhiCount.pdf> <../Figures/Figure
-s_v4/SearchPhi_VaryS.pdf> <../Figures/Figures_v4/SearchPhi_VaryPhi.pdf>]
-<../Figures/Figures_v4/EV_vs_SearchPhi.pdf, id=712, 462.52798pt x 346.89601pt>
-File: ../Figures/Figures_v4/EV_vs_SearchPhi.pdf Graphic file (type pdf)
-<use ../Figures/Figures_v4/EV_vs_SearchPhi.pdf>
-Package pdftex.def Info: ../Figures/Figures_v4/EV_vs_SearchPhi.pdf  used on inp
-ut line 501.
-(pdftex.def)             Requested size: 338.22418pt x 253.6819pt.
-
-
-Package natbib Warning: Citation `Iskhakov2017-jb' on page 12 undefined on inpu
-t line 522.
-
-[12 <../Figures/Figures_v4/EV_vs_SearchPhi.pdf>] [13]) (DurableModelBasic.tex
-
-Package natbib Warning: Citation `Monninger2025-cz' on page 14 undefined on inp
-ut line 3.
-
-<timeline_DurableModel.pdf, id=804, 813.34265pt x 106.60829pt>
+ [9] [10 <../Figures/Figures_v4/EV_VaryT.pdf> <../Figures/Figures_v4/Search_Var
+yS.pdf>] [11 <../Figures/Figures_v4/Price_VaryPhi.pdf> <../Figures/Figures_v4/P
+rice_VaryPhiCount.pdf> <../Figures/Figures_v4/SearchPhi_VaryS.pdf> <../Figures/
+Figures_v4/SearchPhi_VaryPhi.pdf>]
+<../Output/Retirement_KinkFrontier_EV.pdf, id=757, 770.8762pt x 323.38905pt>
+File: ../Output/Retirement_KinkFrontier_EV.pdf Graphic file (type pdf)
+<use ../Output/Retirement_KinkFrontier_EV.pdf>
+Package pdftex.def Info: ../Output/Retirement_KinkFrontier_EV.pdf  used on inpu
+t line 569.
+(pdftex.def)             Requested size: 403.9896pt x 169.48077pt.
+<../Output/Retirement_SteepDrop_EV.pdf, id=758, 770.94464pt x 322.82193pt>
+File: ../Output/Retirement_SteepDrop_EV.pdf Graphic file (type pdf)
+<use ../Output/Retirement_SteepDrop_EV.pdf>
+Package pdftex.def Info: ../Output/Retirement_SteepDrop_EV.pdf  used on input l
+ine 574.
+(pdftex.def)             Requested size: 403.9896pt x 169.16386pt.
+<../Output/Retirement_KinkFrontier_SP.pdf, id=759, 765.39822pt x 322.7547pt>
+File: ../Output/Retirement_KinkFrontier_SP.pdf Graphic file (type pdf)
+<use ../Output/Retirement_KinkFrontier_SP.pdf>
+Package pdftex.def Info: ../Output/Retirement_KinkFrontier_SP.pdf  used on inpu
+t line 590.
+(pdftex.def)             Requested size: 403.9896pt x 170.35985pt.
+<../Output/Retirement_SteepDrop_SP.pdf, id=760, 764.61906pt x 322.04704pt>
+File: ../Output/Retirement_SteepDrop_SP.pdf Graphic file (type pdf)
+<use ../Output/Retirement_SteepDrop_SP.pdf>
+Package pdftex.def Info: ../Output/Retirement_SteepDrop_SP.pdf  used on input l
+ine 595.
+(pdftex.def)             Requested size: 403.9896pt x 170.15831pt.
+<../Figures/Figures_v4/EV_vs_SearchPhi_EV015.pdf, id=765, 444.60709pt x 337.931
+4pt>
+File: ../Figures/Figures_v4/EV_vs_SearchPhi_EV015.pdf Graphic file (type pdf)
+<use ../Figures/Figures_v4/EV_vs_SearchPhi_EV015.pdf>
+Package pdftex.def Info: ../Figures/Figures_v4/EV_vs_SearchPhi_EV015.pdf  used 
+on input line 619.
+(pdftex.def)             Requested size: 338.22418pt x 257.07802pt.
+ [12] [13 <../Output/Retirement_KinkFrontier_EV.pdf> <../Output/Retirement_Stee
+pDrop_EV.pdf>] [14 <../Output/Retirement_KinkFrontier_SP.pdf> <../Output/Retire
+ment_SteepDrop_SP.pdf>] [15 <../Figures/Figures_v4/EV_vs_SearchPhi_EV015.pdf>] 
+[16]) (DurableModelBasic.tex
+<timeline_DurableModel.pdf, id=1098, 813.34265pt x 106.60829pt>
 File: timeline_DurableModel.pdf Graphic file (type pdf)
 <use timeline_DurableModel.pdf>
 Package pdftex.def Info: timeline_DurableModel.pdf  used on input line 10.
 (pdftex.def)             Requested size: 469.75502pt x 61.57419pt.
-
-Package natbib Warning: Citation `Berger2015-kp' on page 14 undefined on input 
-line 17.
-
-
-Package natbib Warning: Citation `McKay2021-ib' on page 14 undefined on input l
-ine 17.
-
-
-Package natbib Warning: Citation `Berger2018-yb' on page 14 undefined on input 
-line 17.
-
-
-Package natbib Warning: Citation `Mankiw1983-za' on page 14 undefined on input 
-line 17.
-
-[14 <./timeline_DurableModel.pdf>] [15]
+ [17 <./timeline_DurableModel.pdf>] [18]
 LaTeX Font Info:    Trying to load font information for U+euf on input line 77.
 
 
@@ -1185,48 +1114,41 @@ LaTeX Font Info:    Trying to load font information for U+euf on input line 77.
 File: ueuf.fd 2013/01/14 v3.01 Euler Fraktur
 )
 
-Package natbib Warning: Citation `Iskhakov2017-jb' on page 16 undefined on inpu
-t line 78.
-
-
-Package natbib Warning: Citation `Dobrescu2022-ii' on page 16 undefined on inpu
-t line 78.
-
-
 LaTeX Warning: Float too large for page by 78.68704pt on input line 134.
 
-<../Figures/DurableModel/Baseline_Ss_T.pdf, id=855, 423.79405pt x 350.61363pt>
+<../Figures/DurableModel/Baseline_Ss_T.pdf, id=1164, 423.79405pt x 350.61363pt>
+
 File: ../Figures/DurableModel/Baseline_Ss_T.pdf Graphic file (type pdf)
 <use ../Figures/DurableModel/Baseline_Ss_T.pdf>
 Package pdftex.def Info: ../Figures/DurableModel/Baseline_Ss_T.pdf  used on inp
 ut line 143.
 (pdftex.def)             Requested size: 225.4804pt x 186.54657pt.
-<../Figures/DurableModel/Baseline_d_T.pdf, id=856, 459.58247pt x 313.30638pt>
+<../Figures/DurableModel/Baseline_d_T.pdf, id=1165, 459.58247pt x 313.30638pt>
 File: ../Figures/DurableModel/Baseline_d_T.pdf Graphic file (type pdf)
 <use ../Figures/DurableModel/Baseline_d_T.pdf>
 Package pdftex.def Info: ../Figures/DurableModel/Baseline_d_T.pdf  used on inpu
 t line 149.
 (pdftex.def)             Requested size: 225.4804pt x 153.71269pt.
-<../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf, id=857, 461.63528pt x 313
-.30638pt>
+<../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf, id=1166, 461.63528pt x 31
+3.30638pt>
 File: ../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf Graphic file (type pd
 f)
 <use ../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf>
 Package pdftex.def Info: ../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf  u
 sed on input line 155.
 (pdftex.def)             Requested size: 225.4804pt x 153.03383pt.
-<../Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf, id=858, 461.65411pt x 313
-.30638pt>
+<../Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf, id=1167, 461.65411pt x 31
+3.30638pt>
 File: ../Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf Graphic file (type pd
 f)
 <use ../Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf>
 Package pdftex.def Info: ../Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf  u
 sed on input line 161.
 (pdftex.def)             Requested size: 225.4804pt x 153.02428pt.
-[16] [17] [18 <../Figures/DurableModel/Baseline_Ss_T.pdf> <../Figures/DurableMo
+[19] [20] [21 <../Figures/DurableModel/Baseline_Ss_T.pdf> <../Figures/DurableMo
 del/Baseline_d_T.pdf> <../Figures/DurableModel/Baseline_c_T_MPC_decomp.pdf> <..
 /Figures/DurableModel/Baseline_d_T_MPC_decomp.pdf>]
-<../Figures/DurableModel/Baseline_c_periodt_MPC_decomp.pdf, id=1131, 461.65222p
+<../Figures/DurableModel/Baseline_c_periodt_MPC_decomp.pdf, id=1443, 461.65222p
 t x 313.30638pt>
 File: ../Figures/DurableModel/Baseline_c_periodt_MPC_decomp.pdf Graphic file (t
 ype pdf)
@@ -1234,7 +1156,7 @@ ype pdf)
 Package pdftex.def Info: ../Figures/DurableModel/Baseline_c_periodt_MPC_decomp.
 pdf  used on input line 176.
 (pdftex.def)             Requested size: 225.4804pt x 153.02428pt.
-<../Figures/DurableModel/Baseline_d_periodt_MPC_decomp.pdf, id=1132, 461.6472pt
+<../Figures/DurableModel/Baseline_d_periodt_MPC_decomp.pdf, id=1444, 461.6472pt
  x 313.30638pt>
 File: ../Figures/DurableModel/Baseline_d_periodt_MPC_decomp.pdf Graphic file (t
 ype pdf)
@@ -1242,21 +1164,16 @@ ype pdf)
 Package pdftex.def Info: ../Figures/DurableModel/Baseline_d_periodt_MPC_decomp.
 pdf  used on input line 182.
 (pdftex.def)             Requested size: 225.4804pt x 153.02428pt.
-
-
-Package natbib Warning: Citation `Iskhakov2017-jb' on page 19 undefined on inpu
-t line 191.
-
-[19 <../Figures/DurableModel/Baseline_c_periodt_MPC_decomp.pdf> <../Figures/Dur
-ableModel/Baseline_d_periodt_MPC_decomp.pdf>]
-<../Figures/DurableModel/TasteShock_Ss_T.pdf, id=1257, 712.87404pt x 588.38197p
+ [22 <../Figures/DurableModel/Baseline_c_periodt_MPC_decomp.pdf> <../Figures/Du
+rableModel/Baseline_d_periodt_MPC_decomp.pdf>]
+<../Figures/DurableModel/TasteShock_Ss_T.pdf, id=1570, 712.87404pt x 588.38197p
 t>
 File: ../Figures/DurableModel/TasteShock_Ss_T.pdf Graphic file (type pdf)
 <use ../Figures/DurableModel/TasteShock_Ss_T.pdf>
 Package pdftex.def Info: ../Figures/DurableModel/TasteShock_Ss_T.pdf  used on i
 nput line 231.
 (pdftex.def)             Requested size: 469.75502pt x 387.73178pt.
-<../Figures/DurableModel/TasteShock_c_periodt_MPC_decomp.pdf, id=1259, 714.6041
+<../Figures/DurableModel/TasteShock_c_periodt_MPC_decomp.pdf, id=1572, 714.6041
 4pt x 648.20557pt>
 File: ../Figures/DurableModel/TasteShock_c_periodt_MPC_decomp.pdf Graphic file 
 (type pdf)
@@ -1264,7 +1181,7 @@ File: ../Figures/DurableModel/TasteShock_c_periodt_MPC_decomp.pdf Graphic file
 Package pdftex.def Info: ../Figures/DurableModel/TasteShock_c_periodt_MPC_decom
 p.pdf  used on input line 243.
 (pdftex.def)             Requested size: 225.4804pt x 204.52211pt.
-<../Figures/DurableModel/TasteShock_d_periodt_MPC_decomp.pdf, id=1260, 714.5683
+<../Figures/DurableModel/TasteShock_d_periodt_MPC_decomp.pdf, id=1573, 714.5683
 6pt x 648.20557pt>
 File: ../Figures/DurableModel/TasteShock_d_periodt_MPC_decomp.pdf Graphic file 
 (type pdf)
@@ -1272,20 +1189,16 @@ File: ../Figures/DurableModel/TasteShock_d_periodt_MPC_decomp.pdf Graphic file
 Package pdftex.def Info: ../Figures/DurableModel/TasteShock_d_periodt_MPC_decom
 p.pdf  used on input line 249.
 (pdftex.def)             Requested size: 225.4804pt x 204.53201pt.
- [20] [21 <../Figures/DurableModel/TasteShock_Ss_T.pdf>]
-
-Package natbib Warning: Citation `Khan2019-ew' on page 22 undefined on input li
-ne 268.
-
-[22 <../Figures/DurableModel/TasteShock_c_periodt_MPC_decomp.pdf> <../Figures/D
-urableModel/TasteShock_d_periodt_MPC_decomp.pdf>] [23]
-<../Figures/DurableModel/Search_Ss_T.pdf, id=1497, 712.87404pt x 588.38197pt>
+ [23] [24 <../Figures/DurableModel/TasteShock_Ss_T.pdf>]
+[25 <../Figures/DurableModel/TasteShock_c_periodt_MPC_decomp.pdf> <../Figures/D
+urableModel/TasteShock_d_periodt_MPC_decomp.pdf>] [26]
+<../Figures/DurableModel/Search_Ss_T.pdf, id=1814, 712.87404pt x 588.38197pt>
 File: ../Figures/DurableModel/Search_Ss_T.pdf Graphic file (type pdf)
 <use ../Figures/DurableModel/Search_Ss_T.pdf>
 Package pdftex.def Info: ../Figures/DurableModel/Search_Ss_T.pdf  used on input
  line 350.
 (pdftex.def)             Requested size: 469.75502pt x 387.73178pt.
-<../Figures/DurableModel/Search_c_periodt_MPC_decomp.pdf, id=1498, 714.57338pt 
+<../Figures/DurableModel/Search_c_periodt_MPC_decomp.pdf, id=1815, 714.57338pt 
 x 648.20557pt>
 File: ../Figures/DurableModel/Search_c_periodt_MPC_decomp.pdf Graphic file (typ
 e pdf)
@@ -1293,7 +1206,7 @@ e pdf)
 Package pdftex.def Info: ../Figures/DurableModel/Search_c_periodt_MPC_decomp.pd
 f  used on input line 358.
 (pdftex.def)             Requested size: 225.4804pt x 204.53201pt.
-<../Figures/DurableModel/Search_d_periodt_MPC_decomp.pdf, id=1499, 714.60414pt 
+<../Figures/DurableModel/Search_d_periodt_MPC_decomp.pdf, id=1816, 714.60414pt 
 x 648.20557pt>
 File: ../Figures/DurableModel/Search_d_periodt_MPC_decomp.pdf Graphic file (typ
 e pdf)
@@ -1301,14 +1214,14 @@ e pdf)
 Package pdftex.def Info: ../Figures/DurableModel/Search_d_periodt_MPC_decomp.pd
 f  used on input line 364.
 (pdftex.def)             Requested size: 225.4804pt x 204.52211pt.
-<../Figures/DurableModel/PriceStd_Ss_T.pdf, id=1504, 712.87404pt x 588.38197pt>
+<../Figures/DurableModel/PriceStd_Ss_T.pdf, id=1821, 712.87404pt x 588.38197pt>
 
 File: ../Figures/DurableModel/PriceStd_Ss_T.pdf Graphic file (type pdf)
 <use ../Figures/DurableModel/PriceStd_Ss_T.pdf>
 Package pdftex.def Info: ../Figures/DurableModel/PriceStd_Ss_T.pdf  used on inp
 ut line 378.
 (pdftex.def)             Requested size: 399.29463pt x 329.57246pt.
-<../Figures/DurableModel/PriceStd_c_periodt_MPC_decomp.pdf, id=1505, 714.57338p
+<../Figures/DurableModel/PriceStd_c_periodt_MPC_decomp.pdf, id=1822, 714.57338p
 t x 648.20557pt>
 File: ../Figures/DurableModel/PriceStd_c_periodt_MPC_decomp.pdf Graphic file (t
 ype pdf)
@@ -1316,7 +1229,7 @@ ype pdf)
 Package pdftex.def Info: ../Figures/DurableModel/PriceStd_c_periodt_MPC_decomp.
 pdf  used on input line 387.
 (pdftex.def)             Requested size: 225.4804pt x 204.53201pt.
-<../Figures/DurableModel/PriceStd_d_periodt_MPC_decomp.pdf, id=1506, 714.60414p
+<../Figures/DurableModel/PriceStd_d_periodt_MPC_decomp.pdf, id=1823, 714.60414p
 t x 648.20557pt>
 File: ../Figures/DurableModel/PriceStd_d_periodt_MPC_decomp.pdf Graphic file (t
 ype pdf)
@@ -1324,7 +1237,7 @@ ype pdf)
 Package pdftex.def Info: ../Figures/DurableModel/PriceStd_d_periodt_MPC_decomp.
 pdf  used on input line 393.
 (pdftex.def)             Requested size: 225.4804pt x 204.52211pt.
-<../Figures/DurableModel/PriceCount_c_periodt_MPC_decomp.pdf, id=1507, 714.6041
+<../Figures/DurableModel/PriceCount_c_periodt_MPC_decomp.pdf, id=1824, 714.6041
 4pt x 648.20557pt>
 File: ../Figures/DurableModel/PriceCount_c_periodt_MPC_decomp.pdf Graphic file 
 (type pdf)
@@ -1332,7 +1245,7 @@ File: ../Figures/DurableModel/PriceCount_c_periodt_MPC_decomp.pdf Graphic file
 Package pdftex.def Info: ../Figures/DurableModel/PriceCount_c_periodt_MPC_decom
 p.pdf  used on input line 405.
 (pdftex.def)             Requested size: 225.4804pt x 204.52211pt.
-<../Figures/DurableModel/PriceCount_d_periodt_MPC_decomp.pdf, id=1508, 714.5991
+<../Figures/DurableModel/PriceCount_d_periodt_MPC_decomp.pdf, id=1825, 714.5991
 2pt x 648.20557pt>
 File: ../Figures/DurableModel/PriceCount_d_periodt_MPC_decomp.pdf Graphic file 
 (type pdf)
@@ -1340,20 +1253,20 @@ File: ../Figures/DurableModel/PriceCount_d_periodt_MPC_decomp.pdf Graphic file
 Package pdftex.def Info: ../Figures/DurableModel/PriceCount_d_periodt_MPC_decom
 p.pdf  used on input line 411.
 (pdftex.def)             Requested size: 225.4804pt x 204.52211pt.
- [24] [25 <../Figures/DurableModel/Search_Ss_T.pdf>] [26 <../Figures/DurableMod
+ [27] [28 <../Figures/DurableModel/Search_Ss_T.pdf>] [29 <../Figures/DurableMod
 el/Search_c_periodt_MPC_decomp.pdf> <../Figures/DurableModel/Search_d_periodt_M
-PC_decomp.pdf> <../Figures/DurableModel/PriceStd_Ss_T.pdf>] [27 <../Figures/Dur
+PC_decomp.pdf> <../Figures/DurableModel/PriceStd_Ss_T.pdf>] [30 <../Figures/Dur
 ableModel/PriceStd_c_periodt_MPC_decomp.pdf> <../Figures/DurableModel/PriceStd_
 d_periodt_MPC_decomp.pdf> <../Figures/DurableModel/PriceCount_c_periodt_MPC_dec
 omp.pdf> <../Figures/DurableModel/PriceCount_d_periodt_MPC_decomp.pdf>]
-<../Figures/DurableModel/PriceStd_Search_Ss_T.pdf, id=2025, 712.87404pt x 860.1
+<../Figures/DurableModel/PriceStd_Search_Ss_T.pdf, id=2341, 712.87404pt x 860.1
 1714pt>
 File: ../Figures/DurableModel/PriceStd_Search_Ss_T.pdf Graphic file (type pdf)
 <use ../Figures/DurableModel/PriceStd_Search_Ss_T.pdf>
 Package pdftex.def Info: ../Figures/DurableModel/PriceStd_Search_Ss_T.pdf  used
  on input line 424.
 (pdftex.def)             Requested size: 399.29463pt x 481.78044pt.
-<../Figures/DurableModel/PriceStd_Search_c_periodt_MPC_decomp.pdf, id=2026, 714
+<../Figures/DurableModel/PriceStd_Search_c_periodt_MPC_decomp.pdf, id=2342, 714
 .60414pt x 971.97516pt>
 File: ../Figures/DurableModel/PriceStd_Search_c_periodt_MPC_decomp.pdf Graphic 
 file (type pdf)
@@ -1361,7 +1274,7 @@ file (type pdf)
 Package pdftex.def Info: ../Figures/DurableModel/PriceStd_Search_c_periodt_MPC_
 decomp.pdf  used on input line 433.
 (pdftex.def)             Requested size: 225.4804pt x 306.67805pt.
-<../Figures/DurableModel/PriceStd_Search_d_periodt_MPC_decomp.pdf, id=2027, 714
+<../Figures/DurableModel/PriceStd_Search_d_periodt_MPC_decomp.pdf, id=2343, 714
 .56836pt x 971.97516pt>
 File: ../Figures/DurableModel/PriceStd_Search_d_periodt_MPC_decomp.pdf Graphic 
 file (type pdf)
@@ -1369,15 +1282,10 @@ file (type pdf)
 Package pdftex.def Info: ../Figures/DurableModel/PriceStd_Search_d_periodt_MPC_
 decomp.pdf  used on input line 439.
 (pdftex.def)             Requested size: 225.4804pt x 306.69289pt.
- [28 <../Figures/DurableModel/PriceStd_Search_Ss_T.pdf>] [29 <../Figures/Durabl
+ [31 <../Figures/DurableModel/PriceStd_Search_Ss_T.pdf>] [32 <../Figures/Durabl
 eModel/PriceStd_Search_c_periodt_MPC_decomp.pdf> <../Figures/DurableModel/Price
-Std_Search_d_periodt_MPC_decomp.pdf>]
-
-Package natbib Warning: Citation `Iskhakov2017-jb' on page 30 undefined on inpu
-t line 454.
-
-[30]
-<../Figures/DurableModel/SmoothingShifts_c_periodt.pdf, id=2251, 713.48178pt x 
+Std_Search_d_periodt_MPC_decomp.pdf>] [33]
+<../Figures/DurableModel/SmoothingShifts_c_periodt.pdf, id=2570, 713.48178pt x 
 590.38959pt>
 File: ../Figures/DurableModel/SmoothingShifts_c_periodt.pdf Graphic file (type 
 pdf)
@@ -1385,7 +1293,7 @@ pdf)
 Package pdftex.def Info: ../Figures/DurableModel/SmoothingShifts_c_periodt.pdf 
  used on input line 483.
 (pdftex.def)             Requested size: 225.4804pt x 186.57727pt.
-<../Figures/DurableModel/SmoothingShifts_d_periodt.pdf, id=2252, 712.91167pt x 
+<../Figures/DurableModel/SmoothingShifts_d_periodt.pdf, id=2571, 712.91167pt x 
 590.38959pt>
 File: ../Figures/DurableModel/SmoothingShifts_d_periodt.pdf Graphic file (type 
 pdf)
@@ -1393,7 +1301,7 @@ pdf)
 Package pdftex.def Info: ../Figures/DurableModel/SmoothingShifts_d_periodt.pdf 
  used on input line 489.
 (pdftex.def)             Requested size: 225.4804pt x 186.7214pt.
-<../Figures/DurableModel/SmoothingShifts_c_MPC_periodt.pdf, id=2253, 713.4868pt
+<../Figures/DurableModel/SmoothingShifts_c_MPC_periodt.pdf, id=2572, 713.4868pt
  x 590.38959pt>
 File: ../Figures/DurableModel/SmoothingShifts_c_MPC_periodt.pdf Graphic file (t
 ype pdf)
@@ -1401,7 +1309,7 @@ ype pdf)
 Package pdftex.def Info: ../Figures/DurableModel/SmoothingShifts_c_MPC_periodt.
 pdf  used on input line 500.
 (pdftex.def)             Requested size: 225.4804pt x 186.57727pt.
-<../Figures/DurableModel/SmoothingShifts_d_MPC_periodt.pdf, id=2254, 712.91669p
+<../Figures/DurableModel/SmoothingShifts_d_MPC_periodt.pdf, id=2573, 712.91669p
 t x 590.38959pt>
 File: ../Figures/DurableModel/SmoothingShifts_d_MPC_periodt.pdf Graphic file (t
 ype pdf)
@@ -1409,11 +1317,11 @@ ype pdf)
 Package pdftex.def Info: ../Figures/DurableModel/SmoothingShifts_d_MPC_periodt.
 pdf  used on input line 506.
 (pdftex.def)             Requested size: 225.4804pt x 186.7214pt.
- [31] [32 <../Figures/DurableModel/SmoothingShifts_c_periodt.pdf> <../Figures/D
+ [34] [35 <../Figures/DurableModel/SmoothingShifts_c_periodt.pdf> <../Figures/D
 urableModel/SmoothingShifts_d_periodt.pdf> <../Figures/DurableModel/SmoothingSh
 ifts_c_MPC_periodt.pdf> <../Figures/DurableModel/SmoothingShifts_d_MPC_periodt.
-pdf>] (../Output/DurableModel_Inf_SS_short.tex) [33]
-<../Figures/DurableModel/Taste_Inf_Jacobians_labor.pdf, id=2504, 1148.62878pt x
+pdf>] (../Output/DurableModel_Inf_SS_short.tex) [36]
+<../Figures/DurableModel/Taste_Inf_Jacobians_labor.pdf, id=2822, 1148.62878pt x
  744.28436pt>
 File: ../Figures/DurableModel/Taste_Inf_Jacobians_labor.pdf Graphic file (type 
 pdf)
@@ -1421,7 +1329,7 @@ pdf)
 Package pdftex.def Info: ../Figures/DurableModel/Taste_Inf_Jacobians_labor.pdf 
  used on input line 543.
 (pdftex.def)             Requested size: 399.29463pt x 258.73175pt.
-<../Figures/DurableModel/Combined_varS_Inf_Jacobians_labor.pdf, id=2505, 1148.6
+<../Figures/DurableModel/Combined_varS_Inf_Jacobians_labor.pdf, id=2823, 1148.6
 6457pt x 744.28436pt>
 File: ../Figures/DurableModel/Combined_varS_Inf_Jacobians_labor.pdf Graphic fil
 e (type pdf)
@@ -1429,7 +1337,7 @@ e (type pdf)
 Package pdftex.def Info: ../Figures/DurableModel/Combined_varS_Inf_Jacobians_la
 bor.pdf  used on input line 550.
 (pdftex.def)             Requested size: 399.29463pt x 258.7204pt.
-<../Figures/DurableModel/Combined_varP_Inf_Jacobians_labor.pdf, id=2506, 1148.6
+<../Figures/DurableModel/Combined_varP_Inf_Jacobians_labor.pdf, id=2824, 1148.6
 2878pt x 744.28436pt>
 File: ../Figures/DurableModel/Combined_varP_Inf_Jacobians_labor.pdf Graphic fil
 e (type pdf)
@@ -1437,20 +1345,14 @@ e (type pdf)
 Package pdftex.def Info: ../Figures/DurableModel/Combined_varP_Inf_Jacobians_la
 bor.pdf  used on input line 557.
 (pdftex.def)             Requested size: 399.29463pt x 258.73175pt.
+ [37 <../Figures/DurableModel/Taste_Inf_Jacobians_labor.pdf>] [38 <../Figures/D
+urableModel/Combined_varS_Inf_Jacobians_labor.pdf> <../Figures/DurableModel/Com
+bined_varP_Inf_Jacobians_labor.pdf>] (../Tables/smoothing_euler.tex)
+(../Tables/smoothing_euler_Inf.tex)) (DurableModel.tex [39]) (Conclusion.tex
+[40]) (dcegmSearch.bbl [41]) [42] (Appendix.tex (ApndxRetirementModel.tex
+[43
 
-
-Package natbib Warning: Citation `Judd1992-sp' on page 34 undefined on input li
-ne 566.
-
-[34 <../Figures/DurableModel/Taste_Inf_Jacobians_labor.pdf>] [35 <../Figures/Du
-rableModel/Combined_varS_Inf_Jacobians_labor.pdf> <../Figures/DurableModel/Comb
-ined_varP_Inf_Jacobians_labor.pdf>] (../Tables/smoothing_euler.tex)
-(../Tables/smoothing_euler_Inf.tex)) (DurableModel.tex [36]) (Conclusion.tex
-[37])
-No file dcegmSearch.bbl.
-[38] (Appendix.tex (ApndxRetirementModel.tex [39
-
-] [40]
+] [44]
 Overfull \hbox (9.16306pt too wide) in paragraph at lines 138--139
  []\T1/cmr/bx/n/10.95 Discrete choice with a stochas-tic ac-count.[] \T1/cmr/m/
 n/10.95 Re-call the realization-contingent dis-crete choice [], 
@@ -1461,7 +1363,7 @@ Overfull \hbox (14.7014pt too wide) detected at line 196
 []
  []
 
-[41] [42]
+[45] [46]
 Overfull \hbox (8.57051pt too wide) in paragraph at lines 273--275
 \T1/cmr/m/n/10.95 per-sion is the con-tent of $\OMS/cmsy/m/n/10.95 V[]$\T1/cmr/
 m/n/10.95 . A mean-preserving spread in $\OML/cmm/m/it/10.95 ^^^[]$ \T1/cmr/m/n
@@ -1471,23 +1373,19 @@ L/cmm/m/it/10.95 R; W\OMS/cmsy/m/n/10.95 g\OML/cmm/m/it/10.95 ; ^^^\OT1/cmr/m/n
 /10.95 ) =
  []
 
-[43] [44]) [45] [46] (ApndxDurableModelBasic.tex [47
+[47] [48]) [49] [50] (ApndxDurableModelBasic.tex [51
 
-] [48] [49] [50]
+] [52] [53] [54]
 Underfull \hbox (badness 10000) in paragraph at lines 249--250
 
  []
-
-
-Package natbib Warning: Citation `Dobrescu2022-ii' on page 51 undefined on inpu
-t line 264.
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 267--268
 
  []
 
-[51] [52] [53]
+[55] [56] [57]
 Overfull \hbox (40.75847pt too wide) in paragraph at lines 362--364
 \T1/cmr/m/n/10.95 mer-i-cally sta-ble form $[]\OMS/cmsy/m/n/10.95 f\OML/cmm/m/i
 t/10.95 v[]; v[]\OMS/cmsy/m/n/10.95 g \OT1/cmr/m/n/10.95 + \OML/cmm/m/it/10.95 
@@ -1501,12 +1399,12 @@ Overfull \hbox (28.48837pt too wide) detected at line 382
 []
  []
 
-[54]
+[58]
 Overfull \hbox (55.55864pt too wide) detected at line 404
 []
  []
 
-[55]
+[59]
 Overfull \hbox (30.68985pt too wide) in paragraph at lines 440--442
 \T1/cmr/m/n/10.95 Define the state- and price-contingent in-di-ca-tors $\U/msb/
 m/n/10.95 1[]\OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 m[]; n[]; p[]\OT1/cmr/m/n/
@@ -1516,52 +1414,35 @@ sb/m/n/10.95 1[]\OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 m[]; n[]; p[]\OT1/cmr/m
 /n/10.95 )$
  []
 
-[56]
+[60]
 Overfull \hbox (11.2661pt too wide) detected at line 457
 []
  []
 
-[57] [58] [59] [60]) [61] (ApndxSmoothnessTheory.tex
+[61] [62] [63] [64]) [65] (ApndxSmoothnessTheory.tex
 \c@lemma=\count357
 \c@assumption=\count358
- [62
+ [66
 
-] [63]
+] [67]
 
-LaTeX Warning: Reference `sec:incdisc' on page 64 undefined on input line 226.
+LaTeX Warning: Reference `sec:incdisc' on page 68 undefined on input line 226.
 
-[64]
+[68]
 
-LaTeX Warning: Reference `sec:incdisc' on page 65 undefined on input line 321.
-
-
-LaTeX Warning: Reference `tab:incdisc' on page 65 undefined on input line 323.
-
-[65]
-
-Package natbib Warning: Citation `Mattsson2002-pc' on page 66 undefined on inpu
-t line 405.
+LaTeX Warning: Reference `sec:incdisc' on page 69 undefined on input line 321.
 
 
-Package natbib Warning: Citation `Hofbauer2002-gc' on page 66 undefined on inpu
-t line 406.
+LaTeX Warning: Reference `tab:incdisc' on page 69 undefined on input line 323.
 
-
-Package natbib Warning: Citation `Fudenberg2015-sv' on page 66 undefined on inp
-ut line 406.
-
-
-Package natbib Warning: Citation `Rockafellar1970-cv' on page 66 undefined on i
-nput line 407.
-
-[66]
+[69] [70]
 Overfull \hbox (0.71019pt too wide) in paragraph at lines 447--453
 []\T1/cmr/m/n/10.95 Proposition [][]C.7[][] iden-ti-fies the jump mag-ni-tude w
 ith $\OMS/cmsy/m/n/10.95 jr\OT1/cmr/m/n/10.95 ^^A[]\OMS/cmsy/m/n/10.95 j$\T1/cm
 r/m/n/10.95 , i.e. with the dif-fer-ence in the branches'
  []
 
-[67] [68] [69] [70]
+[71] [72] [73] [74]
 Overfull \hbox (7.22311pt too wide) in paragraph at lines 813--825
 []\T1/cmr/m/n/10.95 Differentiating the en-ve-lope iden-tity $\OML/cmm/m/it/10.
 95 v[] \OT1/cmr/m/n/10.95 = \OML/cmm/m/it/10.95 u[]\OT1/cmr/m/n/10.95 (\OML/cmm
@@ -1572,39 +1453,22 @@ n/10.95 R[] \U/msb/m/n/10.95 E[]\OT1/cmr/m/n/10.95 [\OML/cmm/m/it/10.95 v[]\OT1
 /cmr/m/n/10.95 ] \OMS/cmsy/m/n/10.95 ^^A
  []
 
-[71] [72]
+[75] [76]
 Overfull \hbox (18.49974pt too wide) in paragraph at lines 974--993
  [][] 
  []
 
 
-LaTeX Warning: Reference `sec:incdisc' on page 73 undefined on input line 1018.
+LaTeX Warning: Reference `sec:incdisc' on page 77 undefined on input line 1018.
 
 
 
-LaTeX Warning: Reference `tab:incdisc' on page 73 undefined on input line 1019.
+LaTeX Warning: Reference `tab:incdisc' on page 77 undefined on input line 1019.
 
 
-[73] [74] [75] [76]
+[77] [78] [79] [80] [81]
 
-Package natbib Warning: Citation `Rockafellar1970-cv' on page 77 undefined on i
-nput line 1259.
-
-
-Package natbib Warning: Citation `Mattsson2002-pc' on page 77 undefined on inpu
-t line 1280.
-
-
-Package natbib Warning: Citation `Hofbauer2002-gc' on page 77 undefined on inpu
-t line 1280.
-
-
-Package natbib Warning: Citation `Fudenberg2015-sv' on page 77 undefined on inp
-ut line 1280.
-
-[77]
-
-LaTeX Warning: Reference `sec:incdisc' on page 78 undefined on input line 1324.
+LaTeX Warning: Reference `sec:incdisc' on page 82 undefined on input line 1324.
 
 
 
@@ -1615,16 +1479,8 @@ Overfull \hbox (22.00677pt too wide) in paragraph at lines 1317--1325
  []
 
 
-LaTeX Warning: Reference `tab:incdisc' on page 78 undefined on input line 1333.
+LaTeX Warning: Reference `tab:incdisc' on page 82 undefined on input line 1333.
 
-
-
-Package natbib Warning: Citation `Iskhakov2017-jb' on page 78 undefined on inpu
-t line 1363.
-
-
-Package natbib Warning: Citation `Dobrescu2022-ii' on page 78 undefined on inpu
-t line 1364.
 
 
 Overfull \hbox (10.87616pt too wide) in paragraph at lines 1361--1366
@@ -1636,11 +1492,11 @@ m/n/10.95 (\OML/cmm/m/it/10.95 a\OT1/cmr/m/n/10.95 ))\OMS/cmsy/m/n/10.95 g$\T1/
 cmr/m/n/10.95 ,
  []
 
-[78]))
+[82]))
 
 Package natbib Warning: There were undefined citations.
 
-[79] (dcegmSearch.aux)
+[83] (dcegmSearch.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
@@ -1656,10 +1512,10 @@ Package rerunfilecheck Info: File `dcegmSearch.out' has not changed.
 (rerunfilecheck)             Checksum: F170D3FB492E5862D57B674852703BD5;11790.
  ) 
 Here is how much of TeX's memory you used:
- 26835 strings out of 467871
- 505111 string characters out of 5415956
- 908436 words of memory out of 5000000
- 54547 multiletter control sequences out of 15000+600000
+ 26969 strings out of 467871
+ 508880 string characters out of 5415956
+ 911320 words of memory out of 5000000
+ 54650 multiletter control sequences out of 15000+600000
  664521 words of font info for 154 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,19n,104p,1559b,690s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1667,9 +1523,9 @@ Here is how much of TeX's memory you used:
 \ecti1095.pk> <C:\Users\amonninger\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappe
 n/ec/dpi600\ectt1095.pk> <C:\Users\amonninger\AppData\Local\MiKTeX\fonts/pk/ljf
 our/jknappen/ec/dpi600\ecbx0800.pk> <C:\Users\amonninger\AppData\Local\MiKTeX\f
-onts/pk/ljfour/public/bbm/dpi657\bbm10.pk> <C:\Users\amonninger\AppData\Local\M
-iKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1200.pk> <C:\Users\amonninger\AppD
-ata\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1095.pk> <C:\Users\amon
+onts/pk/ljfour/jknappen/ec/dpi600\ecbx1095.pk> <C:\Users\amonninger\AppData\Loc
+al\MiKTeX\fonts/pk/ljfour/public/bbm/dpi657\bbm10.pk> <C:\Users\amonninger\AppD
+ata\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1200.pk> <C:\Users\amon
 ninger\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1440.pk> <C:
 \Users\amonninger\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1
 095.pk> <C:\Users\amonninger\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/d
@@ -1714,9 +1570,9 @@ onts/cm/cmsy8.pfb><C:/Users/amonninger/AppData/Local/Programs/MiKTeX/fonts/type
 MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb><C:/Users/amonninger/AppD
 ata/Local/Programs/MiKTeX/fonts/type1/public/rsfs/rsfs10.pfb><C:/Users/amonning
 er/AppData/Local/Programs/MiKTeX/fonts/type1/public/hoekwater/stmary10.pfb>
-Output written on dcegmSearch.pdf (79 pages, 11986422 bytes).
+Output written on dcegmSearch.pdf (83 pages, 12135930 bytes).
 PDF statistics:
- 4598 PDF objects out of 5155 (max. 8388607)
- 653 named destinations out of 1000 (max. 500000)
- 633 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 4966 PDF objects out of 5155 (max. 8388607)
+ 681 named destinations out of 1000 (max. 500000)
+ 653 words of extra memory for PDF output out of 10000 (max. 10000000)
 
